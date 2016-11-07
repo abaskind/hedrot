@@ -989,7 +989,8 @@ void headtracker_close(headtrackerData *trackingData)
 {
     if(trackingData->verbose) printf("[hedrot] closing port...\r\n");
     
-    write_serial(trackingData->serialcomm,R2H_STOP_TRANSMISSION_CHAR); //stops sending raw data
+    if(trackingData->serialcomm->comhandle != INVALID_HANDLE_VALUE)
+        write_serial(trackingData->serialcomm,R2H_STOP_TRANSMISSION_CHAR); //stops sending raw data
     
     close_serial(trackingData->serialcomm);
     

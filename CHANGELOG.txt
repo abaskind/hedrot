@@ -1,0 +1,7 @@
+hedrot distribution, changelog:
+
+Version 1.0.1 (XX/XX/XX)
+	. development bugfix: possible crash with max external when compiled in Development configuration
+	. added version number to attributes of hedrotReceiver.app
+
+Version 1.0.0 (6/11/16) - initial release

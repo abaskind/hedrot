@@ -1,5 +1,8 @@
 #!/bin/sh
-echo "Be sure that: 1/ all binaries have been compiled, 2/ a pdf version of the doc has been created, and 3/ the Max standalone hedrotReceiver has been built."
+echo "Before running this script, be sure that: "
+echo "   1/ all binaries have been compiled"
+echo "   2/ a pdf version of the doc has been created"
+echo "   3/ the Max standalone hedrotReceiver has been built."
 
 today=$(date +"%y-%m-%d")
 
@@ -33,9 +36,13 @@ mkdir $packageFolder
 cp -R $rootDirectory/Max/hedrotReceiver.app $packageFolder
 cp -R $rootDirectory/Max/hedrotReceiver.json $packageFolder
 
-#update the version number
-perl -pi -w -e  "s/version X.Y.Z/version $hedrotVersion/g;" $packageFolder/hedrotReceiver.app/Contents/Resources/hedrotReceiver.mxf
+appcontentsdirectory=$packageFolder/hedrotReceiver.app/Contents
 
+#update the version number in Info.plist
+/usr/libexec/PlistBuddy -c "Set :CFBundleGetInfoString '${hedrotVersion}'" $appcontentsdirectory/Info.plist
+/usr/libexec/PlistBuddy -c "Set :CFBundleLongVersionString '${hedrotVersion}'" $appcontentsdirectory/Info.plist
+/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString '${hedrotVersion}'" $appcontentsdirectory/Info.plist
+/usr/libexec/PlistBuddy -c "Set :CFBundleVersion '${hedrotVersion}'" $appcontentsdirectory/Info.plist
 
 
 
@@ -53,6 +60,9 @@ cp "$rootDirectory/doc/hedrot user manual.pdf" "$packageFolder/"
 
 ######### copy the license file #############################
 cp "$rootDirectory/LICENSE" "$packageFolder/"
+
+######### copy the CHANGELOG.txt file #############################
+cp "$rootDirectory/CHANGELOG.txt" "$packageFolder/"
 
 ######### copy and update the main README.txt file #############################
 cp "$rootDirectory/scripts/README-DISTRIBUTION.txt" "$packageFolder/README.txt"

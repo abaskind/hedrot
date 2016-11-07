@@ -24,7 +24,7 @@
 		16B2FC711DC9F69B003EECB3 /* libhedrot.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = libhedrot.c; sourceTree = "<group>"; };
 		16B2FC721DC9F69B003EECB3 /* libhedrot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libhedrot.h; sourceTree = "<group>"; };
 		16DD60A41A5A7879005AE0FF /* hedrot_receiver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hedrot_receiver.h; path = ../source/hedrot_receiver.h; sourceTree = "<group>"; };
-		2FBBEAE508F335360078DB84 /* hedrotReceiver.mxo */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = hedrotReceiver.mxo; sourceTree = BUILT_PRODUCTS_DIR; };
+		2FBBEAE508F335360078DB84 /* hedrot_receiver.mxo */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = hedrot_receiver.mxo; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,7 +75,7 @@
 		19C28FB4FE9D528D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				2FBBEAE508F335360078DB84 /* hedrotReceiver.mxo */,
+				2FBBEAE508F335360078DB84 /* hedrot_receiver.mxo */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -112,7 +112,7 @@
 			);
 			name = "max-external";
 			productName = iterator;
-			productReference = 2FBBEAE508F335360078DB84 /* hedrotReceiver.mxo */;
+			productReference = 2FBBEAE508F335360078DB84 /* hedrot_receiver.mxo */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */

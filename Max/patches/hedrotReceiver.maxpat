@@ -39,15 +39,93 @@
 		"title" : "hedrot Receiver",
 		"boxes" : [ 			{
 				"box" : 				{
+					"id" : "obj-143",
+					"maxclass" : "newobj",
+					"numinlets" : 2,
+					"numoutlets" : 2,
+					"outlettype" : [ "", "" ],
+					"patching_rect" : [ 400.018005, 1802.0, 57.0, 22.0 ],
+					"style" : "",
+					"text" : "route set"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-140",
+					"maxclass" : "message",
+					"numinlets" : 2,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 410.518005, 1764.0, 41.0, 22.0 ],
+					"style" : "",
+					"text" : "dump"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-138",
+					"maxclass" : "newobj",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 401.0, 1677.0, 147.0, 22.0 ],
+					"style" : "",
+					"text" : "loadmess read VERSION"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-134",
+					"maxclass" : "newobj",
+					"numinlets" : 1,
+					"numoutlets" : 3,
+					"outlettype" : [ "", "bang", "int" ],
+					"patching_rect" : [ 400.018005, 1732.5, 40.0, 22.0 ],
+					"style" : "",
+					"text" : "text"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-132",
+					"maxclass" : "newobj",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 400.018005, 1834.5, 98.0, 22.0 ],
+					"style" : "",
+					"text" : "prepend Version"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-131",
+					"maxclass" : "newobj",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 400.018005, 1868.5, 74.0, 22.0 ],
+					"style" : "",
+					"text" : "prepend set"
+				}
+
+			}
+, 			{
+				"box" : 				{
 					"id" : "obj-130",
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 2.02005, 791.0, 152.0, 20.0 ],
+					"patching_rect" : [ 400.018005, 1912.5, 152.0, 20.0 ],
 					"presentation" : 1,
 					"presentation_rect" : [ 15.0, 790.0, 134.0, 20.0 ],
 					"style" : "",
-					"text" : "version X.Y.Z"
+					"text" : "Version 1.0.1beta"
 				}
 
 			}
@@ -139,11 +217,11 @@
 , 			{
 				"box" : 				{
 					"id" : "obj-119",
-					"linecount" : 8,
+					"linecount" : 3,
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 626.0, 1621.5, 152.0, 114.0 ],
+					"patching_rect" : [ 627.0, 1621.5, 485.0, 47.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 3,
 					"presentation_rect" : [ 285.02005, 790.0, 444.0, 47.0 ],
@@ -916,7 +994,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u402001150"
+									"varname" : "u002001152"
 								}
 
 							}
@@ -3170,7 +3248,7 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 563.0, 1189.0, 35.0, 22.0 ],
+					"patching_rect" : [ 361.0, 1212.0, 35.0, 22.0 ],
 					"style" : "",
 					"text" : "open"
 				}
@@ -3183,7 +3261,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 563.0, 1220.0, 53.0, 22.0 ],
+					"patching_rect" : [ 361.0, 1243.0, 53.0, 22.0 ],
 					"style" : "",
 					"text" : "pcontrol"
 				}
@@ -3227,7 +3305,7 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "int" ],
 					"parameter_enable" : 0,
-					"patching_rect" : [ 563.0, 1153.0, 118.036011, 28.0 ],
+					"patching_rect" : [ 361.0, 1176.0, 118.036011, 28.0 ],
 					"presentation" : 1,
 					"presentation_rect" : [ 586.536011, 137.0, 126.036011, 32.0 ],
 					"style" : "",
@@ -4891,7 +4969,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u903001149"
+									"varname" : "u665001151"
 								}
 
 							}
@@ -27426,7 +27504,7 @@
 									"presentation" : 1,
 									"presentation_rect" : [ 145.5, 77.0, 300.0, 17.0 ],
 									"style" : "",
-									"text" : "Data:/Developpement/hedrot-TMP/Max/hedrotReceiver.json"
+									"text" : "Data:/Developpement/hedrot/Max/hedrotReceiver.json"
 								}
 
 							}
@@ -31877,7 +31955,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 4,
 					"outlettype" : [ "", "", "", "" ],
-					"patching_rect" : [ 134.67337, 1250.0, 144.0, 22.0 ],
+					"patching_rect" : [ 457.67337, 1124.0, 144.0, 22.0 ],
 					"restore" : 					{
 						"autodiscover" : [ 1 ],
 						"serialport" : [ "" ],
@@ -31886,7 +31964,7 @@
 ,
 					"style" : "",
 					"text" : "autopattr @autorestore 0",
-					"varname" : "u407001151"
+					"varname" : "u755001153"
 				}
 
 			}
@@ -32611,6 +32689,24 @@
 			}
 , 			{
 				"patchline" : 				{
+					"destination" : [ "obj-130", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-131", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-131", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-132", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
 					"destination" : [ "obj-121", 0 ],
 					"disabled" : 0,
 					"hidden" : 0,
@@ -32620,10 +32716,56 @@
 			}
 , 			{
 				"patchline" : 				{
+					"destination" : [ "obj-140", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-134", 1 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-143", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-134", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-134", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-138", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-134", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"midpoints" : [ 420.018005, 1796.0, 486.768005, 1796.0, 486.768005, 1721.5, 409.518005, 1721.5 ],
+					"source" : [ "obj-140", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
 					"destination" : [ "obj-103", 2 ],
 					"disabled" : 0,
 					"hidden" : 0,
 					"source" : [ "obj-142", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-132", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-143", 0 ]
 				}
 
 			}
@@ -33433,7 +33575,7 @@
 			}
 , 			{
 				"name" : "hedrotReceiver_calibration.maxpat",
-				"bootpath" : "/Volumes/Data/Developpement/hedrot-TMP/Max/patches",
+				"bootpath" : "/Volumes/Data/Developpement/hedrot/Max/patches",
 				"type" : "TEXT",
 				"implicit" : 1
 			}

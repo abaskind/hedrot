@@ -334,11 +334,11 @@ void hedrot_receiver_printVersion(t_hedrot_receiver *x, t_symbol *s) {
 
 
 void hedrot_receiver_outputPortList(t_hedrot_receiver *x) {
-    t_atom message_clear, outptr[4];
+    t_atom message_clear[2], outptr[4];
     
-    atom_setsym(&message_clear, gensym("available_ports"));
-    atom_setsym(&message_clear+1, gensym("clear"));
-    outlet_anything(x->x_status_outlet, gensym("serial"), 2, &message_clear);
+    atom_setsym(message_clear, gensym("available_ports"));
+    atom_setsym(message_clear+1, gensym("clear"));
+    outlet_anything(x->x_status_outlet, gensym("serial"), 2, message_clear);
     
     if(x->verbose == VERBOSE_STATE_ALL_MESSAGES) post("[hedrot_receiver]: list of available comm ports updated: %ld ports:", x->trackingData->serialcomm->numberOfAvailablePorts);
     

@@ -15,7 +15,7 @@ ArduinoAppPath=/Applications/Arduino.app/Contents/MacOS/Arduino
 $ArduinoAppPath -v --board teensy:avr:teensy31:usb=serial --pref build.path=$rootDirectory/firmware/build --verify $rootDirectory/firmware/hedrot-firmware/hedrot-firmware.ino
 
 ######### build the command-line demo #############################
-xcodebuild -project $rootDirectory/command-line-demo/xcode/hedrotReceiverDemo.xcodeproj
+xcodebuild -configuration Release -project $rootDirectory/command-line-demo/xcode/hedrotReceiverDemo.xcodeproj
 
 ######### build the Max external #############################
-xcodebuild -project $rootDirectory/Max/xcode/hedrot_receiver.xcodeproj
+xcodebuild -configuration Deployment -project $rootDirectory/Max/xcode/hedrot_receiver.xcodeproj

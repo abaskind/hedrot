@@ -2,7 +2,7 @@
 	"name" : "hedrotReceiver",
 	"version" : 1,
 	"creationdate" : 3560933167,
-	"modificationdate" : 3561352129,
+	"modificationdate" : 3561382304,
 	"viewrect" : [ 25.0, 69.0, 300.0, 500.0 ],
 	"autoorganize" : 0,
 	"hideprojectwindow" : 0,
@@ -23,12 +23,12 @@
 		}
 ,
 		"other" : 		{
-			"VERSION" : 			{
+			"HEDROT_VERSION" : 			{
 				"kind" : "file",
 				"local" : 1,
 				"singleton" : 				{
-					"bootpath" : "/Volumes/Data/Developpement/hedrot/scripts",
-					"projectrelativepath" : "../scripts"
+					"bootpath" : "/Volumes/Data/Developpement/hedrot-headtracker/hedrot",
+					"projectrelativepath" : ".."
 				}
 
 			}

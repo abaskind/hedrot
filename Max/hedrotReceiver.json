@@ -6,9 +6,6 @@
 				"id" : 1,
 				"name" : "default",
 				"data" : 				{
-					"autodiscover" : [ 1 ],
-					"serialport" : [ "" ],
-					"values_to_transmit" : [ 0 ],
 					"osc_settings::IPaddress" : [ "127.0.0.1" ],
 					"osc_settings::pitchOSCpattern" : [ "/hedrot/pitch" ],
 					"osc_settings::portNumber" : [ 2001 ],
@@ -18,7 +15,10 @@
 					"ReceiverSettings::MadgwickBetaMax" : [ 2.5 ],
 					"ReceiverSettings::accLPalpha" : [ 0.01 ],
 					"ReceiverSettings::outputCenteredAngles" : [ 1 ],
-					"ReceiverSettings::outputDataPeriod" : [ 1 ]
+					"ReceiverSettings::outputDataPeriod" : [ 1 ],
+					"autodiscover" : [ 1 ],
+					"serialport" : [ "" ],
+					"values_to_transmit" : [ 0 ]
 				}
 
 			}

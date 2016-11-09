@@ -34,9 +34,25 @@
         <h2>
 <a id="what-is-hedrot" class="anchor" href="#what-is-hedrot" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What is hedrot?</h2>
 
-<p>Hedrot (for "head rotation tracker") is a low-cost and efficient open-source hardware/solution for head tracking. Contrary to several generic open-source head tracking solutions, hedrot relies on and has been optimized for specific widely spread and efficient hardware parts, i.e. a Teensy 3 board (optimized Arduino-like board) combined to a IMU/MARG daughter board with 3 common sensors (Analog Devices ADXL345 accelerometer, Honeywell HMC5883L magnetometer and Invensense ITG-3200 gyroscope). </p>
+        <p><i>Hedrot</i> (for "head rotation tracker") is a low-cost and efficient open-source hardware/solution for head tracking. <i>Hedrot</i> is especially suitable for binaural rendering (3D-Audio on headphones), and has been initially designed for use with the binaural renderer <i>Bipan</i> as part of the <a href="http://www.bili-project.org/">Bili Project</a>.</p>
+
+<p>Contrary to several generic open-source head tracking solutions, <i>hedrot</i> relies on and has been optimized for specific widely spread and efficient hardware parts, i.e. a Teensy 3 board (optimized Arduino-like board) combined to a IMU/MARG daughter board with 3 common sensors (Analog Devices ADXL345 accelerometer, Honeywell HMC5883L magnetometer and Invensense ITG-3200 gyroscope). </p>
 
 <p>The estimation algorithm is based on a modified version of the precise and efficient open-source gradient descent algorithm from Sebastian Madgwick. The technology was dramatically optimized for speed: the head tracker can deliver data at a rates up to 2 kHz. The hardware latency of the Teensy board and USB communication relies below 2 ms. The overall latency (including sensor latency and time constant of the algorithm) was estimated to remain between 10 and 15 ms for typical settings, further experiments are currently being done to measure it. </p>
+        
+<h2>
+<a id="further-developments" class="anchor" href="#further-developments" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Further Developments</h2>
+
+The next developments include among others:
+
+<ul>
+<li>A Windows Version</li>
+<li>A 3D-printable enclosure</li>
+<li>An enhanced automatic magnetometer calibration algorithm</li>
+<li>A precise calibration algorithm for the gyroscope</li>
+</ul>
+
+Contributions to help developing this project further are warmly welcome. Please contact <a href="https://github.com/abaskind">Alexis Baskind</a> for proposals and questions.
 
 <h2>
 <a id="licensing-and-credits" class="anchor" href="#licensing-and-credits" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Licensing and Credits</h2>
@@ -53,7 +69,7 @@ Part of code is derived from Yuri Petrov "ellipsoid fit" algorithm (initially wr
 <a id="developers-and-contributors" class="anchor" href="#developers-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Developers and Contributors</h3>
 
 <ul>
-<li>Alexis Baskind (sound engineer, main developer)</li>
+<li><a href="https://github.com/abaskind">Alexis Baskind</a> (sound engineer, main developer)</li>
 <li>Jean-Christophe Messonnier (sound engineer)</li>
 <li>Jean-Marc Lyzwa (sound engineer)</li>
 </ul>
@@ -61,8 +77,7 @@ Part of code is derived from Yuri Petrov "ellipsoid fit" algorithm (initially wr
 <h2>
 <a id="hardware-requirements" class="anchor" href="#hardware-requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Hardware Requirements</h2>
 
-<ul>
-<li>Head tracker parts:
+Head tracker parts:
 
 <ul>
 <li>1 Teensy 3 board (tested with versions 3.1 and 3.2)</li>
@@ -73,8 +88,6 @@ Part of code is derived from Yuri Petrov "ellipsoid fit" algorithm (initially wr
 <li>1 Analog Devices ADXL345 accelerometer</li>
 <li>1 Honeywell HMC5883L compass (magnetometer)</li>
 <li>1 Invensense ITG3200 gyroscope</li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>

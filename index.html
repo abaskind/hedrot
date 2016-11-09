@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Hedrot : Open-Source Head Tracker">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Hedrot</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/abaskind/hedrot">View on GitHub</a>
+
+          <h1 id="project_title">Hedrot</h1>
+          <h2 id="project_tagline">Open-Source Head Tracker</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/abaskind/hedrot/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/abaskind/hedrot/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h2>
+<a id="what-is-hedrot" class="anchor" href="#what-is-hedrot" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What is hedrot?</h2>
+
+<p>Hedrot (for "head rotation tracker") is a low-cost and efficient open-source hardware/solution for head tracking. Contrary to several generic open-source head tracking solutions, hedrot relies on and has been optimized for specific widely spread and efficient hardware parts, i.e. a Teensy 3 board (optimized Arduino-like board) combined to a IMU/MARG daughter board with 3 common sensors (Analog Devices ADXL345 accelerometer, Honeywell HMC5883L magnetometer and Invensense ITG-3200 gyroscope). </p>
+
+<p>The estimation algorithm is based on a modified version of the precise and efficient open-source gradient descent algorithm from Sebastian Madgwick. The technology was dramatically optimized for speed: the head tracker can deliver data at a rates up to 2 kHz. The hardware latency of the Teensy board and USB communication relies below 2 ms. The overall latency (including sensor latency and time constant of the algorithm) was estimated to remain between 10 and 15 ms for typical settings, further experiments are currently being done to measure it. </p>
+
+<h2>
+<a id="licensing-and-credits" class="anchor" href="#licensing-and-credits" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Licensing and Credits</h2>
+
+<p>The first development phase of Hedrot has achieved in collaboration with the Conservatoire National Supérieur de Musique et de Danse de Paris (<a href="http://www.conservatoiredeparis.fr/">http://www.conservatoiredeparis.fr/</a>) as part of the "Bili" project (<a href="http://www.bili-project.org/">http://www.bili-project.org/</a>).</p>
+
+<p>Hedrot is licensed under the terms of the GNU General Public License (version 3) as published by the Free Software Foundation.</p>
+
+<p>Part of code is derived from Sebastian Madgwick's open-source gradient descent angle estimation algorithm (<a href="http://x-io.co.uk/open-source-imu-and-ahrs-algorithms/">http://x-io.co.uk/open-source-imu-and-ahrs-algorithms/</a>)
+Part of code is derived from "comport", (c) 1998-2005  Winfried Ritsch, Institute for Electronic Music - Graz.
+Part of code is derived from Yuri Petrov "ellipsoid fit" algorithm (initially written for Matlab).</p>
+
+<h3>
+<a id="developers-and-contributors" class="anchor" href="#developers-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Developers and Contributors</h3>
+
+<ul>
+<li>Alexis Baskind (sound engineer, main developer)</li>
+<li>Jean-Christophe Messonnier (sound engineer)</li>
+<li>Jean-Marc Lyzwa (sound engineer)</li>
+</ul>
+
+<h2>
+<a id="hardware-requirements" class="anchor" href="#hardware-requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Hardware Requirements</h2>
+
+<ul>
+<li>Head tracker parts:
+
+<ul>
+<li>1 Teensy 3 board (tested with versions 3.1 and 3.2)</li>
+<li>1 USB to Micro-USB 2.0 cable, minimum length 1.5 m</li>
+<li>1 gy85 IMU daughter board with the following sensors:
+
+<ul>
+<li>1 Analog Devices ADXL345 accelerometer</li>
+<li>1 Honeywell HMC5883L compass (magnetometer)</li>
+<li>1 Invensense ITG3200 gyroscope</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<h2>
+<a id="software-requirements" class="anchor" href="#software-requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Software Requirements</h2>
+
+<ul>
+<li>Mac OS 10.9.5 or later (hedrot will be ported on windows in a next future)</li>
+<li>Xcode version 6.2 or later</li>
+<li>the teensy.app firmware flash loader</li>
+<li>Arduino IDE 1.6.11</li>
+<li>Teensyduino 1.30 (teensy support for the Arduino IDE)</li>
+<li>Max version 6 at least (to rebuild the "hedrotReceiver" application. Not needed otherwise)</li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Hedrot maintained by <a href="https://github.com/abaskind">abaskind</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>

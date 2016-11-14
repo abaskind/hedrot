@@ -1230,7 +1230,7 @@ void setAccLPtimeConstant(headtrackerData *trackingData, float accLPtimeConstant
 // public setters to send attributes to the headtracker
 //=====================================================================================================
 void setSamplerate(headtrackerData *trackingData, long samplerate, char requestSettingsFlag) {
-    trackingData->samplerate = max(min(samplerate,65535),0);
+    trackingData->samplerate = max(min(samplerate,65535),2);
     trackingData->samplePeriod = 1.0 / trackingData->samplerate;
     
     // recalculate receiver parameters based on samplerate

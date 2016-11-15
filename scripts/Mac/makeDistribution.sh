@@ -78,7 +78,8 @@ perl -pi -w -e  "s/hedrot library Version: ZZZZ/hedrot library Version: $libhedr
 rm "$rootDirectory/build/$packageName.dmg"
 
 #create the DMG
-touch $destDirectory/.Trash
+# the following line (creating a .Trash) is a hocus-pocus work-around that some times works when hdiutils does not succeed and returns an error 5341 (bug)
+#touch $destDirectory/.Trash 
 hdiutil create "$rootDirectory/build/$packageName.dmg" -volname "$packageName" -fs HFS+ -srcfolder $destDirectory
 
 #erase temp build directory

@@ -1,9 +1,10 @@
 hedrot distribution, changelog:
 
-Version 1.0.1 (XX/XX/XX)
+Version 1.0.1 (15/11/16)
 	. development bugfix: possible crash with max external when compiled in Development configuration
 	. development bugfix: problem with search paths when including hedrotReceiver.maxpat in a bigger max standalone app
 	. added version number to attributes of hedrotReceiver.app
 	. hedrotReceiver.app: fixed problem with receiver attributes not being updated in the GUI
+	. hedrotReceiver.app: various GUI optimizations
 
 Version 1.0.0 (6/11/16) - initial release

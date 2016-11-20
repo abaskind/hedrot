@@ -19,7 +19,7 @@
 
 
 // libhedrot software version
-#define LIBHEDROT_VERSION 1
+#define LIBHEDROT_VERSION 2
 
 //=====================================================================================================
 // static definitions
@@ -89,7 +89,6 @@ typedef struct _headtrackerData {
     
     // configuration flags
     char            autoDiscover;
-    char            outputCenteredAngles;
     
     // angle estimation coefficients
     float           MadgwickBetaMax;
@@ -164,7 +163,12 @@ typedef struct _headtrackerData {
     // estimated angles (yaw,pitch,roll)
     float           yaw,pitch,roll;
     float           centeredYaw,centeredPitch,centeredRoll;
-    float           yawReference, pitchReference, rollReference;
+    
+    // reference quaternion for centering
+    float           qref1, qref2, qref3, qref4;
+    
+    // centered quaternion
+    float           qcent1, qcent2, qcent3, qcent4;
     
     // internal variables for the computation of the angles
     float           accCalDataLP[3]; // low-pass filtered acc data
@@ -190,7 +194,6 @@ headtrackerData* headtracker_new();
 void headtracker_init(headtrackerData *trackingData);
 void headtracker_tick(headtrackerData *trackingData);
 void center_angles(headtrackerData *trackingData);
-void compute_centered_angles(headtrackerData *trackingData);
 void headtracker_open(headtrackerData *trackingData, int portnum);
 void headtracker_close(headtrackerData *trackingData);
 int  pullNotificationMessage(headtrackerData *trackingData);
@@ -208,7 +211,6 @@ void setAutoDiscover(headtrackerData *trackingData, char autoDiscover);
 void setGyroOffsetAutocalOn(headtrackerData *trackingData, char gyroOffsetAutocalOn);
 void setGyroOffsetAutocalTime(headtrackerData *trackingData, float gyroOffsetAutocalTime);
 void setGyroOffsetAutocalThreshold(headtrackerData *trackingData, long gyroOffsetAutocalThreshold);
-void setOutputCenteredAngles(headtrackerData *trackingData, char outputCenteredAngles);
 void setMadgwickBetaGain(headtrackerData *trackingData, float MadgwickBetaGain);
 void setMadgwickBetaMax(headtrackerData *trackingData, float MadgwickBetaMax);
 void setAccLPtimeConstant(headtrackerData *trackingData, float accLPtimeConstant);
@@ -270,7 +272,8 @@ int  processKeyValueSettingPair(headtrackerData *trackingData, char *key, char *
 //=====================================================================================================
 double mod(double a, double N);
 float invSqrt(float x);
-void Quaternion2Euler(float q1, float q2, float q3, float q4, float *yaw, float *pitch, float *roll);
+void quaternion2Euler(float q1, float q2, float q3, float q4, float *yaw, float *pitch, float *roll);
+void quaternionComposition(float q01, float q02, float q03, float q04, float q11, float q12, float q13, float q14, float *q21, float *q22, float *q23, float *q24);
 int stringToFloats(char* valueBuffer, float* data, int nvalues);
 int stringToChars(char* valueBuffer, char* data, int nvalues);
 

@@ -139,17 +139,18 @@ void hedrot_receiver_output_data(t_hedrot_receiver *x)
     
     // output data, right-to-left order
     if(x->trackingData->calibrationValid) {
-        if(x->trackingData->outputCenteredAngles) {
-            atom_setfloat(x->t_estimatedAngles,(float)x->trackingData->centeredYaw);
-            atom_setfloat(x->t_estimatedAngles+1,(float)x->trackingData->centeredPitch);
-            atom_setfloat(x->t_estimatedAngles+2,(float)x->trackingData->centeredRoll);
-        }
-        else {
-            atom_setfloat(x->t_estimatedAngles,(float)x->trackingData->yaw);
-            atom_setfloat(x->t_estimatedAngles+1,(float)x->trackingData->pitch);
-            atom_setfloat(x->t_estimatedAngles+2,(float)x->trackingData->roll);
-        }
-        outlet_list(x->x_cookedData_outlet,NULL,3,x->t_estimatedAngles);
+        atom_setfloat(x->t_estimatedQuaternion,(float)x->trackingData->qcent1);
+        atom_setfloat(x->t_estimatedQuaternion+1,(float)x->trackingData->qcent2);
+        atom_setfloat(x->t_estimatedQuaternion+2,(float)x->trackingData->qcent3);
+        atom_setfloat(x->t_estimatedQuaternion+3,(float)x->trackingData->qcent4);
+        
+        
+        atom_setfloat(x->t_estimatedAngles,(float)x->trackingData->yaw);
+        atom_setfloat(x->t_estimatedAngles+1,(float)x->trackingData->pitch);
+        atom_setfloat(x->t_estimatedAngles+2,(float)x->trackingData->roll);
+        
+        outlet_list(x->x_cookedQuaternions_outlet,NULL,4,x->t_estimatedQuaternion);
+        outlet_list(x->x_cookedAngles_outlet,NULL,3,x->t_estimatedAngles);
         outlet_list(x->x_calData_outlet,NULL,9,x->calData);
     }
     
@@ -187,7 +188,8 @@ void *hedrot_receiver_new(t_symbol *s, short ac, t_atom *av)
     x->x_debug_outlet = outlet_new(x, 0);
     x->x_error_outlet = outlet_new(x, 0);
     x->x_status_outlet = outlet_new(x, 0);
-    x->x_cookedData_outlet = outlet_new(x, 0);
+    x->x_cookedQuaternions_outlet = outlet_new(x, 0);
+    x->x_cookedAngles_outlet = outlet_new(x, 0);
     x->x_calData_outlet = outlet_new(x, 0);
     x->x_rawData_outlet = outlet_new(x, 0);
     
@@ -254,8 +256,9 @@ void hedrot_receiver_assist(t_hedrot_receiver *x, void *b, long m, long a, char 
             case 0: sprintf(s, "raw headtracker data"); break;
             case 1: sprintf(s, "calibrated headtracker data"); break;
             case 2: sprintf(s, "cooked angles"); break;
-            case 3: sprintf(s, "status"); break;
-            case 4: sprintf(s, "error messages"); break;
+            case 3: sprintf(s, "cooked quaternion"); break;
+            case 4: sprintf(s, "status"); break;
+            case 5: sprintf(s, "error messages"); break;
         }
     }
 }
@@ -466,9 +469,6 @@ void hedrot_receiver_mirrorHeadtrackerInfo(t_hedrot_receiver *x) {
     
     x->autoDiscover = x->trackingData->autoDiscover;
     object_attr_touch( (t_object *)x, gensym("autoDiscover"));
-    
-    x->outputCenteredAngles = x->trackingData->outputCenteredAngles;
-    object_attr_touch( (t_object *)x, gensym("outputCenteredAngles"));
     
     x->samplerate = x->trackingData->samplerate;
     object_attr_touch( (t_object *)x, gensym("samplerate"));
@@ -750,15 +750,6 @@ t_max_err hedrot_receiver_samplerate_set(t_hedrot_receiver *x, t_object *attr, l
     }
     return MAX_ERR_NONE;
 }
-
-t_max_err hedrot_receiver_outputCenteredAngles_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
-    if (argc && argv) {
-        x->outputCenteredAngles = (char) max(min(atom_getlong(argv),1),0);
-        setOutputCenteredAngles(x->trackingData, x->outputCenteredAngles);
-    }
-    return MAX_ERR_NONE;
-}
-
 
 t_max_err hedrot_receiver_gyroDataRate_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
@@ -1138,11 +1129,6 @@ int C74_EXPORT main()
     CLASS_ATTR_LONG(c,    "outputDataPeriod",    0,  t_hedrot_receiver,  outputDataPeriod);
     CLASS_ATTR_ACCESSORS(c, "outputDataPeriod", NULL, hedrot_receiver_outputDataPeriod_set);
     CLASS_ATTR_SAVE(c,    "outputDataPeriod",   0);
-    
-    CLASS_ATTR_CHAR(c, "outputCenteredAngles", 0, t_hedrot_receiver, outputCenteredAngles);
-    CLASS_ATTR_ENUMINDEX(c, "outputCenteredAngles", 0, "no yes");
-    CLASS_ATTR_ACCESSORS(c, "outputCenteredAngles", NULL, hedrot_receiver_outputCenteredAngles_set);
-    CLASS_ATTR_SAVE(c,    "outputCenteredAngles",   0);
     
     
     // --------------------------------------- register class --------------------------------------------------------

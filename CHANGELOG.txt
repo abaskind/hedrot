@@ -1,7 +1,8 @@
 hedrot distribution, changelog:
 
-Version 1.1.0 (XX/XX/XX)
+Version 1.0.2 (20/11/16)
 	. added sources of Max patch in the distribution
+	. quaternion output (added an extra outlet in the Max patch)
 
 Version 1.0.1 (15/11/16)
 	. development bugfix: possible crash with max external when compiled in Development configuration

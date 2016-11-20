@@ -24,7 +24,7 @@
 
 
 // libhedrot software version
-#define MAX_hedrot_receiver_VERSION 1
+#define MAX_hedrot_receiver_VERSION 2
 
 // time constants
 #define SEARCHING_DEVICE_TIME          200  //time period between two ticks when the headtracker has still not been found
@@ -36,7 +36,8 @@ typedef struct hedrot_receiver
     //outlets
     void			*x_rawData_outlet;
     void			*x_calData_outlet;
-    void			*x_cookedData_outlet;
+    void			*x_cookedAngles_outlet;
+    void			*x_cookedQuaternions_outlet;
     void			*x_status_outlet;
     void			*x_error_outlet;
     void			*x_debug_outlet;
@@ -80,6 +81,7 @@ typedef struct hedrot_receiver
     
     // output data
     t_atom          t_estimatedAngles[3];
+    t_atom          t_estimatedQuaternion[4];
     
     // (control) output data rate
     long            outputDataPeriod;

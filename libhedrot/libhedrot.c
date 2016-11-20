@@ -74,7 +74,6 @@ headtrackerData* headtracker_new() {
     trackingData->autoDiscover = 0;
     trackingData->samplerate = 1000;
     trackingData->samplePeriod = .001; // 1 / trackingData->samplerate
-    trackingData->outputCenteredAngles = 1;
     
     trackingData->gyroDataRate = 0;
     trackingData->gyroClockSource = 1;
@@ -147,10 +146,11 @@ void headtracker_init(headtrackerData *trackingData) {
     trackingData->numberOfMessages = 0;
     trackingData->firstMessageToNotify = 0;
     
-    // reset reference angles
-    trackingData->yawReference = 0;
-    trackingData->pitchReference = 0;
-    trackingData->rollReference = 0;
+    // reset reference quaternion
+    trackingData->qref1 = 1;
+    trackingData->qref2 = 0;
+    trackingData->qref3 = 0;
+    trackingData->qref4 = 0;
     
     // init the calibration values
     trackingData->calibrationValid = 0;
@@ -197,7 +197,6 @@ int export_headtracker_settings(headtrackerData *trackingData, char* filename) {
     }
     
     // dump all values in the text file
-    fprintf(fd, "outputCenteredAngles, %x;\n",      trackingData->outputCenteredAngles);
     fprintf(fd, "MadgwickBetaMax, %f;\n",           trackingData->MadgwickBetaMax);
     fprintf(fd, "MadgwickBetaGain, %f;\n",          trackingData->MadgwickBetaGain);
     fprintf(fd, "accLPalpha, %f;\n",                trackingData->accLPalpha);
@@ -588,9 +587,6 @@ void headtracker_compute_data(headtrackerData *trackingData) {
     // angle estimation
     if(trackingData->calibrationValid) {
         MadgwickAHRSupdateModified(trackingData); //compute cooked data and angles only if calibration is valid
-        if(trackingData->outputCenteredAngles) {
-            compute_centered_angles(trackingData);
-        }
     }
     
     // check if the gyro calibration is done
@@ -616,8 +612,13 @@ void headtracker_compute_data(headtrackerData *trackingData) {
                 break;
         }
     }
+    // center according to reference1
+    quaternionComposition(trackingData->qref1, trackingData->qref2, trackingData->qref3, trackingData->qref4,
+                          trackingData->q1, trackingData->q2, trackingData->q3, trackingData->q4,
+                          &trackingData->qcent1, &trackingData->qcent2, &trackingData->qcent3, &trackingData->qcent4);
     
-    Quaternion2Euler(trackingData->q1, trackingData->q2, trackingData->q3, trackingData->q4, &trackingData->yaw, &trackingData->pitch, &trackingData->roll);
+    // compute euler angles
+    quaternion2Euler(trackingData->qcent1, trackingData->qcent2, trackingData->qcent3, trackingData->qcent4, &trackingData->yaw, &trackingData->pitch, &trackingData->roll);
 }
 
 //=====================================================================================================
@@ -1133,27 +1134,14 @@ void headtracker_autodiscover_tryNextPort(headtrackerData *trackingData) {
 // function center_angles
 //=====================================================================================================
 //
-// center headtracker according to current position
+// center headtracker according to current position using inverse quaternion of the current quaternion
 //
 void center_angles(headtrackerData *trackingData) {
-    trackingData->yawReference = trackingData->yaw;
-    trackingData->pitchReference = trackingData->pitch;
-    trackingData->rollReference = trackingData->roll;
+    trackingData->qref1 = trackingData->q1;
+    trackingData->qref2 = - trackingData->q2;
+    trackingData->qref3 = - trackingData->q3;
+    trackingData->qref4 = - trackingData->q4;
 }
-
-
-//=====================================================================================================
-// function compute_centered_angles
-//=====================================================================================================
-//
-// remove angle offset set as center to all angles
-//
-void compute_centered_angles(headtrackerData *trackingData) {
-    trackingData->centeredYaw = (float)(mod(trackingData->yaw - trackingData->yawReference + 180,360)-180);
-    trackingData->centeredPitch = (float)(mod(trackingData->pitch - trackingData->pitchReference + 90,180)-90);
-    trackingData->centeredRoll = (float)(mod(trackingData->roll - trackingData->rollReference + 180,360)-180);
-}
-
 
 //=====================================================================================================
 // "public" setters for receiver parameters
@@ -1201,11 +1189,6 @@ void setGyroOffsetAutocalTime(headtrackerData *trackingData, float gyroOffsetAut
 
 void setGyroOffsetAutocalThreshold(headtrackerData *trackingData, long gyroOffsetAutocalThreshold) {
     trackingData->gyroOffsetAutocalThreshold = gyroOffsetAutocalThreshold;
-}
-
-
-void setOutputCenteredAngles(headtrackerData *trackingData, char outputCenteredAngles) {
-    trackingData->outputCenteredAngles = outputCenteredAngles;
 }
 
 
@@ -1523,17 +1506,26 @@ float invSqrt(float x) {
  else return 1./sqrt(x);
  }*/
 
-void Quaternion2Euler(float q1, float q2, float q3, float q4, float *yaw, float *pitch, float *roll) {
+void quaternion2Euler(float q1, float q2, float q3, float q4, float *yaw, float *pitch, float *roll) {
     // see http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
     // zyx Euler angles: phi=roll, theta=pitch, psi=yaw
     
     *roll = RAD_TO_DEGREE * atan2(2.0 * (q1*q2 + q3*q4),
                                   1.0 - 2.0 * (q2*q2 + q3*q3));
     
-    *pitch = RAD_TO_DEGREE * asin(2.0 * (q1*q3 - q4*q2));
+    *pitch = RAD_TO_DEGREE * asin(min(max(2.0 * (q1*q3 - q4*q2),-1),1));
     
     *yaw = RAD_TO_DEGREE * atan2(2.0 * (q1*q4 + q2*q3),
                                  1.0 - 2.0 * (q3*q3 + q4*q4) );
+}
+
+void quaternionComposition(float q01, float q02, float q03, float q04, float q11, float q12, float q13, float q14, float *q21, float *q22, float *q23, float *q24) {
+    // compose two quaternions (Hamilton product)
+    // the quaternion (q11, q12, q13, q14) is rotated according to the reference quaternion (q01, q02, q03, q04)
+    *q21 = q01 * q11 - q02 * q12 - q03 * q13 - q04 * q14;
+    *q22 = q01 * q12 + q02 * q11 + q03 * q14 - q04 * q13;
+    *q23 = q01 * q13 - q02 * q14 + q03 * q11 + q04 * q12;
+    *q24 = q01 * q14 + q02 * q13 - q03 * q12 + q04 * q11;
 }
 
 int stringToFloats(char* valueBuffer, float* data, int nvalues) {

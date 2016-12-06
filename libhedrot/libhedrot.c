@@ -517,7 +517,7 @@ int processInfoFromHeadtracker(headtrackerData *trackingData, int offset, int nu
     }
     
     if((trackingData->gyroHalfScaleSensitivity!=-1) & (trackingData->gyroBitDepth!=-1)) {
-        trackingData->gyroscopeCalibrationFactor =  trackingData->gyroHalfScaleSensitivity * M_PI / 180.0f / (float) pow((double) 2,(int) trackingData->gyroBitDepth-1);
+        trackingData->gyroscopeCalibrationFactor =  trackingData->gyroHalfScaleSensitivity * M_PI_float / 180.0f / (float) pow((double) 2,(int) trackingData->gyroBitDepth-1);
         if(trackingData->verbose) printf("gyroscopeCalibrationFactor: %f\r\n", trackingData->gyroscopeCalibrationFactor);
     } else {
         
@@ -1376,8 +1376,9 @@ void setAccOffset(headtrackerData *trackingData, float* accOffset, char requestS
 }
 
 void setAccScaling(headtrackerData *trackingData, float* accScaling, char requestSettingsFlag) {
-    
-    for(int i=0;i<3;i++) {
+    int i;
+
+    for(i=0;i<3;i++) {
         trackingData->accScaling[i] = accScaling[i];
         trackingData->accScalingFactor[i] = 1/accScaling[i];
     }
@@ -1401,8 +1402,9 @@ void setMagOffset(headtrackerData *trackingData, float* magOffset, char requestS
 }
 
 void setMagScaling(headtrackerData *trackingData, float* magScaling, char requestSettingsFlag) {
-    
-    for(int i=0;i<3;i++) {
+    int i;
+
+    for(i=0;i<3;i++) {
         trackingData->magScaling[i] = magScaling[i];
         trackingData->magScalingFactor[i] = 1/magScaling[i];
     }

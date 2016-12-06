@@ -27,7 +27,8 @@ double getTime() {
     mach_port_deallocate(mach_task_self(), cclock);
     return mts.tv_sec + mts.tv_nsec*1e-9;
 }
-#else if defined(_WIN32) || defined(_WIN64)
+#else 
+#if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>
 double getTime() {
 	LARGE_INTEGER frequency;
@@ -36,7 +37,8 @@ double getTime() {
     QueryPerformanceCounter(&time);
     return time.QuadPart / (double)frequency.QuadPart;
 }
-#endif
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
+#endif /* #ifdef __MACH__ */
 
 
 int main(int argc, const char * argv[]) {

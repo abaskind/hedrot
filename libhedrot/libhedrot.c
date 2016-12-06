@@ -36,7 +36,8 @@ double get_monotonic_time() {
     mach_port_deallocate(mach_task_self(), cclock);
     return mts.tv_sec + mts.tv_nsec*1e-9;
 }
-#else if defined(_WIN32) || defined(_WIN64)
+#else 
+#if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>
 double get_monotonic_time() {
 	LARGE_INTEGER frequency;
@@ -45,7 +46,8 @@ double get_monotonic_time() {
     QueryPerformanceCounter(&time);
     return time.QuadPart / (double)frequency.QuadPart;
 }
-#endif
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
+#endif /* #ifdef __MACH__ */
 
 
 //=====================================================================================================
@@ -98,12 +100,18 @@ headtrackerData* headtracker_new() {
     trackingData->accScaling[0] = 1;
     trackingData->accScaling[1] = 1;
     trackingData->accScaling[2] = 1;
+    trackingData->accScalingFactor[0] = 1;
+    trackingData->accScalingFactor[1] = 1;
+    trackingData->accScalingFactor[2] = 1;
     trackingData->magOffset[0] = 0;
     trackingData->magOffset[1] = 0;
     trackingData->magOffset[2] = 0;
     trackingData->magScaling[0] = 1;
     trackingData->magScaling[1] = 1;
     trackingData->magScaling[2] = 1;
+    trackingData->magScalingFactor[0] = 1;
+    trackingData->magScalingFactor[1] = 1;
+    trackingData->magScalingFactor[2] = 1;
     
     // default values (receiver)
     // gyro autocalibration attributes
@@ -355,7 +363,7 @@ void headtracker_tick(headtrackerData *trackingData) {
         init_read_serial(trackingData->serialcomm);
         
         while(is_data_available(trackingData->serialcomm)) {
-            if(trackingData->serialcomm->numberOfReadBytes < 0) { // if a read error has been detected
+            if(trackingData->serialcomm->numberOfReadBytes == 0) { // if a read error has been detected
                 if(trackingData->verbose) printf("[hedrot] : read error\r\n");
                 headtracker_init(trackingData);
             } else {
@@ -681,15 +689,15 @@ char MadgwickAHRSupdateModified(headtrackerData *trackingData) {
     trackingData->gyroCalData[1] = (trackingData->gyroRawData[1]-trackingData->gyroOffset[1]) * trackingData->gyroscopeCalibrationFactor;
     trackingData->gyroCalData[2] = (trackingData->gyroRawData[2]-trackingData->gyroOffset[2]) * trackingData->gyroscopeCalibrationFactor;
     
-    //scale acc data
-    trackingData->magCalData[0]=(trackingData->magRawData[0]-trackingData->magOffset[0])/trackingData->magScaling[0];
-    trackingData->magCalData[1]=(trackingData->magRawData[1]-trackingData->magOffset[1])/trackingData->magScaling[1];
-    trackingData->magCalData[2]=(trackingData->magRawData[2]-trackingData->magOffset[2])/trackingData->magScaling[2];
-    
     //scale mag data
-    trackingData->accCalData[0]=(trackingData->accRawData[0]-trackingData->accOffset[0])/trackingData->accScaling[0];
-    trackingData->accCalData[1]=(trackingData->accRawData[1]-trackingData->accOffset[1])/trackingData->accScaling[1];
-    trackingData->accCalData[2]=(trackingData->accRawData[2]-trackingData->accOffset[2])/trackingData->accScaling[2];
+    trackingData->magCalData[0]=(trackingData->magRawData[0]-trackingData->magOffset[0]) * trackingData->magScalingFactor[0];
+    trackingData->magCalData[1]=(trackingData->magRawData[1]-trackingData->magOffset[1]) * trackingData->magScalingFactor[1];
+    trackingData->magCalData[2]=(trackingData->magRawData[2]-trackingData->magOffset[2]) * trackingData->magScalingFactor[2];
+    
+    //scale acc data
+    trackingData->accCalData[0]=(trackingData->accRawData[0]-trackingData->accOffset[0]) * trackingData->accScalingFactor[0];
+    trackingData->accCalData[1]=(trackingData->accRawData[1]-trackingData->accOffset[1]) * trackingData->accScalingFactor[1];
+    trackingData->accCalData[2]=(trackingData->accRawData[2]-trackingData->accOffset[2]) * trackingData->accScalingFactor[2];
     
     
     // compute the squared norm of the gyro data => rough estimation of the movement
@@ -1065,27 +1073,25 @@ void headtracker_autodiscover(headtrackerData *trackingData) {
         init_read_serial(trackingData->serialcomm);
         
         if(is_data_available(trackingData->serialcomm)) {
-            while(is_data_available(trackingData->serialcomm)) { //loop on all received buffers
-                // read one byte and check that there is no read error
-                if(trackingData->serialcomm->numberOfReadBytes < 0) { // if a read error was detected
-                    if(trackingData->verbose) printf("autodiscover : read error\r\n");
-                    headtracker_setReceptionStatus(trackingData, COMMUNICATION_STATE_AUTODISCOVERING_NO_HEADTRACKER_THERE);
-                    // close the port
-                    close_serial(trackingData->serialcomm);
-                } else {
-					for( i = 0; i < trackingData->serialcomm->numberOfReadBytes; i++) { //loop on all received bytes
-						if(trackingData->verbose == 3) printf("autodiscover : byte received = %d\r\n",trackingData->serialcomm->readBuffer[i]);
-						if(trackingData->serialcomm->readBuffer[i]==H2R_IAMTHERE_CHAR) {
-							//if the headtracker responded, close and reopen it with the proper headtracker_open function
-							if(trackingData->verbose) printf("Headtracker Found on port %d, open the port\r\n",trackingData->serialcomm->portNumber);
+            // read one byte and check that there is no read error
+            if(trackingData->serialcomm->numberOfReadBytes == 0) { // if a read error was detected
+                if(trackingData->verbose) printf("autodiscover : read error\r\n");
+                headtracker_setReceptionStatus(trackingData, COMMUNICATION_STATE_AUTODISCOVERING_NO_HEADTRACKER_THERE);
+                // close the port
+                close_serial(trackingData->serialcomm);
+            } else {
+                for( i = 0; i < trackingData->serialcomm->numberOfReadBytes; i++) { //loop on all received bytes
+                    if(trackingData->verbose == 3) printf("autodiscover : byte received = %d\r\n",trackingData->serialcomm->readBuffer[i]);
+                    if(trackingData->serialcomm->readBuffer[i]==H2R_IAMTHERE_CHAR) {
+                        //if the headtracker responded, close and reopen it with the proper headtracker_open function
+                        if(trackingData->verbose) printf("Headtracker Found on port %d, open the port\r\n",trackingData->serialcomm->portNumber);
                         
-							close_serial(trackingData->serialcomm);
+                        close_serial(trackingData->serialcomm);
                         
-							headtracker_setReceptionStatus(trackingData, COMMUNICATION_STATE_AUTODISCOVERING_HEADTRACKER_FOUND);
+                        headtracker_setReceptionStatus(trackingData, COMMUNICATION_STATE_AUTODISCOVERING_HEADTRACKER_FOUND);
                         
-							headtracker_open(trackingData,trackingData->serialcomm->portNumber);
-						}
-					}
+                        headtracker_open(trackingData,trackingData->serialcomm->portNumber);
+                    }
                 }
             }
         } else { // no data available
@@ -1370,10 +1376,11 @@ void setAccOffset(headtrackerData *trackingData, float* accOffset, char requestS
 }
 
 void setAccScaling(headtrackerData *trackingData, float* accScaling, char requestSettingsFlag) {
-    int i;
-
-    for(i=0;i<3;i++)
+    
+    for(int i=0;i<3;i++) {
         trackingData->accScaling[i] = accScaling[i];
+        trackingData->accScalingFactor[i] = 1/accScaling[i];
+    }
     
     headtracker_sendFloatArray2Headtracker(trackingData,trackingData->accScaling,3,R2H_START_TRANSMIT_ACCEL_SCALING_DATA_CHAR,R2H_STOP_TRANSMIT_ACCEL_SCALING_DATA_CHAR);
     
@@ -1394,10 +1401,11 @@ void setMagOffset(headtrackerData *trackingData, float* magOffset, char requestS
 }
 
 void setMagScaling(headtrackerData *trackingData, float* magScaling, char requestSettingsFlag) {
-    int i;
-
-    for(i=0;i<3;i++)
+    
+    for(int i=0;i<3;i++) {
         trackingData->magScaling[i] = magScaling[i];
+        trackingData->magScalingFactor[i] = 1/magScaling[i];
+    }
     
     headtracker_sendFloatArray2Headtracker(trackingData,trackingData->magScaling,3,R2H_START_TRANSMIT_MAG_SCALING_DATA_CHAR,R2H_STOP_TRANSMIT_MAG_SCALING_DATA_CHAR);
     

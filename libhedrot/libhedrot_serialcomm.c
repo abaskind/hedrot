@@ -1,5 +1,5 @@
 //
-// libheadtracker_serialcomm.c
+// libhedrot_serialcomm.c
 // root functions for serial communication with the headtracker
 //
 // Part of code is derived from "comport", (c) 1998-2005  Winfried Ritsch, Institute for Electronic Music - Graz
@@ -414,11 +414,11 @@ void init_read_serial(headtrackerSerialcomm *x) {
 }
 
 
-// check with select() if a data is available for reading on opened comm port
+// check if a data is available for reading on opened comm port, if yes, reads it
 int is_data_available(headtrackerSerialcomm *x) {
+    int          err;
 #if defined(_WIN32) || defined(_WIN64)
     OVERLAPPED    osReader = {0};
-	int          err;
 
     osReader.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     if(ReadFile(x->comhandle, x->readBuffer, READ_BUFFER_SIZE, &x->numberOfReadBytes, &osReader)) {
@@ -428,8 +428,17 @@ int is_data_available(headtrackerSerialcomm *x) {
     }
     CloseHandle(osReader.hEvent);
 #else /* #if defined(_WIN32) || defined(_WIN64) */
+    ssize_t numberOfBytes;
     err =  select(x->comhandle+1,&x->com_rfds,NULL,NULL,&tv);
-	x->numberOfReadBytes = (int) read(x->comhandle, x->readBuffer,READ_BUFFER_SIZE);
+    if(err) { // data is available, read it
+        numberOfBytes = (unsigned long) read(x->comhandle, x->readBuffer,READ_BUFFER_SIZE);
+        if(numberOfBytes == -1) { // read error
+            x->numberOfReadBytes = 0;
+            err = 0;
+        } else {
+            x->numberOfReadBytes = (unsigned long) numberOfBytes;
+        }
+    }
 #endif /* #if defined(_WIN32) || defined(_WIN64) */
 	return err;
 }
@@ -481,7 +490,7 @@ int write_serial(headtrackerSerialcomm *x, unsigned char serial_byte) {
     int result = (int) write(x->comhandle,(char *) &serial_byte,1);
     if (result != 1) {
         printf ("[hedrot] write on comhandle %i returned %d, errno is %d\r\n", x->comhandle, result, errno);
-    } 
+    }
     return result;
 }
 #endif /* #if defined(_WIN32) || defined(_WIN64) */

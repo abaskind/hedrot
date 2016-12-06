@@ -1,5 +1,5 @@
 //
-// libheatracker.h
+// libhedrot.h
 // all functions for communicating with the headtracker, receiving the raw data and cook the angles
 // header file
 //
@@ -32,11 +32,9 @@
 #define AUTODISCOVER_MAX_TIME   0.1  // max time period in seconds between autodiscover ping and headtracker response
 
 // math utils
-#ifndef M_PI
-#define M_PI (float) 3.14159265358979323846
-#endif
-#define	DEGREE_TO_RAD		M_PI / 180.0f
-#define	RAD_TO_DEGREE		180.0f / M_PI
+#define M_PI_float (float)            3.14159265358979323846264338327950288
+#define	DEGREE_TO_RAD           M_PI_float / 180.0f
+#define	RAD_TO_DEGREE           180.0f / M_PI_float
 #ifndef min
 #define min(a,b) (((a)<(b))?(a):(b))
 #endif
@@ -143,9 +141,9 @@ typedef struct _headtrackerData {
     long            gyroHalfScaleSensitivity; // internal
     long            gyroBitDepth; // internal
     float           accOffset[3];
-    float           accScaling[3];
+    float           accScaling[3], accScalingFactor[3];
     float           magOffset[3];
-    float           magScaling[3];
+    float           magScaling[3], magScalingFactor[3];
     
     
     // info status variables and flags

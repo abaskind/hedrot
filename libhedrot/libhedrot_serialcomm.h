@@ -1,5 +1,5 @@
 //
-//  libheadtracker_serialcomm.h
+//  libhedrot_serialcomm.h
 //
 // Part of code is derived from "comport", (c) 1998-2005  Winfried Ritsch, Institute for Electronic Music - Graz
 //

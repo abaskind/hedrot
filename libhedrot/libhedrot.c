@@ -28,25 +28,24 @@
 #ifdef __MACH__ // if mach (mac os X)
 #include <mach/clock.h>
 #include <mach/mach.h>
-#else
-#include <time.h>
-#endif
-
 double get_monotonic_time() {
-#ifdef __MACH__ // if mach (mac os X)
     clock_serv_t cclock;
     mach_timespec_t mts;
     host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cclock);
     clock_get_time(cclock, &mts);
     mach_port_deallocate(mach_task_self(), cclock);
     return mts.tv_sec + mts.tv_nsec*1e-9;
-#else
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    return mts.tv_sec + mts.tv_nsec*1e-9;
-#endif
 }
-
+#else if defined(_WIN32) || defined(_WIN64)
+#include <Windows.h>
+double get_monotonic_time() {
+	LARGE_INTEGER frequency;
+    LARGE_INTEGER time;
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&time);
+    return time.QuadPart / (double)frequency.QuadPart;
+}
+#endif
 
 
 //=====================================================================================================
@@ -61,10 +60,10 @@ double get_monotonic_time() {
 //
 headtrackerData* headtracker_new() {
     // allocate memory for the main structure
-    headtrackerData* trackingData = malloc(sizeof(headtrackerData));
+    headtrackerData* trackingData = (headtrackerData*) malloc(sizeof(headtrackerData));
     
     // allocate memory for the serial comm structure
-    trackingData->serialcomm = malloc(sizeof(headtrackerSerialcomm));
+    trackingData->serialcomm = (headtrackerSerialcomm*) malloc(sizeof(headtrackerSerialcomm));
     
     headtracker_init(trackingData);
     
@@ -73,7 +72,7 @@ headtrackerData* headtracker_new() {
     trackingData->headtracker_on = 0;
     trackingData->autoDiscover = 0;
     trackingData->samplerate = 1000;
-    trackingData->samplePeriod = .001; // 1 / trackingData->samplerate
+    trackingData->samplePeriod = .001f; // 1 / trackingData->samplerate
     
     trackingData->gyroDataRate = 0;
     trackingData->gyroClockSource = 1;
@@ -116,7 +115,7 @@ headtrackerData* headtracker_new() {
     // default filter coefficients and internal variables
     trackingData->MadgwickBetaMax = 2.5;
     trackingData->MadgwickBetaGain = 1;
-    setAccLPtimeConstant(trackingData, .01); // default time constant 10 ms
+    setAccLPtimeConstant(trackingData, .01f); // default time constant 10 ms
     
     trackingData->gyroOffsetCalibratedState = 0;
     resetGyroOffsetCalibration(trackingData);
@@ -187,8 +186,13 @@ void headtracker_list_comm_ports(headtrackerData *trackingData) {
 // returns 0 if error
 //
 int export_headtracker_settings(headtrackerData *trackingData, char* filename) {
+	FILE *fd;
     // open file for writing, returns 0 if it fails
-    FILE *fd = fopen( filename, "w");
+#if defined(_WIN32) || defined(_WIN64)
+    fopen_s( &fd, filename, "w");
+#else /* #if defined(_WIN32) || defined(_WIN64) */
+	fd = fopen( filename, "w");
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
     
     if( fd == NULL) {
         printf("Error: file %s could not be opened for writing", filename);
@@ -247,15 +251,19 @@ int export_headtracker_settings(headtrackerData *trackingData, char* filename) {
 // returns 0 if error
 //
 int import_headtracker_settings(headtrackerData *trackingData, char* filename) {
-    char   *lineBuffer = NULL;
+    char   lineBuffer[200];
     char   *keyBuffer =  NULL;
     char   *valueBuffer = NULL;
     char   *brkt;
-    
-    size_t lineBufferCap = 0;
+
+	FILE *fd;
     
     // open file for reading, returns 0 if it fails
-    FILE *fd = fopen( filename, "r");
+#if defined(_WIN32) || defined(_WIN64)
+    fopen_s( &fd, filename, "r");
+#else /* #if defined(_WIN32) || defined(_WIN64) */
+	fd = fopen( filename, "r");
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
     
     if( fd == NULL) {
         printf("Error: file %s could not be opened for reading", filename);
@@ -264,7 +272,7 @@ int import_headtracker_settings(headtrackerData *trackingData, char* filename) {
     }
     
     // get all values from the text file with fprintf, returns 0 if it fails
-    while (getline(&lineBuffer, &lineBufferCap, fd) > 0) {
+    while (fgets(lineBuffer, 200, fd) != NULL) {
         if((keyBuffer=strtok_r(lineBuffer, ", ", &brkt)) == NULL) {
             printf("Error: syntax error for line <<%s>> (1)\r\n", lineBuffer);
             pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_IMPORT_SETTINGS_FAILED);
@@ -309,8 +317,6 @@ int import_headtracker_settings(headtrackerData *trackingData, char* filename) {
 // main routine of the headtracker receiver
 //
 void headtracker_tick(headtrackerData *trackingData) {
-    int numberOfReadBytes;
-    
     int readBufferInfoOffset = 0; // index of the first value in the read buffer to be taken into account (the one right after H2R_START_TRANSMIT_INFO_CHAR) by processInfoFromHeadtracker
     
     
@@ -329,6 +335,8 @@ void headtracker_tick(headtrackerData *trackingData) {
         // get current time
         
         double current_time = get_monotonic_time();
+
+		unsigned int i;
         
         // check if a new scheduled ping is necessary
         if(current_time >= trackingData->scheduledNextPingTime) {
@@ -347,37 +355,36 @@ void headtracker_tick(headtrackerData *trackingData) {
         init_read_serial(trackingData->serialcomm);
         
         while(is_data_available(trackingData->serialcomm)) {
-            numberOfReadBytes = (int) read(trackingData->serialcomm->comhandle,(char *) &trackingData->readBuffer,READ_BUFFER_SIZE);
-            if(numberOfReadBytes < 0) { // if a read error has been detected
+            if(trackingData->serialcomm->numberOfReadBytes < 0) { // if a read error has been detected
                 if(trackingData->verbose) printf("[hedrot] : read error\r\n");
                 headtracker_init(trackingData);
             } else {
                 //printf("%ld bytes read\r\n", numberOfReadBytes);
-                for(int i = 0; i<numberOfReadBytes; i++) {
+                for(i = 0; i<trackingData->serialcomm->numberOfReadBytes; i++) {
                     if(trackingData->verbose == VERBOSE_STATE_ALL_MESSAGES) {
-                        printf( "[hedrot] : byte received = %c\r\n",trackingData->readBuffer[i]);
+                        printf( "[hedrot] : byte received = %c\r\n",trackingData->serialcomm->readBuffer[i]);
                     }
-                    if(trackingData->readBuffer[i]==H2R_DATA_RECEIVE_ERROR_CHAR) { //if the headtracker report an error by receiving
+                    if(trackingData->serialcomm->readBuffer[i]==H2R_DATA_RECEIVE_ERROR_CHAR) { //if the headtracker report an error by receiving
                         printf("[hedrot] : the headtracker reports a receive error\r\n");
                     } else {
                         switch (trackingData->infoReceptionStatus) {
                             case COMMUNICATION_STATE_WAITING_FOR_INFO:
                                 //check if the headtracker has started transmitting the info
-                                if(trackingData->readBuffer[i]==H2R_START_TRANSMIT_INFO_CHAR) {
+                                if(trackingData->serialcomm->readBuffer[i]==H2R_START_TRANSMIT_INFO_CHAR) {
                                     headtracker_setReceptionStatus(trackingData,COMMUNICATION_STATE_RECEIVING_INFO);
                                     readBufferInfoOffset = i+1;
                                 }
                                 break;
                             case COMMUNICATION_STATE_RECEIVING_INFO:
                                 //check if the headtracker has finished transmitting the info
-                                if(trackingData->readBuffer[i]==H2R_STOP_TRANSMIT_INFO_CHAR) {
+                                if(trackingData->serialcomm->readBuffer[i]==H2R_STOP_TRANSMIT_INFO_CHAR) {
                                     if(processInfoFromHeadtracker(trackingData, readBufferInfoOffset, i+1)) { // is the info stream sent by the headtracker valid?
                                         trackingData->rawDataBufferIndex = 0; //reset the counter
                                     } else {
                                         //change back to state 1, which means that we will request the info once more at the end of the loop
                                         headtracker_setReceptionStatus(trackingData,COMMUNICATION_STATE_WAITING_FOR_INFO);
                                     }
-                                } else if(trackingData->readBuffer[i]==H2R_PING_CHAR) {
+                                } else if(trackingData->serialcomm->readBuffer[i]==H2R_PING_CHAR) {
                                     //if the headtracker responds to the ping, it means we can start to transmit
                                     headtracker_setReceptionStatus(trackingData,COMMUNICATION_STATE_HEADTRACKER_TRANSMITTING);
                                 } else {
@@ -386,9 +393,9 @@ void headtracker_tick(headtrackerData *trackingData) {
                                 break;
                             case COMMUNICATION_STATE_HEADTRACKER_TRANSMITTING:
                                 //check if the MSB of the current byte is 0 (meaning "frame end" or any other message)
-                                if((trackingData->readBuffer[i]&128)==0) {
+                                if((trackingData->serialcomm->readBuffer[i]&128)==0) {
                                     //is it the end of the frame?
-                                    if(trackingData->readBuffer[i]==H2R_END_OF_RAWDATA_FRAME) {
+                                    if(trackingData->serialcomm->readBuffer[i]==H2R_END_OF_RAWDATA_FRAME) {
                                         //check that the number of received bytes is correct
                                         if(trackingData->rawDataBufferIndex==NUMBER_OF_BYTES_IN_RAWDATA_FRAME) {
                                             
@@ -401,12 +408,12 @@ void headtracker_tick(headtrackerData *trackingData) {
                                             }
                                         }
                                         trackingData->rawDataBufferIndex = 0; //reset the counter
-                                    } else if(trackingData->readBuffer[i]==H2R_BOARD_OVERLOAD) {
+                                    } else if(trackingData->serialcomm->readBuffer[i]==H2R_BOARD_OVERLOAD) {
                                         // error: teensy overloaded
                                         pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_BOARD_OVERLOAD);
                                     }
                                 } else { //MSB = 1, raw headtracking data, store in the buffer
-                                    trackingData->rawDataBuffer[trackingData->rawDataBufferIndex++]=trackingData->readBuffer[i];
+                                    trackingData->rawDataBuffer[trackingData->rawDataBufferIndex++]=trackingData->serialcomm->readBuffer[i];
                                 }
                                 break;
                             default: //error
@@ -450,31 +457,32 @@ int processInfoFromHeadtracker(headtrackerData *trackingData, int offset, int nu
     
     char   keyBuffer[RAWDATA_STRING_MAX_SIZE];
     char   valueBuffer[RAWDATA_STRING_MAX_SIZE];
-    
-    for(int n=0;n<RAWDATA_STRING_MAX_SIZE;n++) {
-        keyBuffer[n] = '\0';
-        valueBuffer[n] = '\0';
-    }
+	int n,i;
     
     int keyBufferIndex = 0;
     int valueBufferIndex = 0;
     int isValueFlag = 0; //0 means "still aquiring the key name", 1 means "acquiring the value name"
     
+	for(n=0;n<RAWDATA_STRING_MAX_SIZE;n++) {
+        keyBuffer[n] = '\0';
+        valueBuffer[n] = '\0';
+    }
+
     trackingData->calibrationValid = 1; //initialize the "calibration valid" flag
     
     if(trackingData->verbose) printf("headtracker info (%d bytes): \r\n", numberOfBytes);
     
-    for(int i=offset;i<numberOfBytes;i++) {
+    for(i=offset;i<numberOfBytes;i++) {
         if(isValueFlag==0) { //acquiring the key name
-            if(trackingData->readBuffer[i] == SPACE) {
+            if(trackingData->serialcomm->readBuffer[i] == SPACE) {
                 //stop acquiring the key name
                 isValueFlag = 1;
             } else {
-                keyBuffer[keyBufferIndex]=trackingData->readBuffer[i];
+                keyBuffer[keyBufferIndex]=trackingData->serialcomm->readBuffer[i];
                 keyBufferIndex++;
             }
         } else if(isValueFlag==1) { //acquiring the value(s)
-            if((trackingData->readBuffer[i] == COMMA) || (i == numberOfBytes-1)) { // the comma at the end is not mandatory
+            if((trackingData->serialcomm->readBuffer[i] == COMMA) || (i == numberOfBytes-1)) { // the comma at the end is not mandatory
                 //stop acquiring the key/value pair, process it and go to the next one
                 
                 if(trackingData->verbose) printf("key received: %s - value received %s\r\n",keyBuffer, valueBuffer);
@@ -489,19 +497,19 @@ int processInfoFromHeadtracker(headtrackerData *trackingData, int offset, int nu
                 isValueFlag = 0;
                 keyBufferIndex = 0;
                 valueBufferIndex = 0;
-                for(int n=0;n<RAWDATA_STRING_MAX_SIZE;n++) {
+                for(n=0;n<RAWDATA_STRING_MAX_SIZE;n++) {
                     keyBuffer[n]='\0';
                     valueBuffer[n]='\0';
                 }
             } else {
-                valueBuffer[valueBufferIndex]=trackingData->readBuffer[i];
+                valueBuffer[valueBufferIndex]=trackingData->serialcomm->readBuffer[i];
                 valueBufferIndex++;
             }
         }
     }
     
     if((trackingData->gyroHalfScaleSensitivity!=-1) & (trackingData->gyroBitDepth!=-1)) {
-        trackingData->gyroscopeCalibrationFactor =  trackingData->gyroHalfScaleSensitivity * M_PI / 180.0 / pow(2,trackingData->gyroBitDepth-1);
+        trackingData->gyroscopeCalibrationFactor =  trackingData->gyroHalfScaleSensitivity * M_PI / 180.0f / (float) pow((double) 2,(int) trackingData->gyroBitDepth-1);
         if(trackingData->verbose) printf("gyroscopeCalibrationFactor: %f\r\n", trackingData->gyroscopeCalibrationFactor);
     } else {
         
@@ -571,9 +579,9 @@ void gyroOffsetCalibration(headtrackerData *trackingData) {
     
     // check if there are enough stable samples. If yes, update the offsets and the "calibrate" flag
     if(trackingData->gyroOffsetAutocalCounter >= (trackingData->gyroOffsetAutocalTime / 1000. * trackingData->samplerate) ) {
-        trackingData->gyroOffset[0] = (trackingData->gyroOffsetAutocalSum[0] * 1.0)/ trackingData->gyroOffsetAutocalCounter;
-        trackingData->gyroOffset[1] = (trackingData->gyroOffsetAutocalSum[1] * 1.0)/ trackingData->gyroOffsetAutocalCounter;
-        trackingData->gyroOffset[2] = (trackingData->gyroOffsetAutocalSum[2] * 1.0)/ trackingData->gyroOffsetAutocalCounter;
+        trackingData->gyroOffset[0] = (trackingData->gyroOffsetAutocalSum[0] * 1.0f)/ trackingData->gyroOffsetAutocalCounter;
+        trackingData->gyroOffset[1] = (trackingData->gyroOffsetAutocalSum[1] * 1.0f)/ trackingData->gyroOffsetAutocalCounter;
+        trackingData->gyroOffset[2] = (trackingData->gyroOffsetAutocalSum[2] * 1.0f)/ trackingData->gyroOffsetAutocalCounter;
         trackingData->gyroOffsetCalibratedState = 2;
     }
 }
@@ -627,7 +635,7 @@ void headtracker_compute_data(headtrackerData *trackingData) {
 //
 // decode the raw data flow from the headtracker
 //
-void convert_7bytes_to_3int16(unsigned char *rawDataBuffer,int baseIndex,int16_t *rawDataToSend) {
+void convert_7bytes_to_3int16(unsigned char *rawDataBuffer,int baseIndex,short *rawDataToSend) {
     // for each sensor with values vx, vy, vz in 16 bits:
     // each of the 7 bytes starts with the bit 1 (it's a unique marker of raw data info)
     // 1/vx_1-vx_7
@@ -718,16 +726,16 @@ char MadgwickAHRSupdateModified(headtrackerData *trackingData) {
     magDataNorm[2] = trackingData->magCalData[2] * recipNorm;
     
     // Auxiliary variables to avoid repeated arithmetic
-    _2q1mx = 2.0 * trackingData->q1 * magDataNorm[0];
-    _2q1my = 2.0 * trackingData->q1 * magDataNorm[1];
-    _2q1mz = 2.0 * trackingData->q1 * magDataNorm[2];
-    _2q2mx = 2.0 * trackingData->q2 * magDataNorm[0];
-    _2q1 = 2.0 * trackingData->q1;
-    _2q2 = 2.0 * trackingData->q2;
-    _2q3 = 2.0 * trackingData->q3;
-    _2q4 = 2.0 * trackingData->q4;
-    _2q1q3 = 2.0 * trackingData->q1 * trackingData->q3;
-    _2q3q4 = 2.0 * trackingData->q3 * trackingData->q4;
+    _2q1mx = 2.0f * trackingData->q1 * magDataNorm[0];
+    _2q1my = 2.0f * trackingData->q1 * magDataNorm[1];
+    _2q1mz = 2.0f * trackingData->q1 * magDataNorm[2];
+    _2q2mx = 2.0f * trackingData->q2 * magDataNorm[0];
+    _2q1 = 2.0f * trackingData->q1;
+    _2q2 = 2.0f * trackingData->q2;
+    _2q3 = 2.0f * trackingData->q3;
+    _2q4 = 2.0f * trackingData->q4;
+    _2q1q3 = 2.0f * trackingData->q1 * trackingData->q3;
+    _2q3q4 = 2.0f * trackingData->q3 * trackingData->q4;
     q1q1 = trackingData->q1 * trackingData->q1;
     q1q2 = trackingData->q1 * trackingData->q2;
     q1q3 = trackingData->q1 * trackingData->q3;
@@ -742,16 +750,16 @@ char MadgwickAHRSupdateModified(headtrackerData *trackingData) {
     // Reference direction of Earth's magnetic field
     hx =  magDataNorm[0] * q1q1 - _2q1my * trackingData->q4 + _2q1mz * trackingData->q3 + magDataNorm[0] * q2q2 + _2q2 *  magDataNorm[1] * trackingData->q3 + _2q2 *  magDataNorm[2] * trackingData->q4 - magDataNorm[0] * q3q3 - magDataNorm[0] * q4q4;
     hy = _2q1mx * trackingData->q4 + magDataNorm[1] * q1q1 - _2q1mz * trackingData->q2 + _2q2mx * trackingData->q3 - magDataNorm[1] * q2q2 + magDataNorm[1] * q3q3 + _2q3 *  magDataNorm[2] * trackingData->q4 - magDataNorm[1] * q4q4;
-    _2bx = sqrt(hx * hx + hy * hy);
+    _2bx = (float) sqrt(hx * hx + hy * hy);
     _2bz = -_2q1mx * trackingData->q3 + _2q1my * trackingData->q2 + magDataNorm[2] * q1q1 + _2q2mx * trackingData->q4 - magDataNorm[2] * q2q2 + _2q3 *  magDataNorm[1] * trackingData->q4 - magDataNorm[2] * q3q3 + magDataNorm[2] * q4q4;
-    _4bx = 2.0 * _2bx;
-    _4bz = 2.0 * _2bz;
+    _4bx = 2.0f * _2bx;
+    _4bz = 2.0f * _2bz;
     
     // Gradient decent algorithm corrective step
-    s1 = -_2q3 * (2.0 * q2q4 - _2q1q3 - accDataNorm[0]) + _2q2 * (2.0 * q1q2 + _2q3q4 - accDataNorm[1]) - _2bz * trackingData->q3 * (_2bx * (0.5 - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - magDataNorm[0]) + (-_2bx * trackingData->q4 + _2bz * trackingData->q2) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - magDataNorm[1]) + _2bx * trackingData->q3 * (_2bx * (q1q3 + q2q4) + _2bz * (0.5 - q2q2 - q3q3) - magDataNorm[2]);
-    s2 = _2q4 * (2.0 * q2q4 - _2q1q3 - accDataNorm[0]) + _2q1 * (2.0 * q1q2 + _2q3q4 - accDataNorm[1]) - 4.0 * trackingData->q2 * (1 - 2.0 * q2q2 - 2.0 * q3q3 - accDataNorm[2]) + _2bz * trackingData->q4 * (_2bx * (0.5 - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - magDataNorm[0]) + (_2bx * trackingData->q3 + _2bz * trackingData->q1) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - magDataNorm[1]) + (_2bx * trackingData->q4 - _4bz * trackingData->q2) * (_2bx * (q1q3 + q2q4) + _2bz * (0.5 - q2q2 - q3q3) - magDataNorm[2]);
-    s3 = -_2q1 * (2.0 * q2q4 - _2q1q3 - accDataNorm[0]) + _2q4 * (2.0 * q1q2 + _2q3q4 - accDataNorm[1]) - 4.0 * trackingData->q3 * (1 - 2.0 * q2q2 - 2.0 * q3q3 - accDataNorm[2]) + (-_4bx * trackingData->q3 - _2bz * trackingData->q1) * (_2bx * (0.5 - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - magDataNorm[0]) + (_2bx * trackingData->q2 + _2bz * trackingData->q4) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - magDataNorm[1]) + (_2bx * trackingData->q1 - _4bz * trackingData->q3) * (_2bx * (q1q3 + q2q4) + _2bz * (0.5 - q2q2 - q3q3) - magDataNorm[2]);
-    s4 = _2q2 * (2.0 * q2q4 - _2q1q3 - accDataNorm[0]) + _2q3 * (2.0 * q1q2 + _2q3q4 - accDataNorm[1]) + (-_4bx * trackingData->q4 + _2bz * trackingData->q2) * (_2bx * (0.5 - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - magDataNorm[0]) + (-_2bx * trackingData->q1 + _2bz * trackingData->q3) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - magDataNorm[1]) + _2bx * trackingData->q2 * (_2bx * (q1q3 + q2q4) + _2bz * (0.5 - q2q2 - q3q3) - magDataNorm[2]);
+    s1 = -_2q3 * (2.0f * q2q4 - _2q1q3 - accDataNorm[0]) + _2q2 * (2.0f * q1q2 + _2q3q4 - accDataNorm[1]) - _2bz * trackingData->q3 * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - magDataNorm[0]) + (-_2bx * trackingData->q4 + _2bz * trackingData->q2) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - magDataNorm[1]) + _2bx * trackingData->q3 * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - magDataNorm[2]);
+    s2 = _2q4 * (2.0f * q2q4 - _2q1q3 - accDataNorm[0]) + _2q1 * (2.0f * q1q2 + _2q3q4 - accDataNorm[1]) - 4.0f * trackingData->q2 * (1 - 2.0f * q2q2 - 2.0f * q3q3 - accDataNorm[2]) + _2bz * trackingData->q4 * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - magDataNorm[0]) + (_2bx * trackingData->q3 + _2bz * trackingData->q1) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - magDataNorm[1]) + (_2bx * trackingData->q4 - _4bz * trackingData->q2) * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - magDataNorm[2]);
+    s3 = -_2q1 * (2.0f * q2q4 - _2q1q3 - accDataNorm[0]) + _2q4 * (2.0f * q1q2 + _2q3q4 - accDataNorm[1]) - 4.0f * trackingData->q3 * (1 - 2.0f * q2q2 - 2.0f * q3q3 - accDataNorm[2]) + (-_4bx * trackingData->q3 - _2bz * trackingData->q1) * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - magDataNorm[0]) + (_2bx * trackingData->q2 + _2bz * trackingData->q4) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - magDataNorm[1]) + (_2bx * trackingData->q1 - _4bz * trackingData->q3) * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - magDataNorm[2]);
+    s4 = _2q2 * (2.0f * q2q4 - _2q1q3 - accDataNorm[0]) + _2q3 * (2.0f * q1q2 + _2q3q4 - accDataNorm[1]) + (-_4bx * trackingData->q4 + _2bz * trackingData->q2) * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - magDataNorm[0]) + (-_2bx * trackingData->q1 + _2bz * trackingData->q3) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - magDataNorm[1]) + _2bx * trackingData->q2 * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - magDataNorm[2]);
     recipNorm = invSqrt(s1 * s1 + s2 * s2 + s3 * s3 + s4 * s4);
     
     // normalise step magnitude
@@ -761,10 +769,10 @@ char MadgwickAHRSupdateModified(headtrackerData *trackingData) {
     s4 *= recipNorm;
     
     // Rate of change of quaternion from gyroscope
-    qDot1 = 0.5 * (-trackingData->q2 * trackingData->gyroCalData[0] - trackingData->q3 * trackingData->gyroCalData[1] - trackingData->q4 * trackingData->gyroCalData[2]);
-    qDot2 = 0.5 * (trackingData->q1 * trackingData->gyroCalData[0] + trackingData->q3 * trackingData->gyroCalData[2] - trackingData->q4 * trackingData->gyroCalData[1]);
-    qDot3 = 0.5 * (trackingData->q1 * trackingData->gyroCalData[1] - trackingData->q2 * trackingData->gyroCalData[2] + trackingData->q4 * trackingData->gyroCalData[0]);
-    qDot4 = 0.5 * (trackingData->q1 * trackingData->gyroCalData[2] + trackingData->q2 * trackingData->gyroCalData[1] - trackingData->q3 * trackingData->gyroCalData[0]);
+    qDot1 = 0.5f * (-trackingData->q2 * trackingData->gyroCalData[0] - trackingData->q3 * trackingData->gyroCalData[1] - trackingData->q4 * trackingData->gyroCalData[2]);
+    qDot2 = 0.5f * (trackingData->q1 * trackingData->gyroCalData[0] + trackingData->q3 * trackingData->gyroCalData[2] - trackingData->q4 * trackingData->gyroCalData[1]);
+    qDot3 = 0.5f * (trackingData->q1 * trackingData->gyroCalData[1] - trackingData->q2 * trackingData->gyroCalData[2] + trackingData->q4 * trackingData->gyroCalData[0]);
+    qDot4 = 0.5f * (trackingData->q1 * trackingData->gyroCalData[2] + trackingData->q2 * trackingData->gyroCalData[1] - trackingData->q3 * trackingData->gyroCalData[0]);
     
     // Apply feedback step
     // compute the dynamic parameter beta: no movement => beta maximum, lot of movement => beta tends to 0
@@ -806,7 +814,7 @@ char MadgwickAHRSupdateModified(headtrackerData *trackingData) {
 //
 int  processKeyValueSettingPair(headtrackerData *trackingData, char *keyBuffer, char *valueBuffer, char UpdateHeadtrackerFlag) {
     if(strcmp(keyBuffer,"firmware_version") == 0) {
-        trackingData->firmwareVersion=strtol(valueBuffer,NULL,10);
+        trackingData->firmwareVersion=(char) strtol(valueBuffer,NULL,10);
         if(trackingData->verbose) printf("firmware version: %d\r\n",trackingData->firmwareVersion);
         if(trackingData->firmwareVersion!=HEDROT_FIRMWARE_VERSION) {
             printf("wrong firmware version\r\n");
@@ -817,7 +825,7 @@ int  processKeyValueSettingPair(headtrackerData *trackingData, char *keyBuffer, 
         
     } else if(strcmp(keyBuffer,"samplerate") == 0) {
         trackingData->samplerate=strtol(valueBuffer,NULL,10);
-        trackingData->samplePeriod = 1.0 / trackingData->samplerate;
+        trackingData->samplePeriod = 1.0f / trackingData->samplerate;
         if(trackingData->verbose) printf("samplerate: %ld\r\n",trackingData->samplerate);
         if(UpdateHeadtrackerFlag) setSamplerate(trackingData, trackingData->samplerate, 0);
         
@@ -830,17 +838,17 @@ int  processKeyValueSettingPair(headtrackerData *trackingData, char *keyBuffer, 
         if(trackingData->verbose) printf("gyroBitDepth: %ld\r\n",trackingData->gyroBitDepth);
         
     } else if(strcmp(keyBuffer,"gyroDataRate") == 0) {
-        trackingData->gyroDataRate=strtol(valueBuffer,NULL,10);
+        trackingData->gyroDataRate=(char) strtol(valueBuffer,NULL,10);
         if(trackingData->verbose) printf("gyroDataRate: %d\r\n",trackingData->gyroDataRate);
         if(UpdateHeadtrackerFlag) setgyroDataRate(trackingData, trackingData->gyroDataRate, 0);
         
     } else if(strcmp(keyBuffer,"gyroClockSource") == 0) {
-        trackingData->gyroClockSource=strtol(valueBuffer,NULL,10);
+        trackingData->gyroClockSource=(char) strtol(valueBuffer,NULL,10);
         if(trackingData->verbose) printf("gyroClockSource: %d\r\n",trackingData->gyroClockSource);
         if(UpdateHeadtrackerFlag) setGyroClockSource(trackingData, trackingData->gyroClockSource, 0);
         
     } else if(strcmp(keyBuffer,"gyroDLPFBandwidth") == 0) {
-        trackingData->gyroDLPFBandwidth=strtol(valueBuffer,NULL,10);
+        trackingData->gyroDLPFBandwidth=(char) strtol(valueBuffer,NULL,10);
         if(trackingData->verbose) printf("gyroDLPFBandwidth: %d\r\n",trackingData->gyroDLPFBandwidth);
         if(UpdateHeadtrackerFlag) setGyroDLPFBandwidth(trackingData, trackingData->gyroDLPFBandwidth, 0);
         
@@ -954,7 +962,11 @@ int  processKeyValueSettingPair(headtrackerData *trackingData, char *keyBuffer, 
 //
 void headtracker_open(headtrackerData *trackingData, int portnum)
 {
+#if defined(_WIN32) || defined(_WIN64)
+    HANDLE handle;
+#else /* #if defined(_WIN32) || defined(_WIN64)*/
     int handle;
+#endif
     
     if(trackingData->serialcomm->comhandle != INVALID_HANDLE_VALUE) {
         if(trackingData->verbose) printf("[hedrot] : closing previously openened port port %s\r\n", trackingData->serialcomm->serial_device_name);
@@ -1040,7 +1052,7 @@ void pushNotificationMessage(headtrackerData *trackingData, char messageNumber){
 // headtracker autodiscovering function
 //
 void headtracker_autodiscover(headtrackerData *trackingData) {
-    char charbuf;
+	unsigned int i;
     
     if(trackingData->verbose) printf("[hedrot] : autodiscovering\r\n");
     
@@ -1053,25 +1065,27 @@ void headtracker_autodiscover(headtrackerData *trackingData) {
         init_read_serial(trackingData->serialcomm);
         
         if(is_data_available(trackingData->serialcomm)) {
-            while(is_data_available(trackingData->serialcomm)) { //loop on all received values
+            while(is_data_available(trackingData->serialcomm)) { //loop on all received buffers
                 // read one byte and check that there is no read error
-                if(read(trackingData->serialcomm->comhandle, &charbuf,1) < 0) { // if a read error was detected
+                if(trackingData->serialcomm->numberOfReadBytes < 0) { // if a read error was detected
                     if(trackingData->verbose) printf("autodiscover : read error\r\n");
                     headtracker_setReceptionStatus(trackingData, COMMUNICATION_STATE_AUTODISCOVERING_NO_HEADTRACKER_THERE);
                     // close the port
                     close_serial(trackingData->serialcomm);
                 } else {
-                    if(trackingData->verbose == 3) printf("autodiscover : byte received = %d\r\n",charbuf);
-                    if(charbuf==H2R_IAMTHERE_CHAR) {
-                        //if the headtracker responded, close and reopen it with the proper headtracker_open function
-                        if(trackingData->verbose) printf("Headtracker Found on port %d, open the port\r\n",trackingData->serialcomm->portNumber);
+					for( i = 0; i < trackingData->serialcomm->numberOfReadBytes; i++) { //loop on all received bytes
+						if(trackingData->verbose == 3) printf("autodiscover : byte received = %d\r\n",trackingData->serialcomm->readBuffer[i]);
+						if(trackingData->serialcomm->readBuffer[i]==H2R_IAMTHERE_CHAR) {
+							//if the headtracker responded, close and reopen it with the proper headtracker_open function
+							if(trackingData->verbose) printf("Headtracker Found on port %d, open the port\r\n",trackingData->serialcomm->portNumber);
                         
-                        close_serial(trackingData->serialcomm);
+							close_serial(trackingData->serialcomm);
                         
-                        headtracker_setReceptionStatus(trackingData, COMMUNICATION_STATE_AUTODISCOVERING_HEADTRACKER_FOUND);
+							headtracker_setReceptionStatus(trackingData, COMMUNICATION_STATE_AUTODISCOVERING_HEADTRACKER_FOUND);
                         
-                        headtracker_open(trackingData,trackingData->serialcomm->portNumber);
-                    }
+							headtracker_open(trackingData,trackingData->serialcomm->portNumber);
+						}
+					}
                 }
             }
         } else { // no data available
@@ -1204,7 +1218,7 @@ void setMadgwickBetaMax(headtrackerData *trackingData, float MadgwickBetaMax) {
 
 void setAccLPtimeConstant(headtrackerData *trackingData, float accLPtimeConstant) {
     trackingData->accLPtimeConstant = accLPtimeConstant;
-    trackingData->accLPalpha = 1 - exp(-trackingData->samplePeriod/trackingData->accLPtimeConstant);
+    trackingData->accLPalpha = 1 - (float) exp(-trackingData->samplePeriod/trackingData->accLPtimeConstant);
 }
 
 
@@ -1214,10 +1228,10 @@ void setAccLPtimeConstant(headtrackerData *trackingData, float accLPtimeConstant
 //=====================================================================================================
 void setSamplerate(headtrackerData *trackingData, long samplerate, char requestSettingsFlag) {
     trackingData->samplerate = max(min(samplerate,65535),2);
-    trackingData->samplePeriod = 1.0 / trackingData->samplerate;
+    trackingData->samplePeriod = 1.0f / trackingData->samplerate;
     
     // recalculate receiver parameters based on samplerate
-    trackingData->accLPalpha = 1 - exp(-trackingData->samplePeriod/trackingData->accLPtimeConstant);
+    trackingData->accLPalpha = 1 - (float) exp(-trackingData->samplePeriod/trackingData->accLPtimeConstant);
     
     write_serial(trackingData->serialcomm, R2H_TRANSMIT_SAMPLERATE);
     write_serial(trackingData->serialcomm, (char) (trackingData->samplerate%256)); //least significant byte first, then most significant byte
@@ -1264,7 +1278,8 @@ void setAccRange(headtrackerData *trackingData, char accRange, char requestSetti
 }
 
 void setAccHardOffset(headtrackerData *trackingData, char* accHardOffset, char requestSettingsFlag) {
-    for(int i=0;i<3;i++) {
+    int i;
+	for(i=0;i<3;i++) {
         trackingData->accHardOffset[i] = accHardOffset[i];
     }
     
@@ -1343,8 +1358,9 @@ void setMagMeasurementMode(headtrackerData *trackingData, char magMeasurementMod
 //=====================================================================================================
 
 void setAccOffset(headtrackerData *trackingData, float* accOffset, char requestSettingsFlag) {
-    
-    for(int i=0;i<3;i++)
+    int i;
+
+    for(i=0;i<3;i++)
         trackingData->accOffset[i] = accOffset[i];
     
     headtracker_sendFloatArray2Headtracker(trackingData,trackingData->accOffset,3,R2H_START_TRANSMIT_ACCEL_OFFSET_DATA_CHAR,R2H_STOP_TRANSMIT_ACCEL_OFFSET_DATA_CHAR);
@@ -1354,8 +1370,9 @@ void setAccOffset(headtrackerData *trackingData, float* accOffset, char requestS
 }
 
 void setAccScaling(headtrackerData *trackingData, float* accScaling, char requestSettingsFlag) {
-    
-    for(int i=0;i<3;i++)
+    int i;
+
+    for(i=0;i<3;i++)
         trackingData->accScaling[i] = accScaling[i];
     
     headtracker_sendFloatArray2Headtracker(trackingData,trackingData->accScaling,3,R2H_START_TRANSMIT_ACCEL_SCALING_DATA_CHAR,R2H_STOP_TRANSMIT_ACCEL_SCALING_DATA_CHAR);
@@ -1365,8 +1382,9 @@ void setAccScaling(headtrackerData *trackingData, float* accScaling, char reques
 }
 
 void setMagOffset(headtrackerData *trackingData, float* magOffset, char requestSettingsFlag) {
-    
-    for(int i=0;i<3;i++)
+    int i;
+
+    for(i=0;i<3;i++)
         trackingData->magOffset[i] = magOffset[i];
     
     headtracker_sendFloatArray2Headtracker(trackingData,trackingData->magOffset,3,R2H_START_TRANSMIT_MAG_OFFSET_DATA_CHAR,R2H_STOP_TRANSMIT_MAG_OFFSET_DATA_CHAR);
@@ -1376,8 +1394,9 @@ void setMagOffset(headtrackerData *trackingData, float* magOffset, char requestS
 }
 
 void setMagScaling(headtrackerData *trackingData, float* magScaling, char requestSettingsFlag) {
-    
-    for(int i=0;i<3;i++)
+    int i;
+
+    for(i=0;i<3;i++)
         trackingData->magScaling[i] = magScaling[i];
     
     headtracker_sendFloatArray2Headtracker(trackingData,trackingData->magScaling,3,R2H_START_TRANSMIT_MAG_SCALING_DATA_CHAR,R2H_STOP_TRANSMIT_MAG_SCALING_DATA_CHAR);
@@ -1425,32 +1444,37 @@ void headtracker_setReceptionStatus(headtrackerData *trackingData, int n) {
 
 // send a float array to the headtracker
 void headtracker_sendFloatArray2Headtracker(headtrackerData *trackingData, float* data, int numValues, unsigned char StartTransmitChar, unsigned char StopTransmitChar) {
-    write_serial(trackingData->serialcomm, StartTransmitChar);
+    char charData[20];
     
-    char* charData = NULL;
+    int i;
+	unsigned int n;
     
-    int i, n;
+	write_serial(trackingData->serialcomm, StartTransmitChar);
     
+
     for(i=0;i<numValues;i++) {
-        asprintf(&charData,"%.2f",data[i]);
-        for(n=0;n<strlen(charData);n++) {
+#if defined(_WIN32) || defined(_WIN64)
+        sprintf_s(charData, 20, "\\\\.\\COM%d", i);/* the recommended way to specify COMs above 9 */
+#else /* #if defined(_WIN32) || defined(_WIN64) */
+        sprintf(charData,"%.2f",data[i]);
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
+
+        for(n=0;n<strlen(charData);n++)
             write_serial(trackingData->serialcomm, charData[n]);
-        }
         
         if(i<numValues-1)
             write_serial(trackingData->serialcomm, ' '); // pas d'espace après le dernier
     }
     
     write_serial(trackingData->serialcomm, StopTransmitChar);
-    free(charData);
 }
 
 
 // send a signed char array to the headtracker
 void headtracker_sendSignedCharArray2Headtracker(headtrackerData *trackingData, char* data, int numValues, unsigned char StartTransmitChar, unsigned char StopTransmitChar) {
-    write_serial(trackingData->serialcomm, StartTransmitChar);
-    
     int i;
+    
+	write_serial(trackingData->serialcomm, StartTransmitChar);
     
     for(i=0;i<numValues;i++) {
         write_serial(trackingData->serialcomm, data[i]);
@@ -1510,13 +1534,13 @@ void quaternion2Euler(float q1, float q2, float q3, float q4, float *yaw, float 
     // see http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
     // zyx Euler angles: phi=roll, theta=pitch, psi=yaw
     
-    *roll = RAD_TO_DEGREE * atan2(2.0 * (q1*q2 + q3*q4),
-                                  1.0 - 2.0 * (q2*q2 + q3*q3));
+    *roll = (float) (RAD_TO_DEGREE * atan2(2.0f * (q1*q2 + q3*q4),
+                                  1.0f - 2.0f * (q2*q2 + q3*q3)));
     
-    *pitch = RAD_TO_DEGREE * asin(min(max(2.0 * (q1*q3 - q4*q2),-1),1));
+    *pitch = (float) (RAD_TO_DEGREE * asin(min(max(2.0f * (q1*q3 - q4*q2),-1),1)));
     
-    *yaw = RAD_TO_DEGREE * atan2(2.0 * (q1*q4 + q2*q3),
-                                 1.0 - 2.0 * (q3*q3 + q4*q4) );
+    *yaw = (float) (RAD_TO_DEGREE * atan2(2.0f * (q1*q4 + q2*q3),
+                                 1.0f - 2.0f * (q3*q3 + q4*q4) ));
 }
 
 void quaternionComposition(float q01, float q02, float q03, float q04, float q11, float q12, float q13, float q14, float *q21, float *q22, float *q23, float *q24) {
@@ -1533,11 +1557,12 @@ int stringToFloats(char* valueBuffer, float* data, int nvalues) {
     
     char *delim = " "; // input separated by spaces
     char *token = NULL;
+	char *brkt;
     
-    for (token = strtok(valueBuffer, delim); token != NULL; token = strtok(NULL, delim))
+    for (token = strtok_r(valueBuffer, delim, &brkt); token != NULL; token = strtok_r(NULL, delim, &brkt))
     {
         char *unconverted;
-        data[i] = strtof(token, &unconverted);
+        data[i] = (float) strtod(token, &unconverted);
         i++;
     }
     
@@ -1554,8 +1579,9 @@ int stringToChars(char* valueBuffer, char* data, int nvalues) {
     
     char *delim = " "; // input separated by spaces
     char *token = NULL;
+	char *brkt;
     
-    for (token = strtok(valueBuffer, delim); token != NULL; token = strtok(NULL, delim))
+    for (token = strtok_r(valueBuffer, delim, &brkt); token != NULL; token = strtok_r(NULL, delim, &brkt))
     {
         char *unconverted;
         data[i] = (char) strtol(token, &unconverted,10);

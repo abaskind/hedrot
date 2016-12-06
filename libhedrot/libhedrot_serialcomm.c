@@ -12,6 +12,10 @@
 #include "string.h"
 
 // global tables
+#if defined(_WIN32) || defined(_WIN64)
+/* we don't use the  table for windos cos we can set the number directly. */
+/* This may result in more possible baud rates than the table contains. */
+#else /* #if defined(_WIN32) || defined(_WIN64) */
 long baudspeedbittable[] =
 {
     BAUDRATE_230400,
@@ -34,6 +38,7 @@ long baudspeedbittable[] =
     B50,
     B0
 };
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
 
 #define BAUDRATETABLE_LEN 19
 
@@ -85,22 +90,69 @@ void serial_comm_init(headtrackerSerialcomm *x) {
 // list all available comm ports
 void list_comm_ports(headtrackerSerialcomm *x) {
     
-    unsigned int   i;
+    int				i;    
+	char*			tmpPortsNames[MAX_NUMBER_OF_PORTS];
+
+#if defined(_WIN32) || defined(_WIN64)
+	HANDLE			fd;
+	char            device_name[10];
+    DWORD           dw;
+#else /* #if defined(_WIN32) || defined(_WIN64) */
     int            fd;
-    struct termios test;
-    
+	struct termios test;
     glob_t         glob_buffer;
-    
-    char*          tmpPortsNames[MAX_NUMBER_OF_PORTS];
-    
+
+	const char		*glob_pattern = "/dev/cu.*";
+
+	// free the previous port list
+    for (i = 0; i < x->numberOfAvailablePorts; i++) {
+        free(x->availablePorts[i]);
+    }
+    if(x->availablePorts) {
+        free(x->availablePorts);
+        x->availablePorts = NULL;
+    }
+    x->numberOfAvailablePorts = 0;
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
+
+#if defined(_WIN32) || defined(_WIN64)
+    for(i = 1; i < MAX_NUMBER_OF_PORTS; i++) {
+        sprintf_s(device_name, 10, "\\\\.\\COM%d", i);/* the recommended way to specify COMs above 9 */
+        fd = CreateFile( device_name,
+                GENERIC_READ | GENERIC_WRITE,
+                0,
+                0,
+                OPEN_EXISTING,
+                FILE_FLAG_OVERLAPPED,
+                0);
+        dw = 0L;
+        if(fd == INVALID_HANDLE_VALUE)
+            dw = GetLastError();
+        else
+            CloseHandle(fd);
+
+        if (dw == 0) {
+			//port available
+			tmpPortsNames[x->numberOfAvailablePorts] = _strdup(device_name);
+            x->numberOfAvailablePorts++;
+
+			if(x->verbose) 
+				printf("[hedrot]: port %s available\r\n", device_name);
+		}
+
+    }
+
+    // update the list of available ports
+    x->availablePorts = (char**) malloc(x->numberOfAvailablePorts*sizeof(char*));
+    for(i=0; i<x->numberOfAvailablePorts; i++)
+        x->availablePorts[i] = _strdup(tmpPortsNames[i]);
+
+#else /* #if defined(_WIN32) || defined(_WIN64) */
     // reset port number (for autodiscovering)
     x->portNumber=-1;
     
     /* first look for registered devices in the filesystem */
-#ifdef __APPLE__
-    const char *glob_pattern = "/dev/cu.*";
-#endif
-    
+   
     switch( glob( glob_pattern, GLOB_ERR, NULL, &glob_buffer ) ) {
         case 0:
             printf("[hedrot]: %ld possible ports found\r\n",glob_buffer.gl_pathc);
@@ -120,16 +172,6 @@ void list_comm_ports(headtrackerSerialcomm *x) {
 # endif /* GLOB_NOMATCH */
     }
     
-    // free the previous port list
-    for (i = 0; i < x->numberOfAvailablePorts; i++) {
-        free(x->availablePorts[i]);
-    }
-    if(x->availablePorts) {
-        free(x->availablePorts);
-        x->availablePorts = NULL;
-    }
-    x->numberOfAvailablePorts = 0;
-    
     // now check which ports are really available and has attributes, and update the port list accordingly
     for(i=0; i<glob_buffer.gl_pathc; i++) {
         // now try to open the device
@@ -146,12 +188,16 @@ void list_comm_ports(headtrackerSerialcomm *x) {
         }
     }
     
+		    
     // update the list of available ports
-    x->availablePorts = malloc(x->numberOfAvailablePorts*sizeof(char*));
+    x->availablePorts = (char**) malloc(x->numberOfAvailablePorts*sizeof(char*));
     for(i=0; i<x->numberOfAvailablePorts; i++)
         x->availablePorts[i] = strdup(tmpPortsNames[i]);
-    
+
+
     globfree( &(glob_buffer) );
+
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
 }
 
 
@@ -159,10 +205,109 @@ void list_comm_ports(headtrackerSerialcomm *x) {
 // returns INVALID_HANDLE_VALUE if fails
 // returns handle value if it succeeds
 
+#if defined(_WIN32) || defined(_WIN64)
+// Windows version
+HANDLE open_serial(headtrackerSerialcomm *x, char* portName) {
+    HANDLE          fd;
+    COMMTIMEOUTS	timeouts;
+    DCB				dcb; /* holds the comm params */
+    DWORD			dw;
+
+    
+    /* the communication is through USB, so:
+     * The number of bits is always 8
+     * no stop bits
+     * no hardware/software handshake
+     * parity bits are not used */
+    
+    fd = CreateFile( portName,
+        GENERIC_READ | GENERIC_WRITE,
+        0,
+        0,
+        OPEN_EXISTING,
+        FILE_FLAG_OVERLAPPED,
+        0);
+
+    if(fd == INVALID_HANDLE_VALUE)
+    {
+        dw = GetLastError();
+		printf("[hedrot] ** ERROR ** could not open device %s: failure(%d): %s\r\n",
+              portName,errno, dw);
+        return INVALID_HANDLE_VALUE;
+    }
+
+    
+    /* set no wait on any operation */
+	//fcntl(fd, F_SETFL, FNDELAY);
+    
+    /* Get the Current Port Configuration  */
+	memset(&(dcb), 0, sizeof(DCB));
+
+    if (!GetCommState(fd, &(dcb)))
+    {
+        printf("[hedrot] ** ERROR ** could not get dcb of device %s\r\n", portName);
+        CloseHandle(fd);
+        return INVALID_HANDLE_VALUE;
+    }
+
+	dcb.fBinary = TRUE; /*  binary mode, no EOF check  */
+    dcb.fErrorChar = FALSE;       /*  enable error replacement  */
+
+	// set baud rate
+	dcb.BaudRate = (DWORD)x->baud;
+
+    
+    /* Setup the new port configuration...NON-CANONICAL INPUT MODE
+     .. as defined in termios.h */
+    
+    /* enable input and ignore modem controls */
+    //tios->c_cflag |= (CREAD | CLOCAL);
+    
+    /* always nocanonical, this means raw i/o no terminal */
+    //tios->c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+    
+    /* no post processing */
+    //tios->c_oflag &= ~OPOST;
+    
+    if(SetCommState(fd, &dcb)) {
+        if(x->verbose) printf("[hedrot] opened serial line device %s\r\n", portName);
+        
+        return fd;
+    } else {
+        printf("[hedrot] ** ERROR ** could not set params to control dcb of device %s\r\n", portName);
+        CloseHandle(fd);
+        return INVALID_HANDLE_VALUE;
+    }
+
+	/* setting new timeouts for read to immediately return */
+    timeouts.ReadIntervalTimeout = MAXDWORD;
+    timeouts.ReadTotalTimeoutMultiplier = 0;
+    timeouts.ReadTotalTimeoutConstant = 0;
+    timeouts.WriteTotalTimeoutMultiplier = 0;
+    timeouts.WriteTotalTimeoutConstant = 0;
+
+    if (!SetCommTimeouts(fd, &timeouts))
+    {
+        printf("[hedrot] ** ERROR ** Couldn't set timeouts for serial device (%d)", GetLastError());
+        return INVALID_HANDLE_VALUE;
+    }
+	if (!SetupComm(x->comhandle, 4096L, 4096L))/* try to get big buffers to avoid overruns*/
+	{
+		printf("[hedrot] ** ERROR ** Couldn't do SetupComm (%d)", GetLastError());
+	}
+
+	// update structure info
+    x->serial_device_name = _strdup(portName);
+    x->comhandle = fd;
+    return fd;
+
+}
+#else /* #if defined(_WIN32) || defined(_WIN64) */
+// Mac version
 int open_serial(headtrackerSerialcomm *x, char* portName) {
     int             fd;
+
     struct termios  *tios = &(x->com_termio);
-    int             *baud = &(x->baud);
     
     /* the communication is through USB, so:
      * The number of bits is always 8
@@ -179,18 +324,18 @@ int open_serial(headtrackerSerialcomm *x, char* portName) {
     /* set no wait on any operation */
     fcntl(fd, F_SETFL, FNDELAY);
     
-    /*   Save the Current Port Configuration  */
+    /* Get the Current Port Configuration  */
     if(tcgetattr(fd, tios) < 0) {
         printf("[hedrot] ** ERROR ** could not get termios-structure of device %s\r\n", portName);
         close(fd);
         return INVALID_HANDLE_VALUE;
     }
 
-    if (cfsetspeed(tios, *baud) < 0) {
-        printf("error in cfsetspeed\n\n");
+	// set baud rate
+    if (cfsetspeed(tios, x->baud) < 0) {
+        printf("error in cfsetspeed\n");
         return INVALID_HANDLE_VALUE;
     }
-    
     if (tcsetattr(fd, TCSANOW, tios) < 0) {
         printf("unable to set baud rate\n");
         return INVALID_HANDLE_VALUE;
@@ -208,8 +353,6 @@ int open_serial(headtrackerSerialcomm *x, char* portName) {
     /* no post processing */
     tios->c_oflag &= ~OPOST;
     
-    //set_baudrate(x, *baud);
-    
     if(tcsetattr(fd, TCSAFLUSH, tios) != -1) {
         if(x->verbose) printf("[hedrot] opened serial line device %s\r\n", portName);
         
@@ -224,10 +367,25 @@ int open_serial(headtrackerSerialcomm *x, char* portName) {
         return INVALID_HANDLE_VALUE;
     }
 }
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
 
 // close serial port
 // returns INVALID_HANDLE_VALUE in any case
 
+#if defined(_WIN32) || defined(_WIN64)
+// Windows version
+HANDLE close_serial(headtrackerSerialcomm *x) {
+    if(x->comhandle != INVALID_HANDLE_VALUE)
+    {
+        CloseHandle(x->comhandle);
+        if(x->verbose) printf("[hedrot] closed %s\r\n",x->serial_device_name);
+        x->serial_device_name = NULL;
+        x->comhandle = INVALID_HANDLE_VALUE;
+    }
+    return INVALID_HANDLE_VALUE;
+}
+#else /* #if defined(_WIN32) || defined(_WIN64) */
+// Mac version
 int close_serial(headtrackerSerialcomm *x)
 {
     struct termios *tios = &(x->com_termio);
@@ -241,19 +399,39 @@ int close_serial(headtrackerSerialcomm *x)
     }
     return INVALID_HANDLE_VALUE;
 }
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
 
 // clear file descriptors before reading data on opened comm port
 void init_read_serial(headtrackerSerialcomm *x) {
+#if defined(_WIN32) || defined(_WIN64)
+	// nothing to do here
+#else /* #if defined(_WIN32) || defined(_WIN64) */
     FD_ZERO(&x->com_rfds);
     FD_SET(x->comhandle,&x->com_rfds);
     tv.tv_sec = 0;
     tv.tv_usec = 0;
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
 }
 
 
 // check with select() if a data is available for reading on opened comm port
-inline int is_data_available(headtrackerSerialcomm *x) {
-    return select(x->comhandle+1,&x->com_rfds,NULL,NULL,&tv);
+int is_data_available(headtrackerSerialcomm *x) {
+#if defined(_WIN32) || defined(_WIN64)
+    OVERLAPPED    osReader = {0};
+	int          err;
+
+    osReader.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+    if(ReadFile(x->comhandle, x->readBuffer, READ_BUFFER_SIZE, &x->numberOfReadBytes, &osReader)) {
+		err = 0;
+    } else {
+        err = -1;
+    }
+    CloseHandle(osReader.hEvent);
+#else /* #if defined(_WIN32) || defined(_WIN64) */
+    err =  select(x->comhandle+1,&x->com_rfds,NULL,NULL,&tv);
+	x->numberOfReadBytes = (int) read(x->comhandle, x->readBuffer,READ_BUFFER_SIZE);
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
+	return err;
 }
 
 
@@ -261,9 +439,44 @@ inline int is_data_available(headtrackerSerialcomm *x) {
 // write byte on serial port
 // return 0 if fails
 // return 1 if it succeeds
+#if defined(_WIN32) || defined(_WIN64)
+// Windows version
+int write_serial(headtrackerSerialcomm *x, unsigned char serial_byte) {
+	OVERLAPPED osWrite = {0};
+    DWORD      dwWritten;
+    DWORD      dwToWrite = 1L;
+    DWORD      dwErr;
+	DWORD      numTransferred = 0L;
 
-int write_serial(headtrackerSerialcomm *x, unsigned char serial_byte)
-{
+	if(x->verbose >= 2) printf("write_serial on comhandle %i: %x\r\n", x->comhandle, serial_byte);
+    
+    osWrite.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+    if (osWrite.hEvent == NULL)
+    {
+        printf("Couldn't create event. Transmission aborted.");
+        return 0;
+    }
+
+    if (!WriteFile(x->comhandle, &serial_byte, dwToWrite, &dwWritten, &osWrite))
+    {
+        dwErr = GetLastError();
+        if (dwErr != ERROR_IO_PENDING)
+        {
+            printf("WriteFile error: %d", (int)dwErr);
+            return 0;
+        }
+    }
+	if (!GetOverlappedResult(x->comhandle, &osWrite, &numTransferred, TRUE))
+	{/* wait for the character to be sent */
+        dwErr = GetLastError();
+		printf("WriteFile:GetOverlappedResult error: %d", (int)dwErr);
+	}
+    CloseHandle(osWrite.hEvent);
+    return 1;
+}
+#else /* #if defined(_WIN32) || defined(_WIN64) */
+// Mac version
+int write_serial(headtrackerSerialcomm *x, unsigned char serial_byte) {
     if(x->verbose >= 2) printf("write_serial on comhandle %i: %x\r\n", x->comhandle, serial_byte);
     int result = (int) write(x->comhandle,(char *) &serial_byte,1);
     if (result != 1) {
@@ -271,21 +484,4 @@ int write_serial(headtrackerSerialcomm *x, unsigned char serial_byte)
     } 
     return result;
 }
-
-
-long get_baud_ratebits(float *baud)
-{
-    int i = 0;
-    
-    while(i < BAUDRATETABLE_LEN && baudratetable[i] > *baud) i++;
-    
-    /* nearest Baudrate finding */
-    if(i==BAUDRATETABLE_LEN ||  baudspeedbittable[i] < 0)
-    {
-        printf("*Warning* The baud rate %f is not supported or out of range, using 9600\r\n",*baud);
-        i = 8;
-    }
-    *baud =  baudratetable[i];
-    
-    return baudspeedbittable[i];
-}
+#endif /* #if defined(_WIN32) || defined(_WIN64) */

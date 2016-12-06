@@ -11,6 +11,10 @@
 #include <stdio.h>
 
 // for serial communication
+#if defined(_WIN32) || defined(_WIN64)
+#include <windows.h>
+#include <commctrl.h>
+#else
 #include <sys/time.h>
 #include <fcntl.h>
 #include <sys/ioctl.h> /* for ioctl DTR */
@@ -18,21 +22,26 @@
 #include <unistd.h>
 #include <glob.h>
 #include <errno.h>
+#define INVALID_HANDLE_VALUE -1
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
 
 // other includes
 #include "hedrot_comm_protocol.h"
 
 // internal constants
-#define HANDLE int
-#define INVALID_HANDLE_VALUE -1
-#define MAX_NUMBER_OF_PORTS 100
+#define MAX_NUMBER_OF_PORTS 99
+#define READ_BUFFER_SIZE 10000
 
-// serial constants and tables
+// serial constants and tables (only for mac)
+#if defined(_WIN32) || defined(_WIN64)
+#else /* #if defined(_WIN32) || defined(_WIN64) */
 #define OPENPARAMS (O_RDWR|O_NDELAY|O_NOCTTY)
 #define BAUDRATE_230400 B230400
 #define BAUDRATE_115200 B115200
 #define BAUDRATE_57600  B57600
 #define BAUDRATE_38400  B38400
+struct timeval tv;
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
 
 
 //=====================================================================================================
@@ -40,23 +49,30 @@
 //=====================================================================================================
 
 typedef struct _headtrackerSerialcomm {
-    fd_set          com_rfds;
-
     char**          availablePorts;
-    int             numberOfAvailablePorts;
+    int				numberOfAvailablePorts;
+
+	unsigned long	numberOfReadBytes;
+	unsigned char	readBuffer[READ_BUFFER_SIZE];
     
     // information about the opened port
     char            *serial_device_name;
-    struct termios	com_termio; /* save the com config */
     int             portNumber; // port number in the list "availablePorts"
+#if defined(_WIN32) || defined(_WIN64)
+    HANDLE			comhandle; /* holds the comport handle */
+    DCB				dcb; /* holds the comm pars */
+    DCB				dcb_old; /* holds the comm pars */
+    COMMTIMEOUTS	old_timeouts;
+#else /* #if defined(_WIN32) || defined(_WIN64) */
+    struct termios	com_termio; /* save the com config */
     int				comhandle; /* holds the headtracker_rcv handle */
+	fd_set          com_rfds;
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
     
     int				baud; /* holds the current baud rate */
     
     char            verbose;
 } headtrackerSerialcomm;
-
-struct timeval tv;
 
 //=====================================================================================================
 // function declarations
@@ -67,8 +83,13 @@ void list_comm_ports(headtrackerSerialcomm *x);
 void init_read_serial(headtrackerSerialcomm *x);
 int is_data_available(headtrackerSerialcomm *x);
 int write_serial(headtrackerSerialcomm *x, unsigned char serial_byte);
+#if defined(_WIN32) || defined(_WIN64)
+HANDLE open_serial(headtrackerSerialcomm *x,  char* portName);
+HANDLE close_serial(headtrackerSerialcomm *x);
+#else /* #if defined(_WIN32) || defined(_WIN64) */
 int open_serial(headtrackerSerialcomm *x,  char* portName);
 int close_serial(headtrackerSerialcomm *x);
-long get_baud_ratebits(float *baud);
+#endif
+
 
 #endif /* defined(__libheadtracker_serialcomm__) */

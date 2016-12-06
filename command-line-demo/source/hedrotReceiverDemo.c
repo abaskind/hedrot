@@ -11,7 +11,7 @@
 #include "hedrot_comm_protocol.h"
 
 // time constants
-#define TICK_PERIOD             .01 // time period in seconds between two ticks
+#define TICK_PERIOD             .1 // time period in seconds between two ticks
 
 //=====================================================================================================
 // definitions and includes for clocking
@@ -19,32 +19,31 @@
 #ifdef __MACH__ // if mach (mac os X)
 #include <mach/clock.h>
 #include <mach/mach.h>
-#else
-#include <time.h>
-#endif
-
-
 double getTime() {
-#ifdef __MACH__ // if mach (mac os X)
     clock_serv_t cclock;
     mach_timespec_t mts;
     host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cclock);
     clock_get_time(cclock, &mts);
     mach_port_deallocate(mach_task_self(), cclock);
     return mts.tv_sec + mts.tv_nsec*1e-9;
-#else
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    return mts.tv_sec + mts.tv_nsec*1e-9;
-#endif
 }
+#else if defined(_WIN32) || defined(_WIN64)
+#include <Windows.h>
+double getTime() {
+	LARGE_INTEGER frequency;
+    LARGE_INTEGER time;
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&time);
+    return time.QuadPart / (double)frequency.QuadPart;
+}
+#endif
 
 
 int main(int argc, const char * argv[]) {
     double currentTime1, currentTime2, previousTime;
-    
-    printf("instantiating headtracker\r");
-    
+    char messageNumber;
+	int i;
+
     headtrackerData* trackingData = headtracker_new();
     
     // change baudrate (for some reason the command-line version does not accept higher baud rates than 57600)
@@ -69,11 +68,13 @@ int main(int argc, const char * argv[]) {
         headtracker_tick(trackingData);
         
         // process messages to notify
-        char messageNumber;
         while( (messageNumber = pullNotificationMessage(trackingData)) ) {
             switch( messageNumber ) {
                 case NOTIFICATION_MESSAGE_COMM_PORT_LIST_UPDATED:
-                    printf("port list updated\r\n");
+                    printf("port list updated, %d ports found\r\n", trackingData->serialcomm->numberOfAvailablePorts);
+					for(i = 0;i<trackingData->serialcomm->numberOfAvailablePorts; i++) {
+						printf("\t port %d: %s \r\n", i, trackingData->serialcomm->availablePorts[i]);
+					}
                     break;
                 case NOTIFICATION_MESSAGE_PORT_OPENED:
                     printf("port %s opened\r\n", trackingData->serialcomm->availablePorts[trackingData->serialcomm->portNumber]);
@@ -111,7 +112,11 @@ int main(int argc, const char * argv[]) {
         previousTime = currentTime2;
         
         // sleep so that the next tick starts TICK_PERIOD later
+#if defined(_WIN32) || defined(_WIN64)
+        Sleep((DWORD) (TICK_PERIOD*1000));
+#else /* #if defined(_WIN32) || defined(_WIN64) */
         usleep((int) ((TICK_PERIOD + currentTime2 - currentTime1) * 1000000));
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
     }
     
     return 0;

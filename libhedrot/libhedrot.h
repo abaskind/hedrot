@@ -25,7 +25,6 @@
 // static definitions
 //=====================================================================================================
 
-#define READ_BUFFER_SIZE 10000
 #define RAWDATA_STRING_MAX_SIZE 100 // should be bigger as NUMBER_OF_BYTES_IN_RAWDATA_FRAME
 
 // time constants
@@ -33,10 +32,22 @@
 #define AUTODISCOVER_MAX_TIME   0.1  // max time period in seconds between autodiscover ping and headtracker response
 
 // math utils
-#define	DEGREE_TO_RAD		(float)M_PI / 180.0f)
-#define	RAD_TO_DEGREE		(180.0 / (float)M_PI)
+#ifndef M_PI
+#define M_PI (float) 3.14159265358979323846
+#endif
+#define	DEGREE_TO_RAD		M_PI / 180.0f
+#define	RAD_TO_DEGREE		180.0f / M_PI
+#ifndef min
 #define min(a,b) (((a)<(b))?(a):(b))
+#endif
+#ifndef max
 #define max(a,b) (((a)>(b))?(a):(b))
+#endif
+
+// prototypes
+#if defined(_WIN32) || defined(_WIN64)
+# define strtok_r strtok_s // strtok_r does not exist on windows, use strtok_s instead
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
 
 
 // communication states
@@ -71,6 +82,7 @@
 #define NOTIFICATION_MESSAGE_BOARD_OVERLOAD             12
 
 
+
 //=====================================================================================================
 // structure definition: the headtrackerData "object"
 //=====================================================================================================
@@ -78,9 +90,6 @@
 typedef struct _headtrackerData {
     // structure for serial communication
     headtrackerSerialcomm *serialcomm;
-    
-    unsigned char   readBuffer[READ_BUFFER_SIZE];
-    
     
     // global receiver infos and settings
     char            calibrationValid;
@@ -148,9 +157,9 @@ typedef struct _headtrackerData {
     int             rawDataBufferIndex;
     
     // raw data pro sensor
-    int16_t         magRawData[3];
-    int16_t         accRawData[3];
-    int16_t         gyroRawData[3];
+    short         magRawData[3];
+    short         accRawData[3];
+    short         gyroRawData[3];
     
     // calibrated data pro sensor
     float           magCalData[3];
@@ -257,7 +266,7 @@ void gyroOffsetCalibration(headtrackerData *trackingData);
 void headtracker_autodiscover(headtrackerData *trackingData);
 void headtracker_autodiscover_tryNextPort(headtrackerData *trackingData);
 void headtracker_compute_data(headtrackerData *trackingData);
-void convert_7bytes_to_3int16(unsigned char *rawDataBuffer,int baseIndex,int16_t *rawDataToSend);
+void convert_7bytes_to_3int16(unsigned char *rawDataBuffer,int baseIndex,short *rawDataToSend);
 char MadgwickAHRSupdateModified(headtrackerData *trackingData);
 void pushNotificationMessage(headtrackerData *trackingData, char messageNumber);
 void headtracker_sendFloatArray2Headtracker(headtrackerData *trackingData, float* data, int numValues, unsigned char StartTransmitChar, unsigned char StopTransmitChar);

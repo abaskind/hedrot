@@ -362,71 +362,66 @@ void headtracker_tick(headtrackerData *trackingData) {
         if( trackingData->serialcomm->comhandle == INVALID_HANDLE_VALUE) return; //error
         init_read_serial(trackingData->serialcomm);
         
-        while(is_data_available(trackingData->serialcomm)) {
-            if(trackingData->serialcomm->numberOfReadBytes == 0) { // if a read error has been detected
-                if(trackingData->verbose) printf("[hedrot] : read error\r\n");
-                headtracker_init(trackingData);
-            } else {
-                //printf("%ld bytes read\r\n", numberOfReadBytes);
-                for(i = 0; i<trackingData->serialcomm->numberOfReadBytes; i++) {
-                    if(trackingData->verbose == VERBOSE_STATE_ALL_MESSAGES) {
-                        printf( "[hedrot] : byte received = %c\r\n",trackingData->serialcomm->readBuffer[i]);
-                    }
-                    if(trackingData->serialcomm->readBuffer[i]==H2R_DATA_RECEIVE_ERROR_CHAR) { //if the headtracker report an error by receiving
-                        printf("[hedrot] : the headtracker reports a receive error\r\n");
-                    } else {
-                        switch (trackingData->infoReceptionStatus) {
-                            case COMMUNICATION_STATE_WAITING_FOR_INFO:
-                                //check if the headtracker has started transmitting the info
-                                if(trackingData->serialcomm->readBuffer[i]==H2R_START_TRANSMIT_INFO_CHAR) {
-                                    headtracker_setReceptionStatus(trackingData,COMMUNICATION_STATE_RECEIVING_INFO);
-                                    readBufferInfoOffset = i+1;
-                                }
-                                break;
-                            case COMMUNICATION_STATE_RECEIVING_INFO:
-                                //check if the headtracker has finished transmitting the info
-                                if(trackingData->serialcomm->readBuffer[i]==H2R_STOP_TRANSMIT_INFO_CHAR) {
-                                    if(processInfoFromHeadtracker(trackingData, readBufferInfoOffset, i+1)) { // is the info stream sent by the headtracker valid?
-                                        trackingData->rawDataBufferIndex = 0; //reset the counter
-                                    } else {
-                                        //change back to state 1, which means that we will request the info once more at the end of the loop
-                                        headtracker_setReceptionStatus(trackingData,COMMUNICATION_STATE_WAITING_FOR_INFO);
-                                    }
-                                } else if(trackingData->serialcomm->readBuffer[i]==H2R_PING_CHAR) {
-                                    //if the headtracker responds to the ping, it means we can start to transmit
-                                    headtracker_setReceptionStatus(trackingData,COMMUNICATION_STATE_HEADTRACKER_TRANSMITTING);
+        while(is_data_available(trackingData->serialcomm)) { // if bytes are available for reading
+            //printf("%ld bytes read\r\n", numberOfReadBytes);
+            for(i = 0; i<trackingData->serialcomm->numberOfReadBytes; i++) {
+                if(trackingData->verbose == VERBOSE_STATE_ALL_MESSAGES) {
+                    printf( "[hedrot] : byte received = %c\r\n",trackingData->serialcomm->readBuffer[i]);
+                }
+                if(trackingData->serialcomm->readBuffer[i]==H2R_DATA_RECEIVE_ERROR_CHAR) { //if the headtracker report an error by receiving
+                    printf("[hedrot] : the headtracker reports a receive error\r\n");
+                } else {
+                    switch (trackingData->infoReceptionStatus) {
+                        case COMMUNICATION_STATE_WAITING_FOR_INFO:
+                            //check if the headtracker has started transmitting the info
+                            if(trackingData->serialcomm->readBuffer[i]==H2R_START_TRANSMIT_INFO_CHAR) {
+                                headtracker_setReceptionStatus(trackingData,COMMUNICATION_STATE_RECEIVING_INFO);
+                                readBufferInfoOffset = i+1;
+                            }
+                            break;
+                        case COMMUNICATION_STATE_RECEIVING_INFO:
+                            //check if the headtracker has finished transmitting the info
+                            if(trackingData->serialcomm->readBuffer[i]==H2R_STOP_TRANSMIT_INFO_CHAR) {
+                                if(processInfoFromHeadtracker(trackingData, readBufferInfoOffset, i+1)) { // is the info stream sent by the headtracker valid?
+                                    trackingData->rawDataBufferIndex = 0; //reset the counter
                                 } else {
-                                    // info still transmitting, do nothing
+                                    //change back to state 1, which means that we will request the info once more at the end of the loop
+                                    headtracker_setReceptionStatus(trackingData,COMMUNICATION_STATE_WAITING_FOR_INFO);
                                 }
-                                break;
-                            case COMMUNICATION_STATE_HEADTRACKER_TRANSMITTING:
-                                //check if the MSB of the current byte is 0 (meaning "frame end" or any other message)
-                                if((trackingData->serialcomm->readBuffer[i]&128)==0) {
-                                    //is it the end of the frame?
-                                    if(trackingData->serialcomm->readBuffer[i]==H2R_END_OF_RAWDATA_FRAME) {
-                                        //check that the number of received bytes is correct
-                                        if(trackingData->rawDataBufferIndex==NUMBER_OF_BYTES_IN_RAWDATA_FRAME) {
+                            } else if(trackingData->serialcomm->readBuffer[i]==H2R_PING_CHAR) {
+                                //if the headtracker responds to the ping, it means we can start to transmit
+                                headtracker_setReceptionStatus(trackingData,COMMUNICATION_STATE_HEADTRACKER_TRANSMITTING);
+                            } else {
+                                // info still transmitting, do nothing
+                            }
+                            break;
+                        case COMMUNICATION_STATE_HEADTRACKER_TRANSMITTING:
+                            //check if the MSB of the current byte is 0 (meaning "frame end" or any other message)
+                            if((trackingData->serialcomm->readBuffer[i]&128)==0) {
+                                //is it the end of the frame?
+                                if(trackingData->serialcomm->readBuffer[i]==H2R_END_OF_RAWDATA_FRAME) {
+                                    //check that the number of received bytes is correct
+                                    if(trackingData->rawDataBufferIndex==NUMBER_OF_BYTES_IN_RAWDATA_FRAME) {
                                             
-                                            headtracker_compute_data(trackingData);
+                                        headtracker_compute_data(trackingData);
                                             
-                                            trackingData->trackingDataReady = 1;
-                                        } else {
-                                            if(trackingData->verbose) {
-                                                printf( "[hedrot] : bad stream (%d elements instead of %d)\r\n",trackingData->rawDataBufferIndex, NUMBER_OF_BYTES_IN_RAWDATA_FRAME);
-                                            }
+                                        trackingData->trackingDataReady = 1;
+                                    } else {
+                                        if(trackingData->verbose) {
+                                            printf( "[hedrot] : bad stream (%d elements instead of %d)\r\n",trackingData->rawDataBufferIndex, NUMBER_OF_BYTES_IN_RAWDATA_FRAME);
                                         }
-                                        trackingData->rawDataBufferIndex = 0; //reset the counter
-                                    } else if(trackingData->serialcomm->readBuffer[i]==H2R_BOARD_OVERLOAD) {
-                                        // error: teensy overloaded
-                                        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_BOARD_OVERLOAD);
                                     }
-                                } else { //MSB = 1, raw headtracking data, store in the buffer
-                                    trackingData->rawDataBuffer[trackingData->rawDataBufferIndex++]=trackingData->serialcomm->readBuffer[i];
+                                    trackingData->rawDataBufferIndex = 0; //reset the counter
+                                } else if(trackingData->serialcomm->readBuffer[i]==H2R_BOARD_OVERLOAD) {
+                                    // error: teensy overloaded
+                                    pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_BOARD_OVERLOAD);
                                 }
-                                break;
-                            default: //error
-                                break;
-                        }
+                            } else { //MSB = 1, raw headtracking data, store in the buffer
+                                trackingData->rawDataBuffer[trackingData->rawDataBufferIndex++]=trackingData->serialcomm->readBuffer[i];
+                            }
+                            break;
+                        default: //error
+                            break;
                     }
                 }
             }

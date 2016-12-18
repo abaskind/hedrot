@@ -32,7 +32,7 @@
 #define AUTODISCOVER_MAX_TIME   0.1  // max time period in seconds between autodiscover ping and headtracker response
 
 // math utils
-#define M_PI_float (float)            3.14159265358979323846264338327950288
+#define M_PI_float (float)      3.14159265358979323846264338327950288
 #define	DEGREE_TO_RAD           M_PI_float / 180.0f
 #define	RAD_TO_DEGREE           180.0f / M_PI_float
 #ifndef min

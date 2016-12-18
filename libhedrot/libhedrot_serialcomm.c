@@ -103,6 +103,7 @@ void list_comm_ports(headtrackerSerialcomm *x) {
     glob_t         glob_buffer;
 
 	const char		*glob_pattern = "/dev/cu.*";
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
 
 	// free the previous port list
     for (i = 0; i < x->numberOfAvailablePorts; i++) {
@@ -113,7 +114,9 @@ void list_comm_ports(headtrackerSerialcomm *x) {
         x->availablePorts = NULL;
     }
     x->numberOfAvailablePorts = 0;
-#endif /* #if defined(_WIN32) || defined(_WIN64) */
+
+	// reset port number (for autodiscovering)
+    x->portNumber=-1;
 
 #if defined(_WIN32) || defined(_WIN64)
     for(i = 1; i < MAX_NUMBER_OF_PORTS; i++) {
@@ -148,9 +151,6 @@ void list_comm_ports(headtrackerSerialcomm *x) {
         x->availablePorts[i] = _strdup(tmpPortsNames[i]);
 
 #else /* #if defined(_WIN32) || defined(_WIN64) */
-    // reset port number (for autodiscovering)
-    x->portNumber=-1;
-    
     /* first look for registered devices in the filesystem */
    
     switch( glob( glob_pattern, GLOB_ERR, NULL, &glob_buffer ) ) {
@@ -271,8 +271,6 @@ HANDLE open_serial(headtrackerSerialcomm *x, char* portName) {
     
     if(SetCommState(fd, &dcb)) {
         if(x->verbose) printf("[hedrot] opened serial line device %s\r\n", portName);
-        
-        return fd;
     } else {
         printf("[hedrot] ** ERROR ** could not set params to control dcb of device %s\r\n", portName);
         CloseHandle(fd);
@@ -288,12 +286,16 @@ HANDLE open_serial(headtrackerSerialcomm *x, char* portName) {
 
     if (!SetCommTimeouts(fd, &timeouts))
     {
-        printf("[hedrot] ** ERROR ** Couldn't set timeouts for serial device (%d)", GetLastError());
+        printf("[hedrot] ** ERROR ** Couldn't set timeouts for serial device (%d)\r\n", GetLastError());
+		CloseHandle(fd);
         return INVALID_HANDLE_VALUE;
     }
-	if (!SetupComm(x->comhandle, 4096L, 4096L))/* try to get big buffers to avoid overruns*/
+
+	if (!SetupComm(fd, 4096L, 4096L))/* try to get big buffers to avoid overruns*/
 	{
-		printf("[hedrot] ** ERROR ** Couldn't do SetupComm (%d)", GetLastError());
+		printf("[hedrot] ** ERROR ** Couldn't do SetupComm (%d)\r\n", GetLastError());
+		CloseHandle(fd);
+		return INVALID_HANDLE_VALUE;
 	}
 
 	// update structure info
@@ -422,10 +424,12 @@ int is_data_available(headtrackerSerialcomm *x) {
 
     osReader.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     if(ReadFile(x->comhandle, x->readBuffer, READ_BUFFER_SIZE, &x->numberOfReadBytes, &osReader)) {
-		err = 0;
+		err = 1;
     } else {
-        err = -1;
+        err = 0; // read error
     }
+	if(x->numberOfReadBytes ==0)
+		err = 0;
     CloseHandle(osReader.hEvent);
 #else /* #if defined(_WIN32) || defined(_WIN64) */
     ssize_t numberOfBytes;

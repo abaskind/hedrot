@@ -44,7 +44,7 @@ typedef struct hedrot_receiver
     
     
     // general variables about information reception
-    void			*receive_and_output_clock;
+    t_object		*receive_and_output_clock;
     
     headtrackerData *trackingData;
     

@@ -6,8 +6,12 @@
 
 /* ------------------- main methods --------------------------- */
 
-void hedrot_receiver_tick(t_hedrot_receiver *x)
-{
+void hedrot_receiver_tick(t_hedrot_receiver *x) {
+    t_atom output;
+	t_ptr_size len;
+	
+    char messageNumber;
+
     if(x->trackingData->headtracker_on) {
         headtracker_tick(x->trackingData);
         
@@ -23,7 +27,6 @@ void hedrot_receiver_tick(t_hedrot_receiver *x)
             
             
             // output debug variables
-            t_atom output;
             atom_setfloat(&output, x->trackingData->beta);
             outlet_anything( x->x_debug_outlet, gensym("beta"), 1, &output);
             
@@ -42,7 +45,7 @@ void hedrot_receiver_tick(t_hedrot_receiver *x)
                         x->trackingData->gyroCalData[0], x->trackingData->gyroCalData[1], x->trackingData->gyroCalData[2],
                         x->trackingData->q1, x->trackingData->q2, x->trackingData->q3, x->trackingData->q4,
                         x->trackingData->yaw, x->trackingData->pitch, x->trackingData->roll);
-                t_ptr_size len = strlen(x->tmpStr);
+                len = strlen(x->tmpStr);
                 if(sysfile_write(x->fh_write, &len, x->tmpStr)!=MAX_ERR_NONE)
                     error("[hedrot_receiver] : write error on text file");
                 x->recsampleCount++;
@@ -51,7 +54,6 @@ void hedrot_receiver_tick(t_hedrot_receiver *x)
     }
     
     // process messages to notify
-    char messageNumber;
     while( (messageNumber = pullNotificationMessage(x->trackingData)) ) {
         switch( messageNumber ) {
             case NOTIFICATION_MESSAGE_COMM_PORT_LIST_UPDATED:
@@ -125,8 +127,9 @@ void hedrot_receiver_autodiscover_deferedTick(t_hedrot_receiver *x, t_symbol *s,
 
 void hedrot_receiver_output_data(t_hedrot_receiver *x)
 {
-    
-    for (int i=0; i < 3; i++) {
+    int i;
+
+    for (i=0; i < 3; i++) {
         //prepare the lists (raw and calibrated)
         atom_setlong(x->rawData+i,x->trackingData->magRawData[i]);
         atom_setlong(x->rawData+i+3,x->trackingData->accRawData[i]);
@@ -174,7 +177,7 @@ void hedrot_receiver_init(t_hedrot_receiver *x) {
     
     hedrot_receiver_free_clock(x);
     // prepare a clock for the main tick method and start it at low rate first
-    x->receive_and_output_clock = clock_new(x, (method)hedrot_receiver_tick);
+    x->receive_and_output_clock = (t_object*) clock_new(x, (method)hedrot_receiver_tick);
     clock_fdelay(x->receive_and_output_clock, SEARCHING_DEVICE_TIME);
 }
 
@@ -338,6 +341,7 @@ void hedrot_receiver_printVersion(t_hedrot_receiver *x, t_symbol *s) {
 
 void hedrot_receiver_outputPortList(t_hedrot_receiver *x) {
     t_atom message_clear[2], outptr[4];
+	int i;
     
     atom_setsym(message_clear, gensym("available_ports"));
     atom_setsym(message_clear+1, gensym("clear"));
@@ -345,7 +349,7 @@ void hedrot_receiver_outputPortList(t_hedrot_receiver *x) {
     
     if(x->verbose == VERBOSE_STATE_ALL_MESSAGES) post("[hedrot_receiver]: list of available comm ports updated: %ld ports:", x->trackingData->serialcomm->numberOfAvailablePorts);
     
-    for(int i=0; i<x->trackingData->serialcomm->numberOfAvailablePorts; i++) {
+    for(i=0; i<x->trackingData->serialcomm->numberOfAvailablePorts; i++) {
         // now append the list
         atom_setsym(outptr, gensym("available_ports"));
         atom_setsym(outptr+1, gensym("append"));
@@ -453,6 +457,8 @@ void hedrot_receiver_outputReceptionStatus(t_hedrot_receiver *x) {
 // update the headtracker settings for the GUI
 void hedrot_receiver_mirrorHeadtrackerInfo(t_hedrot_receiver *x) {
     t_atom sym[2];
+
+	int i;
     
     if(x->verbose) post("Headtracker settings retrieved\n");
     
@@ -488,7 +494,7 @@ void hedrot_receiver_mirrorHeadtrackerInfo(t_hedrot_receiver *x) {
     x->accRange = x->trackingData->accRange;
     object_attr_touch( (t_object *)x, gensym("accRange"));
     
-    for(int i=0;i<3;i++) x->accHardOffset[i] = x->trackingData->accHardOffset[i];
+    for(i=0;i<3;i++) x->accHardOffset[i] = x->trackingData->accHardOffset[i];
     object_attr_touch( (t_object *)x, gensym("accHardOffset"));
     
     x->accFullResolutionBit = x->trackingData->accFullResolutionBit;
@@ -518,16 +524,16 @@ void hedrot_receiver_mirrorHeadtrackerInfo(t_hedrot_receiver *x) {
     x->gyroOffsetAutocalThreshold = x->trackingData->gyroOffsetAutocalThreshold;
     object_attr_touch( (t_object *)x, gensym("gyroOffsetAutocalThreshold"));
     
-    for(int i=0;i<3;i++) x->accOffset[i] = x->trackingData->accOffset[i];
+    for(i=0;i<3;i++) x->accOffset[i] = x->trackingData->accOffset[i];
     object_attr_touch( (t_object *)x, gensym("accOffset"));
     
-    for(int i=0;i<3;i++) x->accScaling[i] = x->trackingData->accScaling[i];
+    for(i=0;i<3;i++) x->accScaling[i] = x->trackingData->accScaling[i];
     object_attr_touch( (t_object *)x, gensym("accScaling"));
     
-    for(int i=0;i<3;i++) x->magOffset[i] = x->trackingData->magOffset[i];
+    for(i=0;i<3;i++) x->magOffset[i] = x->trackingData->magOffset[i];
     object_attr_touch( (t_object *)x, gensym("magOffset"));
     
-    for(int i=0;i<3;i++) x->magScaling[i] = x->trackingData->magScaling[i];
+    for(i=0;i<3;i++) x->magScaling[i] = x->trackingData->magScaling[i];
     object_attr_touch( (t_object *)x, gensym("magScaling"));
     
     x->MadgwickBetaMax = x->trackingData->MadgwickBetaMax;
@@ -562,7 +568,10 @@ void hedrot_receiver_doopenforwrite(t_hedrot_receiver *x, t_symbol *s) {
     short path=0;
     long err;
     t_filehandle fh_write;
-    
+    char str[1024];
+    t_ptr_size len;
+
+
     if (s == gensym("")) {      // if no argument supplied, ask for file
         filename[0] = 0;
         if (saveasdialog_extended(filename, &path, &outtype, &filetype, 1))
@@ -586,9 +595,6 @@ void hedrot_receiver_doopenforwrite(t_hedrot_receiver *x, t_symbol *s) {
     path_topathname( path, filename, x->filename);
     
     // write the header
-    char str[1024];
-    t_ptr_size len;
-    
     len = strlen("<header>\n");
     sysfile_write(x->fh_write, &len, "<header>\n");
     
@@ -788,10 +794,12 @@ t_max_err hedrot_receiver_accRange_set(t_hedrot_receiver *x, t_object *attr, lon
 
 
 t_max_err hedrot_receiver_accHardOffset_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
-    if (!argc)
+    int i;
+	
+	if (!argc)
         return MAX_ERR_GENERIC;
     
-    for(int i=0;i<3;i++,argv++) {
+    for(i=0;i<3;i++,argv++) {
         x->accHardOffset[i] = (char)max(min(atom_getlong(argv),127),-128);
     }
     
@@ -899,10 +907,12 @@ t_max_err hedrot_receiver_gyroOffsetAutocalThreshold_set(t_hedrot_receiver *x, t
 
 
 t_max_err hedrot_receiver_accOffset_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
-    if (!argc)
+    int i;
+	
+	if (!argc)
         return MAX_ERR_GENERIC;
     
-    for(int i=0;i<3;i++,argv++)
+    for(i=0;i<3;i++,argv++)
         x->accOffset[i] = (float) atom_getfloat(argv);
     
     setAccOffset(x->trackingData, x->accOffset, 1);
@@ -912,11 +922,13 @@ t_max_err hedrot_receiver_accOffset_set(t_hedrot_receiver *x, t_object *attr, lo
 
 
 t_max_err hedrot_receiver_accScaling_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
-    if (!argc)
+    int i;
+	
+	if (!argc)
         return MAX_ERR_GENERIC;
     
     
-    for(int i=0;i<3;i++,argv++)
+    for(i=0;i<3;i++,argv++)
         x->accScaling[i] = (float) atom_getfloat(argv);
     
     setAccScaling(x->trackingData, x->accScaling, 1);
@@ -926,10 +938,12 @@ t_max_err hedrot_receiver_accScaling_set(t_hedrot_receiver *x, t_object *attr, l
 
 
 t_max_err hedrot_receiver_magOffset_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
-    if (!argc)
+    int i;
+	
+	if (!argc)
         return MAX_ERR_GENERIC;
     
-    for(int i=0;i<3;i++,argv++)
+    for(i=0;i<3;i++,argv++)
         x->magOffset[i] = (float) atom_getfloat(argv);
     
     setMagOffset(x->trackingData, x->magOffset, 1);
@@ -939,10 +953,12 @@ t_max_err hedrot_receiver_magOffset_set(t_hedrot_receiver *x, t_object *attr, lo
 
 
 t_max_err hedrot_receiver_magScaling_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
-    if (!argc)
+    int i;
+	
+	if (!argc)
         return MAX_ERR_GENERIC;
     
-    for(int i=0;i<3;i++,argv++)
+    for(i=0;i<3;i++,argv++)
         x->magScaling[i] = (float) atom_getfloat(argv);
     
     setMagScaling(x->trackingData, x->magScaling, 1);

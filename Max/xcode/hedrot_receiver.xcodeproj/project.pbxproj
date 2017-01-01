@@ -23,6 +23,7 @@
 		16B2FC701DC9F69B003EECB3 /* libhedrot_serialcomm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libhedrot_serialcomm.h; sourceTree = "<group>"; };
 		16B2FC711DC9F69B003EECB3 /* libhedrot.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = libhedrot.c; sourceTree = "<group>"; };
 		16B2FC721DC9F69B003EECB3 /* libhedrot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libhedrot.h; sourceTree = "<group>"; };
+		16B6BF111E193823009E5E99 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		16DD60A41A5A7879005AE0FF /* hedrot_receiver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hedrot_receiver.h; path = ../source/hedrot_receiver.h; sourceTree = "<group>"; };
 		2FBBEAE508F335360078DB84 /* hedrot_receiver.mxo */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = hedrot_receiver.mxo; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -41,6 +42,7 @@
 		089C166AFE841209C02AAC07 /* iterator */ = {
 			isa = PBXGroup;
 			children = (
+				16B6BF111E193823009E5E99 /* Info.plist */,
 				1629E7D11DCBBC61006ACD46 /* hedrot-firmware */,
 				16B2FC6E1DC9F68E003EECB3 /* libhedrot */,
 				1695F0041A87997F00708733 /* hedrot_receiver.c */,
@@ -194,6 +196,8 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				INFOPLIST_PREFIX_HEADER = "";
+				INFOPLIST_PREPROCESS = NO;
 				OTHER_LDFLAGS = "$(C74_SYM_LINKER_FLAGS)";
 				PRODUCT_NAME = hedrot_receiver;
 			};
@@ -205,6 +209,8 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
+				INFOPLIST_PREFIX_HEADER = "";
+				INFOPLIST_PREPROCESS = NO;
 				OTHER_LDFLAGS = "$(C74_SYM_LINKER_FLAGS)";
 				PRODUCT_NAME = hedrot_receiver;
 			};

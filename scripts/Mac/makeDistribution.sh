@@ -10,7 +10,7 @@ thisDirectory=`pwd`
 rootDirectory=$thisDirectory/../..
 destDirectory=$rootDirectory/build/forPackaging
 
-hedrotVersion=`awk '/^#define HEDROT_VERSION / { print $3 }' $rootDirectory/libhedrot/libhedrot.h`
+hedrotVersion=`awk '/^#define HEDROT_VERSION / { print $3 }' $rootDirectory/libhedrot/libhedrot.h | sed 's/"//g'`
 hedrotVersionMessage="hedrot version: $hedrotVersion"
 echo $hedrotVersionMessage
 

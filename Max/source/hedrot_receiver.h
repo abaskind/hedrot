@@ -22,10 +22,6 @@
 #include "libhedrot.h"
 #include "hedrot_comm_protocol.h"
 
-
-// libhedrot software version
-#define MAX_hedrot_receiver_VERSION 2
-
 // time constants
 #define SEARCHING_DEVICE_TIME          200  //time period between two ticks when the headtracker has still not been found
 

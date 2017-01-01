@@ -2209,7 +2209,7 @@
 							"modernui" : 1
 						}
 ,
-						"rect" : [ 25.0, 69.0, 640.0, 480.0 ],
+						"rect" : [ 126.0, 92.0, 640.0, 480.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -2238,121 +2238,14 @@
 						"subpatcher_template" : "",
 						"boxes" : [ 							{
 								"box" : 								{
-									"fontname" : "Arial",
-									"fontsize" : 12.0,
-									"id" : "obj-9",
-									"linecount" : 3,
-									"maxclass" : "comment",
-									"numinlets" : 1,
-									"numoutlets" : 0,
-									"patching_rect" : [ 254.0, 90.0, 150.0, 47.0 ],
-									"style" : "",
-									"text" : "update the version number if it finds the file HEDROT_VERSION"
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"fontname" : "Arial",
-									"fontsize" : 12.0,
-									"id" : "obj-7",
-									"maxclass" : "newobj",
-									"numinlets" : 2,
-									"numoutlets" : 2,
-									"outlettype" : [ "", "" ],
-									"patching_rect" : [ 51.0, 73.0, 88.0, 20.0 ],
-									"style" : "",
-									"text" : "route notfound"
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"fontname" : "Arial",
-									"fontsize" : 12.0,
-									"id" : "obj-2",
-									"maxclass" : "newobj",
-									"numinlets" : 1,
-									"numoutlets" : 1,
-									"outlettype" : [ "" ],
-									"patching_rect" : [ 50.981995, 38.0, 79.0, 20.0 ],
-									"style" : "",
-									"text" : "absolutepath"
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"fontname" : "Arial",
-									"fontsize" : 12.0,
-									"id" : "obj-1",
-									"maxclass" : "newobj",
-									"numinlets" : 1,
-									"numoutlets" : 1,
-									"outlettype" : [ "" ],
-									"patching_rect" : [ 50.981995, 10.0, 177.0, 20.0 ],
-									"style" : "",
-									"text" : "loadmess HEDROT_VERSION"
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"fontname" : "Arial",
-									"fontsize" : 12.0,
 									"id" : "obj-143",
 									"maxclass" : "newobj",
-									"numinlets" : 2,
-									"numoutlets" : 2,
-									"outlettype" : [ "", "" ],
-									"patching_rect" : [ 120.0, 225.0, 57.0, 20.0 ],
-									"style" : "",
-									"text" : "route set"
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"fontname" : "Arial",
-									"fontsize" : 12.0,
-									"id" : "obj-140",
-									"maxclass" : "message",
-									"numinlets" : 2,
+									"numinlets" : 0,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 130.5, 187.0, 41.0, 18.0 ],
+									"patching_rect" : [ 9.0, 17.0, 97.0, 22.0 ],
 									"style" : "",
-									"text" : "dump"
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"fontname" : "Arial",
-									"fontsize" : 12.0,
-									"id" : "obj-138",
-									"maxclass" : "newobj",
-									"numinlets" : 1,
-									"numoutlets" : 1,
-									"outlettype" : [ "" ],
-									"patching_rect" : [ 120.0, 102.0, 82.0, 20.0 ],
-									"style" : "",
-									"text" : "prepend read"
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"fontname" : "Arial",
-									"fontsize" : 12.0,
-									"id" : "obj-134",
-									"maxclass" : "newobj",
-									"numinlets" : 1,
-									"numoutlets" : 3,
-									"outlettype" : [ "", "bang", "int" ],
-									"patching_rect" : [ 120.0, 155.5, 40.0, 20.0 ],
-									"style" : "",
-									"text" : "text"
+									"text" : "r hedrot_version"
 								}
 
 							}
@@ -2365,7 +2258,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 120.0, 257.5, 98.0, 20.0 ],
+									"patching_rect" : [ 9.0, 49.5, 98.0, 22.0 ],
 									"style" : "",
 									"text" : "prepend Version"
 								}
@@ -2380,7 +2273,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 120.0, 291.5, 74.0, 20.0 ],
+									"patching_rect" : [ 9.0, 83.5, 74.0, 22.0 ],
 									"style" : "",
 									"text" : "prepend set"
 								}
@@ -2393,22 +2286,13 @@
 									"maxclass" : "outlet",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 120.0, 371.5, 25.0, 25.0 ],
+									"patching_rect" : [ 9.0, 163.5, 25.0, 25.0 ],
 									"style" : ""
 								}
 
 							}
  ],
 						"lines" : [ 							{
-								"patchline" : 								{
-									"destination" : [ "obj-2", 0 ],
-									"disabled" : 0,
-									"hidden" : 0,
-									"source" : [ "obj-1", 0 ]
-								}
-
-							}
-, 							{
 								"patchline" : 								{
 									"destination" : [ "obj-135", 0 ],
 									"disabled" : 0,
@@ -2428,65 +2312,10 @@
 							}
 , 							{
 								"patchline" : 								{
-									"destination" : [ "obj-140", 0 ],
-									"disabled" : 0,
-									"hidden" : 0,
-									"source" : [ "obj-134", 1 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"destination" : [ "obj-143", 0 ],
-									"disabled" : 0,
-									"hidden" : 0,
-									"source" : [ "obj-134", 0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"destination" : [ "obj-134", 0 ],
-									"disabled" : 0,
-									"hidden" : 0,
-									"source" : [ "obj-138", 0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"destination" : [ "obj-134", 0 ],
-									"disabled" : 0,
-									"hidden" : 0,
-									"midpoints" : [ 140.0, 219.0, 206.75, 219.0, 206.75, 144.5, 129.5, 144.5 ],
-									"source" : [ "obj-140", 0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
 									"destination" : [ "obj-132", 0 ],
 									"disabled" : 0,
 									"hidden" : 0,
 									"source" : [ "obj-143", 0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"destination" : [ "obj-7", 0 ],
-									"disabled" : 0,
-									"hidden" : 0,
-									"source" : [ "obj-2", 0 ]
-								}
-
-							}
-, 							{
-								"patchline" : 								{
-									"destination" : [ "obj-138", 0 ],
-									"disabled" : 0,
-									"hidden" : 0,
-									"source" : [ "obj-7", 1 ]
 								}
 
 							}
@@ -2519,7 +2348,7 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 15.0, 720.0, 134.0, 20.0 ],
 					"style" : "",
-					"text" : "Version 1.1.0beta1"
+					"text" : "Version 1.0.3beta2"
 				}
 
 			}
@@ -3106,7 +2935,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u550003345"
+									"varname" : "u235001173"
 								}
 
 							}
@@ -7238,19 +7067,19 @@
 									"restore" : 									{
 										"IPaddress" : [ "127.0.0.1" ],
 										"pitchOSCpattern" : [ "/hedrot/pitch" ],
-										"pitch_transmit" : [ 0 ],
+										"pitch_transmit" : [ 1 ],
 										"portNumber" : [ 2001 ],
 										"quaternionOSCpattern" : [ "/hedrot/quaternion" ],
 										"quaternion_transmit" : [ 1 ],
 										"rollOSCpattern" : [ "/hedrot/roll" ],
-										"roll_transmit" : [ 0 ],
+										"roll_transmit" : [ 1 ],
 										"yawOSCpattern" : [ "/hedrot/yaw" ],
-										"yaw_transmit" : [ 0 ]
+										"yaw_transmit" : [ 1 ]
 									}
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u589003344"
+									"varname" : "u159001172"
 								}
 
 							}
@@ -8572,7 +8401,7 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 26.0, 92.0, 512.67334, 29.0 ],
 					"style" : "",
-					"text" : "headtracker transmitting...",
+					"text" : "no headtracker connected",
 					"textcolor" : [ 0.0, 0.501961, 1.0, 1.0 ],
 					"textjustification" : 1
 				}
@@ -23899,7 +23728,7 @@
 					"fontsize" : 18.0,
 					"id" : "obj-86",
 					"ignoreclick" : 1,
-					"items" : [ 0, "/dev/cu.Bluetooth-Incoming-Port", ",", 1, "/dev/cu.usbmodem568201" ],
+					"items" : "<empty>",
 					"labelclick" : 1,
 					"maxclass" : "umenu",
 					"numinlets" : 1,
@@ -24174,6 +24003,32 @@
 						"style" : "",
 						"subpatcher_template" : "",
 						"boxes" : [ 							{
+								"box" : 								{
+									"hidden" : 1,
+									"id" : "obj-65",
+									"maxclass" : "newobj",
+									"numinlets" : 1,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 506.189484, 320.0, 104.0, 22.0 ],
+									"style" : "",
+									"text" : "loadmess version"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-31",
+									"maxclass" : "newobj",
+									"numinlets" : 1,
+									"numoutlets" : 0,
+									"patching_rect" : [ 834.5, 699.0, 99.0, 22.0 ],
+									"style" : "",
+									"text" : "s hedrot_version"
+								}
+
+							}
+, 							{
 								"box" : 								{
 									"comment" : "",
 									"id" : "obj-26",
@@ -24669,7 +24524,7 @@
  ]
 									}
 ,
-									"patching_rect" : [ 791.5, 676.5, 118.0, 22.0 ],
+									"patching_rect" : [ 772.5, 666.5, 118.0, 22.0 ],
 									"saved_object_attributes" : 									{
 										"description" : "",
 										"digest" : "",
@@ -25371,7 +25226,7 @@
  ]
 									}
 ,
-									"patching_rect" : [ 717.166687, 637.5, 128.0, 22.0 ],
+									"patching_rect" : [ 711.197876, 638.0, 128.0, 22.0 ],
 									"saved_object_attributes" : 									{
 										"description" : "",
 										"digest" : "",
@@ -25391,12 +25246,12 @@
 									"fontsize" : 12.0,
 									"id" : "obj-9",
 									"maxclass" : "newobj",
-									"numinlets" : 4,
-									"numoutlets" : 4,
-									"outlettype" : [ "", "", "", "" ],
-									"patching_rect" : [ 648.5, 585.5, 225.0, 22.0 ],
+									"numinlets" : 5,
+									"numoutlets" : 5,
+									"outlettype" : [ "", "", "", "", "" ],
+									"patching_rect" : [ 648.5, 585.5, 267.0, 22.0 ],
 									"style" : "",
-									"text" : "route serial headtracker calibrating_gyro"
+									"text" : "route serial headtracker calibrating_gyro version"
 								}
 
 							}
@@ -26637,7 +26492,7 @@
  ]
 									}
 ,
-									"patching_rect" : [ 708.0, 554.5, 166.0, 22.0 ],
+									"patching_rect" : [ 692.197876, 553.5, 166.0, 22.0 ],
 									"saved_object_attributes" : 									{
 										"description" : "",
 										"digest" : "",
@@ -26660,7 +26515,7 @@
 									"numinlets" : 3,
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "" ],
-									"patching_rect" : [ 708.0, 528.5, 285.0, 22.0 ],
+									"patching_rect" : [ 692.197876, 527.5, 285.0, 22.0 ],
 									"style" : "",
 									"text" : "route wrong_firmware_version calibration_not_valid"
 								}
@@ -27653,6 +27508,15 @@
 							}
 , 							{
 								"patchline" : 								{
+									"destination" : [ "obj-57", 0 ],
+									"disabled" : 0,
+									"hidden" : 1,
+									"source" : [ "obj-65", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
 									"destination" : [ "obj-112", 0 ],
 									"disabled" : 0,
 									"hidden" : 1,
@@ -27720,6 +27584,15 @@
 									"disabled" : 0,
 									"hidden" : 0,
 									"source" : [ "obj-9", 1 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-31", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"source" : [ "obj-9", 3 ]
 								}
 
 							}
@@ -32786,13 +32659,13 @@
 					"patching_rect" : [ 457.67337, 1124.0, 144.0, 22.0 ],
 					"restore" : 					{
 						"autodiscover" : [ 1 ],
-						"serialport" : [ "1 /dev/cu.usbmodem568201" ],
-						"values_to_transmit" : [ 0 ]
+						"serialport" : [ "" ],
+						"values_to_transmit" : [ 1 ]
 					}
 ,
 					"style" : "",
 					"text" : "autopattr @autorestore 0",
-					"varname" : "u326003346"
+					"varname" : "u750001174"
 				}
 
 			}
@@ -34320,7 +34193,7 @@
 			}
 , 			{
 				"name" : "rs_set.maxpat",
-				"bootpath" : "/Volumes/Data/projets/ImKeller/ERCETIN_Imkeller/turgut-modules/libs_Alexis",
+				"bootpath" : "/Volumes/Data/Developpement/hedrot-headtracker/hedrot/Max/patches",
 				"type" : "JSON",
 				"implicit" : 1
 			}

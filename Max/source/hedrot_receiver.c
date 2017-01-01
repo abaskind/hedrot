@@ -184,7 +184,6 @@ void hedrot_receiver_init(t_hedrot_receiver *x) {
 void *hedrot_receiver_new(t_symbol *s, short ac, t_atom *av)
 {
     t_hedrot_receiver *x;
-    
     x = (t_hedrot_receiver *)object_alloc(hedrot_receiver_class);
     
     // create outlets
@@ -207,6 +206,8 @@ void *hedrot_receiver_new(t_symbol *s, short ac, t_atom *av)
     x->outputDataPeriod = 5;
     
     hedrot_receiver_init(x);
+    
+    post("test");
     
     return x;
 }
@@ -333,8 +334,16 @@ void hedrot_receiver_defered_import_settings(t_hedrot_receiver *x, t_symbol *s) 
 }
 
 void hedrot_receiver_printVersion(t_hedrot_receiver *x, t_symbol *s) {
-    post("[hedrot_receiver] Max object version %d, libhedrot version %d, compiled on "__DATE__, MAX_hedrot_receiver_VERSION, LIBHEDROT_VERSION);
+    t_atom message_version;
+    
+    post("[hedrot_receiver] Max object based on hedrot version %s, compiled on "__DATE__, HEDROT_VERSION);
     post("[hedrot_receiver] Required firmware version %d", HEDROT_FIRMWARE_VERSION);
+
+    // output version number on status outlet
+    atom_setsym(&message_version, gensym(HEDROT_VERSION));
+    outlet_anything(x->x_status_outlet, gensym("version"), 1, &message_version);
+    
+
 }
 
 
@@ -1152,6 +1161,5 @@ int C74_EXPORT main()
     
     hedrot_receiver_class = c;
     
-    post("hedrot_receiver, "__DATE__);
     return 0;
 }

@@ -10,13 +10,9 @@ thisDirectory=`pwd`
 rootDirectory=$thisDirectory/../..
 destDirectory=$rootDirectory/build/forPackaging
 
-hedrotVersion=`more $rootDirectory/HEDROT_VERSION`
+hedrotVersion=`awk '/^#define HEDROT_VERSION / { print $3 }' $rootDirectory/libhedrot/libhedrot.h`
 hedrotVersionMessage="hedrot version: $hedrotVersion"
 echo $hedrotVersionMessage
-
-libhedrotVersion=`awk '/^#define LIBHEDROT_VERSION / { print $3 }' $rootDirectory/libhedrot/libhedrot.h`
-libhedrotVersionMessage="libhedrot version: $libhedrotVersion"
-echo $libhedrotVersionMessage
 
 hedrotFirmwareVersion=`awk '/^#define HEDROT_FIRMWARE_VERSION / { print $3 }' $rootDirectory/firmware/hedrot-firmware/hedrot_comm_protocol.h`
 hedrotFirmwareVersionMessage="Headtracker Firmware version: $hedrotFirmwareVersion"
@@ -74,7 +70,6 @@ cp "$rootDirectory/CHANGELOG.txt" "$packageFolder/"
 cp "$rootDirectory/scripts/README-DISTRIBUTION.txt" "$packageFolder/README.txt"
 perl -pi -w -e  "s/Hedrot Version: XXXX/Hedrot Version: $hedrotVersion/g;" $packageFolder/README.txt
 perl -pi -w -e  "s/Firmware Version: YYYY/Firmware Version: $hedrotFirmwareVersion/g;" $packageFolder/README.txt
-perl -pi -w -e  "s/hedrot library Version: ZZZZ/hedrot library Version: $libhedrotVersion/g;" $packageFolder/README.txt
 
 
 

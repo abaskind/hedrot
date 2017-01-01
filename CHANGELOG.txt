@@ -1,5 +1,8 @@
 hedrot distribution, changelog:
 
+Version 1.0.3 (XX/XX/17)
+	. Windows version
+
 Version 1.0.2 (20/11/16)
 	. added sources of Max patch in the distribution
 	. quaternion output (added an extra outlet in the Max patch)

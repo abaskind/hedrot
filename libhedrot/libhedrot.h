@@ -18,8 +18,8 @@
 #include "libhedrot_serialcomm.h"
 
 
-// libhedrot software version
-#define LIBHEDROT_VERSION 2
+// hedrot version
+#define HEDROT_VERSION "1.0.3beta2"
 
 //=====================================================================================================
 // static definitions

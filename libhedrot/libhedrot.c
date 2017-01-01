@@ -816,6 +816,8 @@ char MadgwickAHRSupdateModified(headtrackerData *trackingData) {
 // returns 1 if successful, 0 if error
 //
 int  processKeyValueSettingPair(headtrackerData *trackingData, char *keyBuffer, char *valueBuffer, char UpdateHeadtrackerFlag) {
+    int i;
+    
     if(strcmp(keyBuffer,"firmware_version") == 0) {
         trackingData->firmwareVersion=(char) strtol(valueBuffer,NULL,10);
         if(trackingData->verbose) printf("firmware version: %d\r\n",trackingData->firmwareVersion);
@@ -915,7 +917,15 @@ int  processKeyValueSettingPair(headtrackerData *trackingData, char *keyBuffer, 
         
     } else if(strcmp(keyBuffer,"accScaling") == 0) {
         if(stringToFloats(valueBuffer, trackingData->accScaling, 3)) {
-            if(trackingData->verbose) printf("accScaling: %f %f %f\r\n",trackingData->accScaling[0], trackingData->accScaling[1], trackingData->accScaling[2]);
+            
+            for(i=0;i<3;i++) {
+                trackingData->accScalingFactor[i] = 1/trackingData->accScaling[i];
+            }
+            
+            if(trackingData->verbose) {
+                printf("accScaling: %f %f %f \r\n",trackingData->accScaling[0],trackingData->accScaling[1],trackingData->accScaling[2]);
+                printf("accScalingFactor: %f %f %f \r\n",trackingData->accScalingFactor[0],trackingData->accScalingFactor[1],trackingData->accScalingFactor[2]);
+            }
             
             if(UpdateHeadtrackerFlag) setAccScaling(trackingData, trackingData->accScaling, 0);
             if((trackingData->accScaling[0]==0) || (trackingData->accScaling[1]==0) || (trackingData->accScaling[2]==0)) { // calibration not valid
@@ -938,7 +948,16 @@ int  processKeyValueSettingPair(headtrackerData *trackingData, char *keyBuffer, 
         
     } else if(strcmp(keyBuffer,"magScaling") == 0) {
         if(stringToFloats(valueBuffer, trackingData->magScaling, 3)) {
-            if(trackingData->verbose) printf("magScaling: %f %f %f\r\n",trackingData->magScaling[0], trackingData->magScaling[1], trackingData->magScaling[2]);
+            
+            for(i=0;i<3;i++) {
+                trackingData->magScalingFactor[i] = 1/trackingData->magScaling[i];
+            }
+            
+            if(trackingData->verbose) {
+                printf("magScaling: %f %f %f \r\n",trackingData->magScaling[0],trackingData->magScaling[1],trackingData->magScaling[2]);
+                printf("magScalingFactor: %f %f %f \r\n",trackingData->magScalingFactor[0],trackingData->magScalingFactor[1],trackingData->magScalingFactor[2]);
+            }
+            
             if(UpdateHeadtrackerFlag) setMagScaling(trackingData, trackingData->magScaling, 0);
             if((trackingData->magScaling[0]==0) || (trackingData->magScaling[1]==0) || (trackingData->magScaling[2]==0)) { // calibration not valid
                 trackingData->calibrationValid = 0;

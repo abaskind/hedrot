@@ -46,7 +46,12 @@ int main(int argc, const char * argv[]) {
     char messageNumber;
 	int i;
 
-    headtrackerData* trackingData = headtracker_new();
+    headtrackerData* trackingData;
+    
+    printf("Hedrot command-line demo, based on hedrot version %s, compiled on "__DATE__"\r\n", HEDROT_VERSION);
+    printf("Required firmware version %d\r\n", HEDROT_FIRMWARE_VERSION);
+    
+    trackingData = headtracker_new();
     
     // change baudrate (for some reason the command-line version does not accept higher baud rates than 57600)
     trackingData->serialcomm->baud = 57600;

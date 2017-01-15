@@ -2,7 +2,7 @@
 	"name" : "hedrotReceiver",
 	"version" : 1,
 	"creationdate" : 3560933167,
-	"modificationdate" : 3566122568,
+	"modificationdate" : 3567322189,
 	"viewrect" : [ 25.0, 69.0, 300.0, 500.0 ],
 	"autoorganize" : 0,
 	"hideprojectwindow" : 0,
@@ -18,7 +18,7 @@
 
 		}
 ,
-		"externals" : 		{
+		"other" : 		{
 
 		}
 

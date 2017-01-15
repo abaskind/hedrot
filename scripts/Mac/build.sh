@@ -9,9 +9,10 @@ echo "The Standlone hedrotReceiver has to be rebuilt afterwards in Max!!!!"
 thisDirectory=`pwd`
 rootDirectory=$thisDirectory/../..
 
+ArduinoAppPath=/Applications/Arduino.app/Contents/MacOS/Arduino
+
 ######### build firmware #############################
 rm -rf $rootDirectory/firmware/build/*
-ArduinoAppPath=/Applications/Arduino.app/Contents/MacOS/Arduino
 $ArduinoAppPath -v --board teensy:avr:teensy31:usb=serial --pref build.path=$rootDirectory/firmware/build --verify $rootDirectory/firmware/hedrot-firmware/hedrot-firmware.ino
 
 ######### build the command-line demo #############################

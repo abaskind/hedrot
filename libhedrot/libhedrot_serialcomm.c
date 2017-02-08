@@ -90,22 +90,22 @@ void serial_comm_init(headtrackerSerialcomm *x) {
 // list all available comm ports
 void list_comm_ports(headtrackerSerialcomm *x) {
     
-    int				i;    
-	char*			tmpPortsNames[MAX_NUMBER_OF_PORTS];
-
+    int				i;
+    char*			tmpPortsNames[MAX_NUMBER_OF_PORTS];
+    
 #if defined(_WIN32) || defined(_WIN64)
-	HANDLE			fd;
-	char            device_name[10];
+    HANDLE			fd;
+    char            device_name[10];
     DWORD           dw;
 #else /* #if defined(_WIN32) || defined(_WIN64) */
     int            fd;
-	struct termios test;
+    struct termios test;
     glob_t         glob_buffer;
-
-	const char		*glob_pattern = "/dev/cu.*";
+    
+    const char		*glob_pattern = "/dev/cu.*";
 #endif /* #if defined(_WIN32) || defined(_WIN64) */
-
-	// free the previous port list
+    
+    // free the previous port list
     for (i = 0; i < x->numberOfAvailablePorts; i++) {
         free(x->availablePorts[i]);
     }
@@ -114,45 +114,45 @@ void list_comm_ports(headtrackerSerialcomm *x) {
         x->availablePorts = NULL;
     }
     x->numberOfAvailablePorts = 0;
-
-	// reset port number (for autodiscovering)
+    
+    // reset port number (for autodiscovering)
     x->portNumber=-1;
-
+    
 #if defined(_WIN32) || defined(_WIN64)
     for(i = 1; i < MAX_NUMBER_OF_PORTS; i++) {
         sprintf_s(device_name, 10, "\\\\.\\COM%d", i);/* the recommended way to specify COMs above 9 */
         fd = CreateFile( device_name,
-                GENERIC_READ | GENERIC_WRITE,
-                0,
-                0,
-                OPEN_EXISTING,
-                FILE_FLAG_OVERLAPPED,
-                0);
+                        GENERIC_READ | GENERIC_WRITE,
+                        0,
+                        0,
+                        OPEN_EXISTING,
+                        FILE_FLAG_OVERLAPPED,
+                        0);
         dw = 0L;
         if(fd == INVALID_HANDLE_VALUE)
             dw = GetLastError();
         else
             CloseHandle(fd);
-
+        
         if (dw == 0) {
-			//port available
-			tmpPortsNames[x->numberOfAvailablePorts] = _strdup(device_name);
+            //port available
+            tmpPortsNames[x->numberOfAvailablePorts] = _strdup(device_name);
             x->numberOfAvailablePorts++;
-
-			if(x->verbose) 
-				printf("[hedrot]: port %s available\r\n", device_name);
-		}
-
+            
+            if(x->verbose)
+                printf("[hedrot]: port %s available\r\n", device_name);
+        }
+        
     }
-
+    
     // update the list of available ports
     x->availablePorts = (char**) malloc(x->numberOfAvailablePorts*sizeof(char*));
     for(i=0; i<x->numberOfAvailablePorts; i++)
         x->availablePorts[i] = _strdup(tmpPortsNames[i]);
-
+    
 #else /* #if defined(_WIN32) || defined(_WIN64) */
     /* first look for registered devices in the filesystem */
-   
+    
     switch( glob( glob_pattern, GLOB_ERR, NULL, &glob_buffer ) ) {
         case 0:
             printf("[hedrot]: %ld possible ports found\r\n",glob_buffer.gl_pathc);
@@ -188,15 +188,15 @@ void list_comm_ports(headtrackerSerialcomm *x) {
         }
     }
     
-		    
+    
     // update the list of available ports
     x->availablePorts = (char**) malloc(x->numberOfAvailablePorts*sizeof(char*));
     for(i=0; i<x->numberOfAvailablePorts; i++)
         x->availablePorts[i] = strdup(tmpPortsNames[i]);
-
-
+    
+    
     globfree( &(glob_buffer) );
-
+    
 #endif /* #if defined(_WIN32) || defined(_WIN64) */
 }
 
@@ -212,7 +212,7 @@ HANDLE open_serial(headtrackerSerialcomm *x, char* portName) {
     COMMTIMEOUTS	timeouts;
     DCB				dcb; /* holds the comm params */
     DWORD			dw;
-
+    
     
     /* the communication is through USB, so:
      * The number of bits is always 8
@@ -221,41 +221,41 @@ HANDLE open_serial(headtrackerSerialcomm *x, char* portName) {
      * parity bits are not used */
     
     fd = CreateFile( portName,
-        GENERIC_READ | GENERIC_WRITE,
-        0,
-        0,
-        OPEN_EXISTING,
-        FILE_FLAG_OVERLAPPED,
-        0);
-
+                    GENERIC_READ | GENERIC_WRITE,
+                    0,
+                    0,
+                    OPEN_EXISTING,
+                    FILE_FLAG_OVERLAPPED,
+                    0);
+    
     if(fd == INVALID_HANDLE_VALUE)
     {
         dw = GetLastError();
-		printf("[hedrot] ** ERROR ** could not open device %s: failure(%d): %s\r\n",
-              portName,errno, dw);
+        printf("[hedrot] ** ERROR ** could not open device %s: failure(%d): %s\r\n",
+               portName,errno, dw);
         return INVALID_HANDLE_VALUE;
     }
-
+    
     
     /* set no wait on any operation */
-	//fcntl(fd, F_SETFL, FNDELAY);
+    //fcntl(fd, F_SETFL, FNDELAY);
     
     /* Get the Current Port Configuration  */
-	memset(&(dcb), 0, sizeof(DCB));
-
+    memset(&(dcb), 0, sizeof(DCB));
+    
     if (!GetCommState(fd, &(dcb)))
     {
         printf("[hedrot] ** ERROR ** could not get dcb of device %s\r\n", portName);
         CloseHandle(fd);
         return INVALID_HANDLE_VALUE;
     }
-
-	dcb.fBinary = TRUE; /*  binary mode, no EOF check  */
+    
+    dcb.fBinary = TRUE; /*  binary mode, no EOF check  */
     dcb.fErrorChar = FALSE;       /*  enable error replacement  */
-
-	// set baud rate
-	dcb.BaudRate = (DWORD)x->baud;
-	dcb.ByteSize = 8;
+    
+    // set baud rate
+    dcb.BaudRate = (DWORD)x->baud;
+    dcb.ByteSize = 8;
     dcb.StopBits = ONESTOPBIT;
     dcb.Parity   = NOPARITY;
     
@@ -266,40 +266,40 @@ HANDLE open_serial(headtrackerSerialcomm *x, char* portName) {
         CloseHandle(fd);
         return INVALID_HANDLE_VALUE;
     }
-
-	/* setting new timeouts for read to immediately return */
+    
+    /* setting new timeouts for read to immediately return */
     timeouts.ReadIntervalTimeout = MAXDWORD;
     timeouts.ReadTotalTimeoutMultiplier = 0;
     timeouts.ReadTotalTimeoutConstant = 0;
     timeouts.WriteTotalTimeoutMultiplier = 0;
     timeouts.WriteTotalTimeoutConstant = 0;
-
+    
     if (!SetCommTimeouts(fd, &timeouts))
     {
         printf("[hedrot] ** ERROR ** Couldn't set timeouts for serial device (%d)\r\n", GetLastError());
-		CloseHandle(fd);
+        CloseHandle(fd);
         return INVALID_HANDLE_VALUE;
     }
-
-	if (!SetupComm(fd, 4096L, 4096L))/* try to get big buffers to avoid overruns*/
-	{
-		printf("[hedrot] ** ERROR ** Couldn't do SetupComm (%d)\r\n", GetLastError());
-		CloseHandle(fd);
-		return INVALID_HANDLE_VALUE;
-	}
-
-	// update structure info
+    
+    if (!SetupComm(fd, 4096L, 4096L))/* try to get big buffers to avoid overruns*/
+    {
+        printf("[hedrot] ** ERROR ** Couldn't do SetupComm (%d)\r\n", GetLastError());
+        CloseHandle(fd);
+        return INVALID_HANDLE_VALUE;
+    }
+    
+    // update structure info
     x->serial_device_name = _strdup(portName);
     x->comhandle = fd;
     return fd;
-
+    
 }
 #else /* #if defined(_WIN32) || defined(_WIN64) */
 // Mac version
 int open_serial(headtrackerSerialcomm *x, char* portName) {
     int             fd;
-
-    struct termios  *tios = &(x->com_termio);f
+    
+    struct termios  *tios = &(x->com_termio);
     
     /* the communication is through USB, so:
      * The number of bits is always 8
@@ -309,7 +309,7 @@ int open_serial(headtrackerSerialcomm *x, char* portName) {
     
     if((fd = open(portName, OPENPARAMS)) == INVALID_HANDLE_VALUE) {
         printf("[hedrot] ** ERROR ** could not open device %s: failure(%d): %s\r\n",
-              portName,errno, strerror(errno));
+               portName,errno, strerror(errno));
         return INVALID_HANDLE_VALUE;
     }
     
@@ -322,8 +322,8 @@ int open_serial(headtrackerSerialcomm *x, char* portName) {
         close(fd);
         return INVALID_HANDLE_VALUE;
     }
-
-	// set baud rate
+    
+    // set baud rate
     if (cfsetspeed(tios, x->baud) < 0) {
         printf("error in cfsetspeed\n");
         return INVALID_HANDLE_VALUE;
@@ -396,7 +396,7 @@ int close_serial(headtrackerSerialcomm *x)
 // clear file descriptors before reading data on opened comm port
 void init_read_serial(headtrackerSerialcomm *x) {
 #if defined(_WIN32) || defined(_WIN64)
-	// nothing to do here
+    // nothing to do here
 #else /* #if defined(_WIN32) || defined(_WIN64) */
     FD_ZERO(&x->com_rfds);
     FD_SET(x->comhandle,&x->com_rfds);
@@ -411,15 +411,15 @@ int is_data_available(headtrackerSerialcomm *x) {
     int          err;
 #if defined(_WIN32) || defined(_WIN64)
     OVERLAPPED    osReader = {0};
-
+    
     osReader.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     if(ReadFile(x->comhandle, x->readBuffer, READ_BUFFER_SIZE, &x->numberOfReadBytes, &osReader)) {
-		err = 1;
+        err = 1;
     } else {
         err = 0; // read error
     }
-	if(x->numberOfReadBytes ==0)
-		err = 0;
+    if(x->numberOfReadBytes ==0)
+        err = 0;
     CloseHandle(osReader.hEvent);
 #else /* #if defined(_WIN32) || defined(_WIN64) */
     ssize_t numberOfBytes;
@@ -434,7 +434,7 @@ int is_data_available(headtrackerSerialcomm *x) {
         }
     }
 #endif /* #if defined(_WIN32) || defined(_WIN64) */
-	return err;
+    return err;
 }
 
 
@@ -446,83 +446,84 @@ int is_data_available(headtrackerSerialcomm *x) {
 #if defined(_WIN32) || defined(_WIN64)
 // Windows version
 int write_serial(headtrackerSerialcomm *x, unsigned char *serial_byte, unsigned long numberOfBytesToWrite) {
-	OVERLAPPED osWrite = {0};
+    OVERLAPPED osWrite = {0};
     DWORD      dwWritten;
     DWORD      dwRes;
     DWORD      dwErr;
-	int			fRes;
-	unsigned long i;
-
-	if(x->verbose >= 2) 
-	{
-		printf("write %d bytes on comhandle %i:", numberOfBytesToWrite, x->comhandle);
-		for(i = 0;i<numberOfBytesToWrite;i++)
-			printf("%d: %u",i,(unsigned int)serial_byte[i]);
-		printf("\r\n");
-	}
-
-	// Create this write operation's OVERLAPPED structure's hEvent.
+    int			fRes;
+    unsigned long i;
+    
+    if(x->verbose >= 2)
+    {
+        printf("write %d bytes on comhandle %i:", numberOfBytesToWrite, x->comhandle);
+        for(i = 0;i<numberOfBytesToWrite;i++)
+            printf("%d: %u",i,(unsigned int)serial_byte[i]);
+        printf("\r\n");
+    }
+    
+    // Create this write operation's OVERLAPPED structure's hEvent.
     osWrite.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     if (osWrite.hEvent == NULL)
     {
         // error creating overlapped event handle
-		printf("Couldn't create event. Transmission aborted.\r\n");
+        printf("Couldn't create event. Transmission aborted.\r\n");
         return 0;
     }
-
+    
     if (!WriteFile(x->comhandle, serial_byte, numberOfBytesToWrite, &dwWritten, &osWrite))
     {
         dwErr = GetLastError();
         if (dwErr != ERROR_IO_PENDING)
         {
-			// WriteFile failed, but isn't delayed. Report error and abort
+            // WriteFile failed, but isn't delayed. Report error and abort
             printf("WriteFile failed, but isn't delayed. WriteFile error: %d\r\n", (int)dwErr);
             fRes = 0;
         }
-	else
-	{
-         // Write is pending.
-         dwRes = WaitForSingleObject(osWrite.hEvent, INFINITE);
-         switch(dwRes)
-         {
-            // OVERLAPPED structure's event has been signaled. 
-            case WAIT_OBJECT_0:
-                 if (!GetOverlappedResult(x->comhandle, &osWrite, &dwWritten, FALSE))
-                       fRes = 0;
-                 else
-                  // Write operation completed successfully.
-                  fRes = 1;
-                 break;
-            
-            default:
-                 // An error has occurred in WaitForSingleObject.
-                 // This usually indicates a problem with the
-                // OVERLAPPED structure's event handle.
-                 printf("An error has occurred in WaitForSingleObject.\r\n");
-				 fRes = 0;
-                 break;
-         }
-      }
-   }
-   else
-      // WriteFile completed immediately.
-      fRes = 1;
-
-   CloseHandle(osWrite.hEvent);
-   return fRes;
+        else
+        {
+            // Write is pending.
+            dwRes = WaitForSingleObject(osWrite.hEvent, INFINITE);
+            switch(dwRes)
+            {
+                    // OVERLAPPED structure's event has been signaled.
+                case WAIT_OBJECT_0:
+                    if (!GetOverlappedResult(x->comhandle, &osWrite, &dwWritten, FALSE))
+                        fRes = 0;
+                    else
+                        // Write operation completed successfully.
+                        fRes = 1;
+                    break;
+                    
+                default:
+                    // An error has occurred in WaitForSingleObject.
+                    // This usually indicates a problem with the
+                    // OVERLAPPED structure's event handle.
+                    printf("An error has occurred in WaitForSingleObject.\r\n");
+                    fRes = 0;
+                    break;
+            }
+        }
+    }
+    else
+        // WriteFile completed immediately.
+        fRes = 1;
+    
+    CloseHandle(osWrite.hEvent);
+    return fRes;
 }
 
 #else /* #if defined(_WIN32) || defined(_WIN64) */
 // Mac version
 int write_serial(headtrackerSerialcomm *x, unsigned char *serial_byte, unsigned long numberOfBytesToWrite) {
-    	if(x->verbose >= 2) 
-	{
-		printf("write %d bytes on comhandle %i:", numberOfBytesToWrite, x->comhandle);
-		for(i = 0;i<numberOfBytesToWrite;i++)
-			printf("%d: %u",i,(unsigned int)serial_byte[i]);
-		printf("\r\n");
-	}
-
+    unsigned long i;
+    if(x->verbose >= 2) 
+    {
+        printf("write %ld bytes on comhandle %i:", numberOfBytesToWrite, x->comhandle);
+        for(i = 0;i<numberOfBytesToWrite;i++)
+            printf("%ld: %u",i,(unsigned int)serial_byte[i]);
+        printf("\r\n");
+    }
+    
     int result = (int) write(x->comhandle,(char *) serial_byte,numberOfBytesToWrite);
     if (result != 1) {
         printf ("[hedrot] write on comhandle %i returned %d, errno is %d\r\n", x->comhandle, result, errno);

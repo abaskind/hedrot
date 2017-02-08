@@ -2348,7 +2348,7 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 15.0, 720.0, 134.0, 20.0 ],
 					"style" : "",
-					"text" : "Version 1.0.3beta2"
+					"text" : "Version 1.0.3beta3"
 				}
 
 			}
@@ -2420,10 +2420,10 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 627.0, 1621.5, 485.0, 48.0 ],
+					"patching_rect" : [ 627.0, 1621.5, 485.0, 47.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 3,
-					"presentation_rect" : [ 285.02005, 720.0, 444.0, 48.0 ],
+					"presentation_rect" : [ 285.02005, 720.0, 444.0, 47.0 ],
 					"style" : "",
 					"text" : " hedrot is free software: you can redistribute it and/or modify it under the terms of the version 3 of the GNU General Public License as published by the Free Software Foundation"
 				}
@@ -2438,9 +2438,9 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 632.0, 1568.5, 504.0, 52.0 ],
+					"patching_rect" : [ 632.0, 1568.5, 504.0, 51.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 225.67334, 665.0, 314.0, 52.0 ],
+					"presentation_rect" : [ 225.67334, 665.0, 314.0, 51.0 ],
 					"style" : "",
 					"text" : "hedrot Receiver"
 				}
@@ -2623,7 +2623,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 17.963989, 567.0, 455.0, 35.0 ],
 									"style" : "",
-									"text" : ";\r\ngetHeadtrackerAttributes bang"
+									"text" : ";\rgetHeadtrackerAttributes bang"
 								}
 
 							}
@@ -2935,7 +2935,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u008001173"
+									"varname" : "u976001173"
 								}
 
 							}
@@ -2951,7 +2951,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 17.963989, 462.5, 352.0, 49.0 ],
 									"style" : "",
-									"text" : "bang;\r\n>hedrot_receiver outputDataPeriod 1, accLPtimeConstant 0.01, MadgwickBetaMax 2.5, MadgwickBetaGain 1"
+									"text" : "bang;\r>hedrot_receiver outputDataPeriod 1, accLPtimeConstant 0.01, MadgwickBetaMax 2.5, MadgwickBetaGain 1"
 								}
 
 							}
@@ -7079,7 +7079,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u389001172"
+									"varname" : "u099001172"
 								}
 
 							}
@@ -8343,7 +8343,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 1365.5, 203.319519, 177.0, 102.0 ],
 					"style" : "",
-					"text" : ";\r\nmax seteventinterval 1;\r\nmax setpollthrottle 2000;\r\nmax setqueuethrottle 2000;\r\nmax setslop 25;\r\nmax setsysqelemthrottle 2000;\r\nmax preempt 1"
+					"text" : ";\rmax seteventinterval 1;\rmax setpollthrottle 2000;\rmax setqueuethrottle 2000;\rmax setslop 25;\rmax setsysqelemthrottle 2000;\rmax preempt 1"
 				}
 
 			}
@@ -8401,7 +8401,7 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 26.0, 92.0, 512.67334, 29.0 ],
 					"style" : "",
-					"text" : "headtracker transmitting...",
+					"text" : "no headtracker connected",
 					"textcolor" : [ 0.0, 0.501961, 1.0, 1.0 ],
 					"textjustification" : 1
 				}
@@ -9725,7 +9725,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 17.963989, 455.0, 476.0, 102.0 ],
 									"style" : "",
-									"text" : ";\r\n>hedrot_receiver samplerate 1000;\r\n>hedrot_receiver gyroDataRate 0, gyroClockSource 1, gyroDLPFBandwidth 0;\r\n>hedrot_receiver accHardOffset 0 0 0, accRange 3, accFullResolutionBit 1, accDataRate 13;\r\n>hedrot_receiver magMeasurementBias 0, magSampleAveraging 0, magDataRate 6, magGain 4, magMeasurementMode 3"
+									"text" : ";\r>hedrot_receiver samplerate 1000;\r>hedrot_receiver gyroDataRate 0, gyroClockSource 1, gyroDLPFBandwidth 0;\r>hedrot_receiver accHardOffset 0 0 0, accRange 3, accFullResolutionBit 1, accDataRate 13;\r>hedrot_receiver magMeasurementBias 0, magSampleAveraging 0, magDataRate 6, magGain 4, magMeasurementMode 3"
 								}
 
 							}
@@ -23629,10 +23629,10 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 29.0, 466.0, 61.0, 34.0 ],
+					"patching_rect" : [ 29.0, 466.0, 61.0, 33.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 2,
-					"presentation_rect" : [ 529.0, 17.5, 64.0, 34.0 ],
+					"presentation_rect" : [ 529.0, 17.5, 64.0, 33.0 ],
 					"style" : "",
 					"text" : "reception state"
 				}
@@ -23728,7 +23728,7 @@
 					"fontsize" : 18.0,
 					"id" : "obj-86",
 					"ignoreclick" : 1,
-					"items" : [ 0, "\\\\.\\COM8" ],
+					"items" : "<empty>",
 					"labelclick" : 1,
 					"maxclass" : "umenu",
 					"numinlets" : 1,
@@ -23975,7 +23975,7 @@
 							"modernui" : 1
 						}
 ,
-						"rect" : [ 45.0, 77.0, 1045.0, 933.0 ],
+						"rect" : [ 45.0, 78.0, 1045.0, 933.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -24002,7 +24002,6 @@
 						"tags" : "",
 						"style" : "",
 						"subpatcher_template" : "",
-						"visible" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
 									"hidden" : 1,
@@ -24095,7 +24094,7 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 182.927979, 14.0, 150.0, 34.0 ],
+									"patching_rect" : [ 182.927979, 14.0, 150.0, 33.0 ],
 									"style" : "",
 									"text" : "internal headtracker samplerate in Hz",
 									"textcolor" : [ 1.0, 1.0, 1.0, 1.0 ]
@@ -25126,7 +25125,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 152.666672, 308.0, 173.0, 35.0 ],
 													"style" : "",
-													"text" : ";\r\ngetHeadtrackerAttributes bang"
+													"text" : ";\rgetHeadtrackerAttributes bang"
 												}
 
 											}
@@ -27955,7 +27954,7 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 140.0, 14.0, 150.0, 34.0 ],
+									"patching_rect" : [ 140.0, 14.0, 150.0, 33.0 ],
 									"presentation" : 1,
 									"presentation_rect" : [ 121.0, 3.0, 239.0, 20.0 ],
 									"style" : "",
@@ -28198,7 +28197,7 @@
 									"presentation" : 1,
 									"presentation_rect" : [ 145.5, 77.0, 388.0, 17.0 ],
 									"style" : "",
-									"text" : "C:/Users/Baskind/Desktop/Developpement/hedrot-headtracker/hedrot/Max/hedrotReceiver.json"
+									"text" : "Data:/Developpement/hedrot-headtracker/hedrot/Max/hedrotReceiver.json"
 								}
 
 							}
@@ -28998,9 +28997,9 @@
 									"numoutlets" : 2,
 									"outlettype" : [ "", "bang" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 168.0, 93.0, 74.0, 25.0 ],
+									"patching_rect" : [ 168.0, 93.0, 74.0, 24.0 ],
 									"presentation" : 1,
-									"presentation_rect" : [ 111.0, 63.0, 31.0, 25.0 ],
+									"presentation_rect" : [ 111.0, 63.0, 31.0, 24.0 ],
 									"style" : "",
 									"textcolor" : [ 0.0, 0.0, 0.0, 1.0 ],
 									"tricolor" : [ 0.75, 0.75, 0.75, 1.0 ],
@@ -32660,13 +32659,13 @@
 					"patching_rect" : [ 457.67337, 1124.0, 144.0, 22.0 ],
 					"restore" : 					{
 						"autodiscover" : [ 1 ],
-						"serialport" : [ "0 \\\\.\\COM8" ],
+						"serialport" : [ "" ],
 						"values_to_transmit" : [ 1 ]
 					}
 ,
 					"style" : "",
 					"text" : "autopattr @autorestore 0",
-					"varname" : "u371001174"
+					"varname" : "u879001174"
 				}
 
 			}
@@ -34187,24 +34186,26 @@
 				"implicit" : 1
 			}
 , 			{
-				"name" : "hedrotReceiver_calibration.maxpat",
-				"bootpath" : "~/Desktop/Developpement/hedrot-headtracker/hedrot/Max/patches",
+				"name" : "controle_pattrstorage.maxpat",
+				"bootpath" : "/Volumes/Data/Max/librairies/mes_libs/controle_pattrstorage",
 				"type" : "JSON",
+				"implicit" : 1
+			}
+, 			{
+				"name" : "hedrotReceiver_calibration.maxpat",
+				"bootpath" : "/Volumes/Data/Developpement/hedrot-headtracker/hedrot/Max/patches",
+				"type" : "TEXT",
 				"implicit" : 1
 			}
 , 			{
 				"name" : "rs_set.maxpat",
-				"bootpath" : "~/Desktop/Developpement/hedrot-headtracker/hedrot/Max/patches",
+				"bootpath" : "/Volumes/Data/Developpement/hedrot-headtracker/hedrot/Max/patches",
 				"type" : "JSON",
 				"implicit" : 1
 			}
 , 			{
-				"name" : "hedrot_receiver.mxe64",
-				"type" : "mx64"
-			}
-, 			{
-				"name" : "jit.pass.mxe64",
-				"type" : "mx64"
+				"name" : "hedrot_receiver.mxo",
+				"type" : "iLaX"
 			}
  ],
 		"autosave" : 0

@@ -82,7 +82,7 @@ void serial_comm_init(headtrackerSerialcomm *x);
 void list_comm_ports(headtrackerSerialcomm *x);
 void init_read_serial(headtrackerSerialcomm *x);
 int is_data_available(headtrackerSerialcomm *x);
-int write_serial(headtrackerSerialcomm *x, unsigned char serial_byte);
+int write_serial(headtrackerSerialcomm *x, unsigned char *serial_byte, unsigned long numberOfBytesToWrite);
 #if defined(_WIN32) || defined(_WIN64)
 HANDLE open_serial(headtrackerSerialcomm *x,  char* portName);
 HANDLE close_serial(headtrackerSerialcomm *x);

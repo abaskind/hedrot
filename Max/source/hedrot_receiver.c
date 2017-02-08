@@ -207,8 +207,6 @@ void *hedrot_receiver_new(t_symbol *s, short ac, t_atom *av)
     
     hedrot_receiver_init(x);
     
-    post("test");
-    
     return x;
 }
 
@@ -760,7 +758,7 @@ t_max_err hedrot_receiver_autoDiscover_set(t_hedrot_receiver *x, t_object *attr,
 
 t_max_err hedrot_receiver_samplerate_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->samplerate = max(min(atom_getlong(argv),65535),2);
+        x->samplerate = (long) max(min(atom_getlong(argv),65535),2);
         setSamplerate(x->trackingData, x->samplerate, 1);
     }
     return MAX_ERR_NONE;
@@ -768,7 +766,7 @@ t_max_err hedrot_receiver_samplerate_set(t_hedrot_receiver *x, t_object *attr, l
 
 t_max_err hedrot_receiver_gyroDataRate_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->gyroDataRate = (char) max(min(atom_getlong(argv),255),0);
+        x->gyroDataRate = (unsigned char) max(min(atom_getlong(argv),255),0);
         setgyroDataRate(x->trackingData, x->gyroDataRate, 1);
     }
     return MAX_ERR_NONE;
@@ -777,7 +775,7 @@ t_max_err hedrot_receiver_gyroDataRate_set(t_hedrot_receiver *x, t_object *attr,
 
 t_max_err hedrot_receiver_gyroClockSource_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->gyroClockSource = (char) max(min(atom_getlong(argv),5),0);
+        x->gyroClockSource = (unsigned char) max(min(atom_getlong(argv),5),0);
         setGyroClockSource(x->trackingData, x->gyroClockSource, 1);
     }
     return MAX_ERR_NONE;
@@ -786,7 +784,7 @@ t_max_err hedrot_receiver_gyroClockSource_set(t_hedrot_receiver *x, t_object *at
 
 t_max_err hedrot_receiver_gyroDLPFBandwidth_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->gyroDLPFBandwidth = (char) max(min(atom_getlong(argv),6),0);
+        x->gyroDLPFBandwidth = (unsigned char) max(min(atom_getlong(argv),6),0);
         setGyroDLPFBandwidth(x->trackingData, x->gyroDLPFBandwidth, 1);
     }
     return MAX_ERR_NONE;
@@ -795,7 +793,7 @@ t_max_err hedrot_receiver_gyroDLPFBandwidth_set(t_hedrot_receiver *x, t_object *
 
 t_max_err hedrot_receiver_accRange_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->accRange = (char) atom_getlong(argv);
+        x->accRange = (unsigned char) atom_getlong(argv);
         setAccRange(x->trackingData, x->accRange, 1);
     }
     return MAX_ERR_NONE;
@@ -809,7 +807,7 @@ t_max_err hedrot_receiver_accHardOffset_set(t_hedrot_receiver *x, t_object *attr
         return MAX_ERR_GENERIC;
     
     for(i=0;i<3;i++,argv++) {
-        x->accHardOffset[i] = (char)max(min(atom_getlong(argv),127),-128);
+        x->accHardOffset[i] = (unsigned char) max(min(atom_getlong(argv),127),-128);
     }
     
     setAccHardOffset(x->trackingData, x->accHardOffset, 1);
@@ -820,7 +818,7 @@ t_max_err hedrot_receiver_accHardOffset_set(t_hedrot_receiver *x, t_object *attr
 
 t_max_err hedrot_receiver_accFullResolutionBit_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->accFullResolutionBit = (char) atom_getlong(argv);
+        x->accFullResolutionBit = (unsigned char) atom_getlong(argv);
         setAccFullResolutionBit(x->trackingData, x->accFullResolutionBit, 1);
     }
     return MAX_ERR_NONE;
@@ -829,7 +827,7 @@ t_max_err hedrot_receiver_accFullResolutionBit_set(t_hedrot_receiver *x, t_objec
 
 t_max_err hedrot_receiver_accDataRate_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->accDataRate = (char) atom_getlong(argv);
+        x->accDataRate = (unsigned char) atom_getlong(argv);
         setAccDataRate(x->trackingData, x->accDataRate, 1);
     }
     return MAX_ERR_NONE;
@@ -838,7 +836,7 @@ t_max_err hedrot_receiver_accDataRate_set(t_hedrot_receiver *x, t_object *attr, 
 
 t_max_err hedrot_receiver_magMeasurementBias_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->magMeasurementBias = (char) max(min(atom_getlong(argv),2),0);
+        x->magMeasurementBias = (unsigned char) max(min(atom_getlong(argv),2),0);
         setMagMeasurementBias(x->trackingData, x->magMeasurementBias, 1);
     }
     return MAX_ERR_NONE;
@@ -847,7 +845,7 @@ t_max_err hedrot_receiver_magMeasurementBias_set(t_hedrot_receiver *x, t_object 
 
 t_max_err hedrot_receiver_magSampleAveraging_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->magSampleAveraging = (char) max(min(atom_getlong(argv),3),0);
+        x->magSampleAveraging = (unsigned char) max(min(atom_getlong(argv),3),0);
         setMagSampleAveraging(x->trackingData, x->magSampleAveraging, 1);
     }
     return MAX_ERR_NONE;
@@ -857,7 +855,7 @@ t_max_err hedrot_receiver_magSampleAveraging_set(t_hedrot_receiver *x, t_object 
 
 t_max_err hedrot_receiver_magDataRate_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->magDataRate = (char) max(min(atom_getlong(argv),6),0);
+        x->magDataRate = (unsigned char) max(min(atom_getlong(argv),6),0);
         setMagDataRate(x->trackingData, x->magDataRate, 1);
     }
     return MAX_ERR_NONE;
@@ -866,7 +864,7 @@ t_max_err hedrot_receiver_magDataRate_set(t_hedrot_receiver *x, t_object *attr, 
 
 t_max_err hedrot_receiver_magGain_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->magGain = (char) max(min(atom_getlong(argv),7),0);
+        x->magGain = (unsigned char) max(min(atom_getlong(argv),7),0);
         setMagGain(x->trackingData, x->magGain, 1);
     }
     return MAX_ERR_NONE;
@@ -875,7 +873,7 @@ t_max_err hedrot_receiver_magGain_set(t_hedrot_receiver *x, t_object *attr, long
 
 t_max_err hedrot_receiver_magMeasurementMode_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->magMeasurementMode = (char) max(min(atom_getlong(argv),1),0);
+        x->magMeasurementMode = (unsigned char) max(min(atom_getlong(argv),1),0);
         setMagMeasurementMode(x->trackingData, x->magMeasurementMode, 1);
     }
     return MAX_ERR_NONE;
@@ -886,7 +884,7 @@ t_max_err hedrot_receiver_gyroOffsetAutocalOn_set(t_hedrot_receiver *x, t_object
     if (!argc)
         return MAX_ERR_GENERIC;
     
-    x->gyroOffsetAutocalOn = (char) max(min(atom_getlong(argv),1),0);
+    x->gyroOffsetAutocalOn = (unsigned char) max(min(atom_getlong(argv),1),0);
     setGyroOffsetAutocalOn(x->trackingData, x->gyroOffsetAutocalOn);
     
     return MAX_ERR_NONE;
@@ -897,7 +895,7 @@ t_max_err hedrot_receiver_gyroOffsetAutocalTime_set(t_hedrot_receiver *x, t_obje
     if (!argc)
         return MAX_ERR_GENERIC;
     
-    x->gyroOffsetAutocalTime = atom_getfloat(argv);
+    x->gyroOffsetAutocalTime = (float) atom_getfloat(argv);
     setGyroOffsetAutocalTime(x->trackingData, x->gyroOffsetAutocalTime);
     
     return MAX_ERR_NONE;
@@ -908,7 +906,7 @@ t_max_err hedrot_receiver_gyroOffsetAutocalThreshold_set(t_hedrot_receiver *x, t
     if (!argc)
         return MAX_ERR_GENERIC;
     
-    x->gyroOffsetAutocalThreshold = max(min(atom_getlong(argv),10000),0);
+    x->gyroOffsetAutocalThreshold = (long) max(min(atom_getlong(argv),10000),0);
     setGyroOffsetAutocalThreshold(x->trackingData, x->gyroOffsetAutocalThreshold);
     
     return MAX_ERR_NONE;
@@ -979,7 +977,7 @@ t_max_err hedrot_receiver_magScaling_set(t_hedrot_receiver *x, t_object *attr, l
 
 t_max_err hedrot_receiver_MadgwickBetaGain_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->MadgwickBetaGain = atom_getfloat(argv);
+        x->MadgwickBetaGain = (float) atom_getfloat(argv);
         setMadgwickBetaGain(x->trackingData, x->MadgwickBetaGain);
     }
     return MAX_ERR_NONE;
@@ -988,7 +986,7 @@ t_max_err hedrot_receiver_MadgwickBetaGain_set(t_hedrot_receiver *x, t_object *a
 
 t_max_err hedrot_receiver_MadgwickBetaMax_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->MadgwickBetaMax = atom_getfloat(argv);
+        x->MadgwickBetaMax = (float) atom_getfloat(argv);
         setMadgwickBetaMax(x->trackingData, x->MadgwickBetaMax);
     }
     return MAX_ERR_NONE;
@@ -997,7 +995,7 @@ t_max_err hedrot_receiver_MadgwickBetaMax_set(t_hedrot_receiver *x, t_object *at
 
 t_max_err hedrot_receiver_accLPtimeConstant_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->accLPtimeConstant = atom_getfloat(argv);
+        x->accLPtimeConstant = (float) atom_getfloat(argv);
         setAccLPtimeConstant(x->trackingData, x->accLPtimeConstant);
     }
     return MAX_ERR_NONE;
@@ -1005,7 +1003,7 @@ t_max_err hedrot_receiver_accLPtimeConstant_set(t_hedrot_receiver *x, t_object *
 
 t_max_err hedrot_receiver_outputDataPeriod_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->outputDataPeriod = max(min(atom_getlong(argv),500),1);
+        x->outputDataPeriod = (long) max(min(atom_getlong(argv),500),1);
         if(x->verbose) post("[hedrot_receiver]: outputDataPeriod set to %ld ms", x->outputDataPeriod);
     }
     return MAX_ERR_NONE;

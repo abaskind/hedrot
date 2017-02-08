@@ -51,19 +51,19 @@ typedef struct hedrot_receiver
     char            autoDiscover;
     char            outputCenteredAngles;
     long            samplerate;
-    char            gyroDataRate;
-    char            gyroClockSource;
-    char            gyroDLPFBandwidth;
-    char            gyroOffsetAutocalOn;
-    char            accRange;
-    char            accHardOffset[3];
-    char            accFullResolutionBit;
-    char            accDataRate;
-    char            magMeasurementBias;
-    char            magSampleAveraging;
-    char            magDataRate;
-    char            magGain;
-    char            magMeasurementMode;
+    unsigned char   gyroDataRate;
+    unsigned char   gyroClockSource;
+    unsigned char   gyroDLPFBandwidth;
+    unsigned char   gyroOffsetAutocalOn;
+    unsigned char   accRange;
+    char			accHardOffset[3];
+    unsigned char   accFullResolutionBit;
+    unsigned char   accDataRate;
+    unsigned char   magMeasurementBias;
+    unsigned char   magSampleAveraging;
+    unsigned char   magDataRate;
+    unsigned char   magGain;
+    unsigned char   magMeasurementMode;
     float           gyroOffsetAutocalTime; // in ms
     long            gyroOffsetAutocalThreshold; //in LSB units
     float           accOffset[3];

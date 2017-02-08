@@ -19,7 +19,7 @@
 
 
 // hedrot version
-#define HEDROT_VERSION "1.0.3beta2"
+#define HEDROT_VERSION "1.0.3beta3"
 
 //=====================================================================================================
 // static definitions
@@ -110,23 +110,23 @@ typedef struct _headtrackerData {
     float           samplePeriod; // internal
     
     // gyroscope settings
-    char            gyroDataRate;
-    char            gyroClockSource;
-    char            gyroDLPFBandwidth;
-    char            gyroOffsetAutocalOn;
+    unsigned char   gyroDataRate;
+    unsigned char   gyroClockSource;
+    unsigned char   gyroDLPFBandwidth;
+    unsigned char   gyroOffsetAutocalOn;
     
     // accelerometer settings
-    char            accRange;
-    char            accHardOffset[3];
-    char            accFullResolutionBit;
-    char            accDataRate;
+    unsigned char   accRange;
+    char			accHardOffset[3];
+    unsigned char   accFullResolutionBit;
+    unsigned char   accDataRate;
     
     // magnetometer settings
-    char            magMeasurementBias;
-    char            magSampleAveraging;
-    char            magDataRate;
-    char            magGain;
-    char            magMeasurementMode;
+    unsigned char   magMeasurementBias;
+    unsigned char   magSampleAveraging;
+    unsigned char   magDataRate;
+    unsigned char   magGain;
+    unsigned char   magMeasurementMode;
     
     // calibration values
     float           gyroOffset[3];
@@ -228,18 +228,18 @@ void setAccLPtimeConstant(headtrackerData *trackingData, float accLPtimeConstant
 // public setters to send attributes to the headtracker
 //=====================================================================================================
 void setSamplerate(headtrackerData *trackingData, long sr, char requestSettingsFlag);
-void setgyroDataRate(headtrackerData *trackingData, char gyroDataRate, char requestSettingsFlag);
-void setGyroClockSource(headtrackerData *trackingData, char gyroClockSource, char requestSettingsFlag);
-void setGyroDLPFBandwidth(headtrackerData *trackingData, char gyroDLPFBandwidth, char requestSettingsFlag);
-void setAccRange(headtrackerData *trackingData, char accRange, char requestSettingsFlag);
+void setgyroDataRate(headtrackerData *trackingData, unsigned char gyroDataRate, char requestSettingsFlag);
+void setGyroClockSource(headtrackerData *trackingData, unsigned char gyroClockSource, char requestSettingsFlag);
+void setGyroDLPFBandwidth(headtrackerData *trackingData, unsigned char gyroDLPFBandwidth, char requestSettingsFlag);
+void setAccRange(headtrackerData *trackingData, unsigned char accRange, char requestSettingsFlag);
 void setAccHardOffset(headtrackerData *trackingData, char* accHardOffset, char requestSettingsFlag);
-void setAccFullResolutionBit(headtrackerData *trackingData, char accFullResolutionBit, char requestSettingsFlag);
-void setAccDataRate(headtrackerData *trackingData, char accDataRate, char requestSettingsFlag);
-void setMagMeasurementBias(headtrackerData *trackingData, char magMeasurementBias, char requestSettingsFlag);
-void setMagSampleAveraging(headtrackerData *trackingData, char magSampleAveraging, char requestSettingsFlag);
-void setMagDataRate(headtrackerData *trackingData, char magDataRate, char requestSettingsFlag);
-void setMagGain(headtrackerData *trackingData, char magGain, char requestSettingsFlag);
-void setMagMeasurementMode(headtrackerData *trackingData, char magMeasurementMode, char requestSettingsFlag);
+void setAccFullResolutionBit(headtrackerData *trackingData, unsigned char accFullResolutionBit, char requestSettingsFlag);
+void setAccDataRate(headtrackerData *trackingData, unsigned char accDataRate, char requestSettingsFlag);
+void setMagMeasurementBias(headtrackerData *trackingData, unsigned char magMeasurementBias, char requestSettingsFlag);
+void setMagSampleAveraging(headtrackerData *trackingData, unsigned char magSampleAveraging, char requestSettingsFlag);
+void setMagDataRate(headtrackerData *trackingData, unsigned char magDataRate, char requestSettingsFlag);
+void setMagGain(headtrackerData *trackingData, unsigned char magGain, char requestSettingsFlag);
+void setMagMeasurementMode(headtrackerData *trackingData, unsigned char magMeasurementMode, char requestSettingsFlag);
 
 //=====================================================================================================
 // public setters to send calibration attributes to the headtracker

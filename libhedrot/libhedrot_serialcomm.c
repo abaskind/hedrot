@@ -255,19 +255,9 @@ HANDLE open_serial(headtrackerSerialcomm *x, char* portName) {
 
 	// set baud rate
 	dcb.BaudRate = (DWORD)x->baud;
-
-    
-    /* Setup the new port configuration...NON-CANONICAL INPUT MODE
-     .. as defined in termios.h */
-    
-    /* enable input and ignore modem controls */
-    //tios->c_cflag |= (CREAD | CLOCAL);
-    
-    /* always nocanonical, this means raw i/o no terminal */
-    //tios->c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
-    
-    /* no post processing */
-    //tios->c_oflag &= ~OPOST;
+	dcb.ByteSize = 8;
+    dcb.StopBits = ONESTOPBIT;
+    dcb.Parity   = NOPARITY;
     
     if(SetCommState(fd, &dcb)) {
         if(x->verbose) printf("[hedrot] opened serial line device %s\r\n", portName);
@@ -309,7 +299,7 @@ HANDLE open_serial(headtrackerSerialcomm *x, char* portName) {
 int open_serial(headtrackerSerialcomm *x, char* portName) {
     int             fd;
 
-    struct termios  *tios = &(x->com_termio);
+    struct termios  *tios = &(x->com_termio);f
     
     /* the communication is through USB, so:
      * The number of bits is always 8
@@ -449,49 +439,91 @@ int is_data_available(headtrackerSerialcomm *x) {
 
 
 
+
 // write byte on serial port
 // return 0 if fails
 // return 1 if it succeeds
 #if defined(_WIN32) || defined(_WIN64)
 // Windows version
-int write_serial(headtrackerSerialcomm *x, unsigned char serial_byte) {
+int write_serial(headtrackerSerialcomm *x, unsigned char *serial_byte, unsigned long numberOfBytesToWrite) {
 	OVERLAPPED osWrite = {0};
     DWORD      dwWritten;
-    DWORD      dwToWrite = 1L;
+    DWORD      dwRes;
     DWORD      dwErr;
-	DWORD      numTransferred = 0L;
+	int			fRes;
+	unsigned long i;
 
-	if(x->verbose >= 2) printf("write_serial on comhandle %i: %x\r\n", x->comhandle, serial_byte);
-    
+	if(x->verbose >= 2) 
+	{
+		printf("write %d bytes on comhandle %i:", numberOfBytesToWrite, x->comhandle);
+		for(i = 0;i<numberOfBytesToWrite;i++)
+			printf("%d: %u",i,(unsigned int)serial_byte[i]);
+		printf("\r\n");
+	}
+
+	// Create this write operation's OVERLAPPED structure's hEvent.
     osWrite.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     if (osWrite.hEvent == NULL)
     {
-        printf("Couldn't create event. Transmission aborted.");
+        // error creating overlapped event handle
+		printf("Couldn't create event. Transmission aborted.\r\n");
         return 0;
     }
 
-    if (!WriteFile(x->comhandle, &serial_byte, dwToWrite, &dwWritten, &osWrite))
+    if (!WriteFile(x->comhandle, serial_byte, numberOfBytesToWrite, &dwWritten, &osWrite))
     {
         dwErr = GetLastError();
         if (dwErr != ERROR_IO_PENDING)
         {
-            printf("WriteFile error: %d", (int)dwErr);
-            return 0;
+			// WriteFile failed, but isn't delayed. Report error and abort
+            printf("WriteFile failed, but isn't delayed. WriteFile error: %d\r\n", (int)dwErr);
+            fRes = 0;
         }
-    }
-	if (!GetOverlappedResult(x->comhandle, &osWrite, &numTransferred, TRUE))
-	{/* wait for the character to be sent */
-        dwErr = GetLastError();
-		printf("WriteFile:GetOverlappedResult error: %d", (int)dwErr);
-	}
-    CloseHandle(osWrite.hEvent);
-    return 1;
+	else
+	{
+         // Write is pending.
+         dwRes = WaitForSingleObject(osWrite.hEvent, INFINITE);
+         switch(dwRes)
+         {
+            // OVERLAPPED structure's event has been signaled. 
+            case WAIT_OBJECT_0:
+                 if (!GetOverlappedResult(x->comhandle, &osWrite, &dwWritten, FALSE))
+                       fRes = 0;
+                 else
+                  // Write operation completed successfully.
+                  fRes = 1;
+                 break;
+            
+            default:
+                 // An error has occurred in WaitForSingleObject.
+                 // This usually indicates a problem with the
+                // OVERLAPPED structure's event handle.
+                 printf("An error has occurred in WaitForSingleObject.\r\n");
+				 fRes = 0;
+                 break;
+         }
+      }
+   }
+   else
+      // WriteFile completed immediately.
+      fRes = 1;
+
+   CloseHandle(osWrite.hEvent);
+   return fRes;
 }
+
 #else /* #if defined(_WIN32) || defined(_WIN64) */
 // Mac version
-int write_serial(headtrackerSerialcomm *x, unsigned char serial_byte) {
-    if(x->verbose >= 2) printf("write_serial on comhandle %i: %x\r\n", x->comhandle, serial_byte);
-    int result = (int) write(x->comhandle,(char *) &serial_byte,1);
+int write_serial(headtrackerSerialcomm *x, unsigned char *serial_byte, unsigned long numberOfBytesToWrite) {
+    	if(x->verbose >= 2) 
+	{
+		printf("write %d bytes on comhandle %i:", numberOfBytesToWrite, x->comhandle);
+		for(i = 0;i<numberOfBytesToWrite;i++)
+			printf("%d: %u",i,(unsigned int)serial_byte[i]);
+		printf("\r\n");
+	}
+
+    int result = (int) write(x->comhandle,(char *) serial_byte,numberOfBytesToWrite);
     if (result != 1) {
         printf ("[hedrot] write on comhandle %i returned %d, errno is %d\r\n", x->comhandle, result, errno);
     }

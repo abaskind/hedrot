@@ -1,5 +1,9 @@
 hedrot distribution, changelog:
 
+Version 1.1.0 (XX/XX/17)
+	. GUI: window smaller
+	. OSC output: scaling options
+
 Version 1.0.3 (10/02/17)
 	. Windows version
 	. bug solved: hedrotReceiver: only yaw transmitted by default, although « yaw/pitch/roll » is selected on startup

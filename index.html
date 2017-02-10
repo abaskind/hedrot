@@ -72,7 +72,6 @@ The next developments and research include among others:
 
 <ul>
 <li>Measurements of the overall (software+hardware) latency</li>
-<li>A Windows Version</li>
 <li>A 3D-printable enclosure</li>
 <li>Calibration enhancements</li>
 </ul>
@@ -105,7 +104,13 @@ Contributions to help developing this collaborative project further are warmly w
 Head tracker parts:
 
 <ul>
-<li>1 Teensy 3 board (tested with versions 3.1 and 3.2)</li>
+<li>1 Teensy 3 board (tested with versions 3.1 and 3.2), can be found for example by the following vendors:
+  <ul>
+  <li><a href="https://www.pjrc.com/store/teensy32.html">PJRC</a></li>
+  <li><a href="https://www.sparkfun.com/products/13736">Sparkfun</a></li>
+  <li><a href="http://www.exp-tech.de/teensy-3-2">Exp-Tech</a></li>
+  </ul>
+  </li>
 <li>1 USB to Micro-USB 2.0 cable, minimum length 1.5 m</li>
 <li>1 gy85 IMU daughter board with the following sensors:
 
@@ -114,6 +119,13 @@ Head tracker parts:
 <li>1 Honeywell HMC5883L compass (magnetometer)</li>
 <li>1 Invensense ITG3200 gyroscope</li>
 </ul>
+  This daughter board can be found for example by those vendors:
+  <ul>
+  <li><a href="http://www.dx.com/fr/p/gy-85-6dof-9dof-imu-sensor-module-for-arduino-148436">dx.com</a></li>
+  <li><a href="https://www.imp3d-france.com/article/395/gyroscope-a-trois-axes-gy-85-6dof-9dof-imu">imp3d-france</a></li>
+  <li><a href="http://www.ebay.com/itm/GY-85-9DOF-9axis-degree-of-freedom-IMU-sensor-ITG320-5-ADXL345-HMC5883L-Module-/281089415111">Ebay</a></li>
+  <li><a href="https://eckstein-shop.de/9-Axis-MPU-80-GY-85-ITG3205-ADXL345-HMC5883L-EN">eckstein-shop</a></li>
+  </ul>
 </li>
 </ul>
 
@@ -121,16 +133,21 @@ Head tracker parts:
 <a id="software-requirements" class="anchor" href="#software-requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Software Requirements</h2>
 
 <ul>
-<li>Mac OS 10.9.5 or later (hedrot will be ported on windows in a next future)</li>
+<li>Mac: Mac OS 10.9.5 or later</li>
+<li>Windows: Windows 7 or later</li>
 <li>the teensy.app firmware flash loader</li>
+<li>Windows: Microsoft Visual C++ 2012 Redistributable package (x86 or x64 version, depending on if a 32 or 64 bit version of the hedrot is being used)</li>
+<li>Windows: Teensy serial driver (called "Windows Serial Installer" on <a href="https://www.pjrc.com">https://www.pjrc.com)</a></li>
+
 </ul>
         
         Extra Requirements for building from sources:
 <ul>
-<li>Xcode version 6.2 or later</li>
-<li>Arduino IDE 1.6.11</li>
-<li>Teensyduino 1.30 (teensy support for the Arduino IDE)</li>
+<li>Xcode version 6.2 or later(for Mac), or Visual Studio 2012 (for Windows)</li>
+<li>Windows: a windows version of awk (like gawk) and the program 7-zip to make the package</li>
 <li>Max version 6 at least</li>
+<li>Arduino IDE 1.8.1</li>
+<li>Teensyduino 1.35 (teensy support for the Arduino IDE and the teensy USB serial driver on Windows), with at least the i2c_t3 library. <span>Note</span>: Teensyduino already includes the Teensy serial driver on Windows</li>
 </ul>
       </section>
     </div>

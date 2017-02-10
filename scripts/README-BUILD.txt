@@ -1,4 +1,4 @@
-﻿			how to build the binaries and create the distribution
+			how to build the binaries and create the distribution
 
 
 1/ Mac OS X
@@ -9,10 +9,12 @@
 	. run « makeDistribution.sh » from the command-line
 
 2/ Windows
-	. edit « scripts/Win/build.bat » and change the path to arduino.exe (variable ArduinoAppPath) if necessary
+	. edit « scripts/Win/build.bat » and change the following paths if necessary:
+			- path to arduino.exe (variable ArduinoAppPath)
+			- path to Microsoft.NET framework (variable MSBuildPath)
+			- path to Visual Studio target V110 (variable VCTargetsPath)
 	. edit "Max\visual studio\hedrot_receiver.props" and change the path to the « c74support » folder in the Max SDK (variable C74SUPPORT)
-	. run « scripts/Win/build.bat » from the command-line (CAUTION: the script does not work Yet properly
-	. open "command-line-demo\visual studio\hedrotReceiverDemo.sln" and build (Release/x64)
-	. open "Max\visual studio\hedrot_receiver.sln" and build in Release for both platforms (Win32 and x64)
+	. run « scripts/Win/build.bat » 
 	. open hedrotReceiver.maxproj in Max and build the standalone in the same directory
+	. run « scripts/Win/makeDistribution.bat »
 	

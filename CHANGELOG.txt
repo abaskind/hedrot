@@ -1,7 +1,8 @@
 hedrot distribution, changelog:
 
-Version 1.0.3 (XX/XX/17)
+Version 1.0.3 (10/02/17)
 	. Windows version
+	. bug solved: hedrotReceiver: only yaw transmitted by default, although « yaw/pitch/roll » is selected on startup
 
 Version 1.0.2 (20/11/16)
 	. added sources of Max patch in the distribution

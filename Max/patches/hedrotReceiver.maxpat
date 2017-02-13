@@ -2361,7 +2361,7 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 18.036011, 623.0, 134.0, 20.0 ],
 					"style" : "",
-					"text" : "Version 1.1.0beta1"
+					"text" : "Version 1.1.0beta2"
 				}
 
 			}
@@ -2948,7 +2948,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u700002202"
+									"varname" : "u726001194"
 								}
 
 							}
@@ -5186,8 +5186,7 @@
 									"numoutlets" : 0,
 									"patching_rect" : [ 1097.0, 254.0, 150.0, 33.0 ],
 									"presentation" : 1,
-									"presentation_linecount" : 2,
-									"presentation_rect" : [ 645.0, 145.5, 95.0, 33.0 ],
+									"presentation_rect" : [ 507.0, 175.0, 183.0, 20.0 ],
 									"style" : "",
 									"text" : "(click to resend the quaternion)"
 								}
@@ -5466,7 +5465,7 @@
 									"parameter_enable" : 0,
 									"patching_rect" : [ 891.0, 250.0, 100.0, 22.0 ],
 									"presentation" : 1,
-									"presentation_rect" : [ 380.0, 151.0, 113.0, 22.0 ],
+									"presentation_rect" : [ 380.0, 163.0, 113.0, 22.0 ],
 									"style" : "",
 									"varname" : "quaternion_order"
 								}
@@ -6307,8 +6306,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 501.0, 259.0, 91.0, 62.0 ],
 									"presentation" : 1,
-									"presentation_linecount" : 2,
-									"presentation_rect" : [ 507.0, 151.0, 136.0, 35.0 ],
+									"presentation_rect" : [ 507.0, 151.0, 213.0, 22.0 ],
 									"style" : "",
 									"text" : "0.9936 -0.077726 0.009845 0.002743"
 								}
@@ -6390,7 +6388,7 @@
 									"parameter_enable" : 0,
 									"patching_rect" : [ 741.0, 259.0, 109.0, 18.0 ],
 									"presentation" : 1,
-									"presentation_rect" : [ 277.0, 151.0, 101.0, 18.0 ],
+									"presentation_rect" : [ 277.0, 163.0, 101.0, 18.0 ],
 									"style" : "",
 									"text" : "do not transmit",
 									"textcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
@@ -6464,7 +6462,7 @@
 									"parameter_enable" : 0,
 									"patching_rect" : [ 156.0, 259.0, 111.0, 22.0 ],
 									"presentation" : 1,
-									"presentation_rect" : [ 121.0, 151.0, 152.0, 21.0 ],
+									"presentation_rect" : [ 121.0, 163.0, 152.0, 21.0 ],
 									"style" : "",
 									"text" : "/hedrot/quaternion",
 									"varname" : "quaternionOSCpattern"
@@ -6481,7 +6479,7 @@
 									"numoutlets" : 0,
 									"patching_rect" : [ 54.0, 259.0, 76.0, 20.0 ],
 									"presentation" : 1,
-									"presentation_rect" : [ 19.0, 151.0, 76.0, 20.0 ],
+									"presentation_rect" : [ 19.0, 163.0, 76.0, 20.0 ],
 									"style" : "",
 									"text" : "quaternion"
 								}
@@ -8265,23 +8263,23 @@
 									"restore" : 									{
 										"IPaddress" : [ "127.0.0.1" ],
 										"pitchOSCpattern" : [ "/hedrot/pitch" ],
-										"pitch_scaling" : [ 4 ],
+										"pitch_scaling" : [ 0 ],
 										"pitch_transmit" : [ 1 ],
 										"portNumber" : [ 2001 ],
 										"quaternionOSCpattern" : [ "/hedrot/quaternion" ],
 										"quaternion_order" : [ 0 ],
-										"quaternion_transmit" : [ 0 ],
+										"quaternion_transmit" : [ 1 ],
 										"rollOSCpattern" : [ "/hedrot/roll" ],
-										"roll_scaling" : [ 1 ],
+										"roll_scaling" : [ 0 ],
 										"roll_transmit" : [ 1 ],
 										"yawOSCpattern" : [ "/hedrot/yaw" ],
-										"yaw_scaling" : [ 1 ],
+										"yaw_scaling" : [ 0 ],
 										"yaw_transmit" : [ 1 ]
 									}
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u349002201"
+									"varname" : "u007001193"
 								}
 
 							}
@@ -25083,7 +25081,7 @@
 					"fontsize" : 18.0,
 					"id" : "obj-86",
 					"ignoreclick" : 1,
-					"items" : [ 0, "/dev/cu.Bluetooth-Incoming-Port", ",", 1, "/dev/cu.usbmodem2383251" ],
+					"items" : "<empty>",
 					"labelclick" : 1,
 					"maxclass" : "umenu",
 					"numinlets" : 1,
@@ -34014,13 +34012,13 @@
 					"patching_rect" : [ 457.67337, 1124.0, 144.0, 22.0 ],
 					"restore" : 					{
 						"autodiscover" : [ 1 ],
-						"serialport" : [ "1 /dev/cu.usbmodem2383251" ],
+						"serialport" : [ "" ],
 						"values_to_transmit" : [ 1 ]
 					}
 ,
 					"style" : "",
 					"text" : "autopattr @autorestore 0",
-					"varname" : "u504002203"
+					"varname" : "u395001195"
 				}
 
 			}

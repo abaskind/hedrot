@@ -30,12 +30,18 @@ Part of code is derived from Yuri Petrov "ellipsoid fit" algorithm (initially wr
     - 1 Invensense ITG3200 gyroscope
 
 ## Software Requirements
-- Mac OS 10.9.5 or later (hedrot will be ported on windows in a next future)
-- Xcode version 6.2 or later
+- Mac OS 10.9.5 or later
+- Windows: Windows 7 or later
 - the teensy.app firmware flash loader
-- Arduino IDE 1.6.11
-- Teensyduino 1.30 (teensy support for the Arduino IDE)
-- Max version 6 at least (to rebuild the "hedrotReceiver" application. Not needed otherwise)
+- Windows: Microsoft Visual C++ 2012 Redistributable package (x86 or x64 version, depending on if a 32 or 64 bit version of the hedrot is being used)
+- Windows: Teensy serial driver (called "Windows Serial Installer" on https://www.pjrc.com)
+
+## Extra Requirements for building from sources:
+- Xcode version 6.2 or later(for Mac), or Visual Studio 2012 (for Windows)
+- Windows: a windows version of awk (like gawk) and the program 7-zip to make the package
+- Max version 6 at least
+- Arduino IDE 1.8.1
+- Teensyduino 1.35 (teensy support for the Arduino IDE and the teensy USB serial driver on Windows), with at least the i2c_t3 library. Note: Teensyduino already includes the Teensy serial driver on Windows
 
 ## Project organisation
 - the folder "doc" contains the documentation

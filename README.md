@@ -37,7 +37,7 @@ Part of code is derived from Yuri Petrov "ellipsoid fit" algorithm (initially wr
 - Windows: Teensy serial driver (called "Windows Serial Installer" on https://www.pjrc.com)
 
 ## Extra Requirements for building from sources:
-- Xcode version 6.2 or later(for Mac), or Visual Studio 2012 (for Windows)
+- Xcode version 6.2 or later (for Mac), or Visual Studio 2012 (for Windows)
 - Windows: a windows version of awk (like gawk) and the program 7-zip to make the package
 - Max version 6 at least
 - Arduino IDE 1.8.1

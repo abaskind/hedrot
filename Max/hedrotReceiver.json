@@ -33,7 +33,7 @@
 ,
 			"2" : 			{
 				"id" : 2,
-				"name" : "Reaper Ambisonics Toolkit",
+				"name" : "Reaper: yaw/pitch/roll scaled to 0/1",
 				"data" : 				{
 					"autodiscover" : [ 1 ],
 					"serialport" : [ "1 /dev/cu.usbmodem2383251" ],

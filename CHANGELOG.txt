@@ -1,8 +1,10 @@
 hedrot distribution, changelog:
 
-Version 1.1.0 (XX/XX/17)
+Version 1.1.0 (22/02/17)
 	. GUI: window smaller
-	. OSC output: scaling options
+	. OSC output: scaling options, for instance to control plugins in Reaper
+	. the MaxBeta parameter can now be set to 0 in order to disconnect the magnetometer
+	. Much smaller App « hedrotReceiver »
 
 Version 1.0.3 (10/02/17)
 	. Windows version

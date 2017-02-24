@@ -2,6 +2,7 @@
 //
 // Copyright 2016 Alexis Baskind
 
+
 #include "hedrot_receiver.h"
 
 /* ------------------- main methods --------------------------- */
@@ -551,6 +552,15 @@ void hedrot_receiver_mirrorHeadtrackerInfo(t_hedrot_receiver *x) {
     
     x->accLPtimeConstant = x->trackingData->accLPtimeConstant;
     object_attr_touch( (t_object *)x, gensym("accLPtimeConstant"));
+    
+    x->axesReference = x->trackingData->axesReference;
+    object_attr_touch( (t_object *)x, gensym("axesReference"));
+    
+    x->rotationOrder = x->trackingData->rotationOrder;
+    object_attr_touch( (t_object *)x, gensym("rotationOrder"));
+    
+    x->invertRotation = x->trackingData->invertRotation;
+    object_attr_touch( (t_object *)x, gensym("invertRotation"));
 }
 
 void hedrot_receiver_outputCalibrationNotValidNotice(t_hedrot_receiver *x) {
@@ -678,6 +688,18 @@ void hedrot_receiver_doopenforwrite(t_hedrot_receiver *x, t_symbol *s) {
     sysfile_write(x->fh_write, &len, str);
     
     sprintf(str, "accLPtimeConstant, %f;\n", x->trackingData->accLPtimeConstant);
+    len = strlen(str);
+    sysfile_write(x->fh_write, &len, str);
+    
+    sprintf(str, "axesReference, %hhi;\n", x->trackingData->axesReference);
+    len = strlen(str);
+    sysfile_write(x->fh_write, &len, str);
+    
+    sprintf(str, "rotationOrder, %hhi;\n", x->trackingData->rotationOrder);
+    len = strlen(str);
+    sysfile_write(x->fh_write, &len, str);
+    
+    sprintf(str, "invertRotation, %hhi;\n", x->trackingData->invertRotation);
     len = strlen(str);
     sysfile_write(x->fh_write, &len, str);
     
@@ -1009,7 +1031,33 @@ t_max_err hedrot_receiver_outputDataPeriod_set(t_hedrot_receiver *x, t_object *a
     return MAX_ERR_NONE;
 }
 
+t_max_err hedrot_receiver_axesReference_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
+    if (argc && argv) {
+        x->axesReference = (long) max(min(atom_getlong(argv),2),0);
+        setAxesReference(x->trackingData, x->axesReference);
+        if(x->verbose) post("[hedrot_receiver]: axesReference set to %ld", x->axesReference);
+    }
+    return MAX_ERR_NONE;
+}
 
+t_max_err hedrot_receiver_rotationOrder_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
+    if (argc && argv) {
+        x->rotationOrder = (long) max(min(atom_getlong(argv),1),0);
+        setRotationOrder(x->trackingData, x->rotationOrder);
+        if(x->verbose) post("[hedrot_receiver]: rotationOrder set to %ld", x->rotationOrder);
+    }
+    return MAX_ERR_NONE;
+}
+
+
+t_max_err hedrot_receiver_invertRotation_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
+    if (argc && argv) {
+        x->invertRotation = (long) max(min(atom_getlong(argv),1),0);
+        setInvertRotation(x->trackingData, x->invertRotation);
+        if(x->verbose) post("[hedrot_receiver]: invertRotation set to %ld", x->invertRotation);
+    }
+    return MAX_ERR_NONE;
+}
 
 
 
@@ -1147,6 +1195,21 @@ int C74_EXPORT main()
     CLASS_ATTR_ACCESSORS(c, "accLPtimeConstant", NULL, hedrot_receiver_accLPtimeConstant_set);
     CLASS_ATTR_SAVE(c,    "accLPtimeConstant",   0);
     
+    CLASS_ATTR_CHAR(c,    "axesReference",    0,  t_hedrot_receiver,  axesReference);
+    CLASS_ATTR_ENUMINDEX(c, "axesReference", 0, "\"X->right, Y->back, Z->down\" \"X->right, Y->front, Z->up\" \"X->front, Y->left, Z->up\"");
+    CLASS_ATTR_ACCESSORS(c, "axesReference", NULL, hedrot_receiver_axesReference_set);
+    CLASS_ATTR_SAVE(c,    "axesReference",   0);
+    
+    CLASS_ATTR_CHAR(c,    "rotationOrder",    0,  t_hedrot_receiver,  rotationOrder);
+    CLASS_ATTR_ENUMINDEX(c, "rotationOrder", 0, "\"Yaw-Pitch-Roll (ZYX)\" \"Roll-Pitch-Yaw (XYZ)\"");
+    CLASS_ATTR_ACCESSORS(c, "rotationOrder", NULL, hedrot_receiver_rotationOrder_set);
+    CLASS_ATTR_SAVE(c,    "rotationOrder",   0);
+
+    CLASS_ATTR_CHAR(c,    "invertRotation",    0,  t_hedrot_receiver,  invertRotation);
+    CLASS_ATTR_ENUMINDEX(c, "invertRotation", 0, "\"Don't invert rotation\" \"Invert rotation\"");
+    CLASS_ATTR_ACCESSORS(c, "invertRotation", NULL, hedrot_receiver_invertRotation_set);
+    CLASS_ATTR_SAVE(c,    "invertRotation",   0);
+
     
     // output settings
     CLASS_ATTR_LONG(c,    "outputDataPeriod",    0,  t_hedrot_receiver,  outputDataPeriod);

@@ -6,12 +6,6 @@
 //
 // Copyright 2016 Alexis Baskind
 
-//TODO: modifications to be done on the code and firmware:
-// . the headtracker should start transmitting data only if it's requested, and thus after data has been transmitted
-// . common method to test a port between normal open and autodiscover
-// . add a function to reset the settings of the headtracker to default values (the same as in headtracker_new())
-
-
 
 //---------------------------------------------------------------------------------------------------
 // Header files
@@ -124,6 +118,9 @@ headtrackerData* headtracker_new() {
     trackingData->MadgwickBetaMax = 2.5;
     trackingData->MadgwickBetaGain = 1;
     setAccLPtimeConstant(trackingData, .01f); // default time constant 10 ms
+    trackingData->axesReference = 0;
+    trackingData->rotationOrder = 0;
+    trackingData->invertRotation = 0;
     
     trackingData->gyroOffsetCalibratedState = 0;
     resetGyroOffsetCalibration(trackingData);
@@ -633,8 +630,27 @@ void headtracker_compute_data(headtrackerData *trackingData) {
                           trackingData->q1, trackingData->q2, trackingData->q3, trackingData->q4,
                           &trackingData->qcent1, &trackingData->qcent2, &trackingData->qcent3, &trackingData->qcent4);
     
+    // change the axes references of the quaternion if it does not fit the standard (X->right, Y->back, Z->down)
+    changeQuaternionReference(trackingData);
+    
+    
+    // invert rotation if requested
+    if(trackingData->invertRotation) {
+        trackingData->qcent2 = - trackingData->qcent2;
+        trackingData->qcent3 = - trackingData->qcent3;
+        trackingData->qcent4 = - trackingData->qcent4;
+    }
+    
     // compute euler angles
-    quaternion2Euler(trackingData->qcent1, trackingData->qcent2, trackingData->qcent3, trackingData->qcent4, &trackingData->yaw, &trackingData->pitch, &trackingData->roll);
+    switch(trackingData->rotationOrder) {
+        case 0:
+            quaternion2YawPitchRoll(trackingData->qcent1, trackingData->qcent2, trackingData->qcent3, trackingData->qcent4, &trackingData->yaw, &trackingData->pitch, &trackingData->roll);
+            break;
+        case 1:
+            quaternion2RollPitchYaw(trackingData->qcent1, trackingData->qcent2, trackingData->qcent3, trackingData->qcent4, &trackingData->yaw, &trackingData->pitch, &trackingData->roll);
+            break;
+    }
+
 }
 
 //=====================================================================================================
@@ -1255,6 +1271,29 @@ void setAccLPtimeConstant(headtrackerData *trackingData, float accLPtimeConstant
 }
 
 
+//=====================================================================================================
+// public setter to change axes reference
+//=====================================================================================================
+void setAxesReference(headtrackerData *trackingData, char axesReference) {
+    trackingData->axesReference = axesReference;
+}
+
+
+//=====================================================================================================
+// public setter to change rotation sequence
+//=====================================================================================================
+void setRotationOrder(headtrackerData *trackingData, char rotationOrder) {
+    trackingData->rotationOrder = rotationOrder;
+}
+
+
+//=====================================================================================================
+// public setter to change invert angles flag
+//=====================================================================================================
+void setInvertRotation(headtrackerData *trackingData, char invertRotation){
+    trackingData->invertRotation = invertRotation;
+}
+
 
 //=====================================================================================================
 // public setters to send attributes to the headtracker
@@ -1480,8 +1519,6 @@ void setMagScaling(headtrackerData *trackingData, float* magScaling, char reques
 }
 
 
-
-
 //=====================================================================================================
 // "private" setters
 //=====================================================================================================
@@ -1610,17 +1647,30 @@ float invSqrt(float x) {
  else return 1./sqrt(x);
  }*/
 
-void quaternion2Euler(float q1, float q2, float q3, float q4, float *yaw, float *pitch, float *roll) {
-    // see http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
-    // zyx Euler angles: phi=roll, theta=pitch, psi=yaw
+void quaternion2YawPitchRoll(float q1, float q2, float q3, float q4, float *yaw, float *pitch, float *roll) {
+    // zyx Talt-Bryan rotation sequence
     
-    *roll = (float) (RAD_TO_DEGREE * atan2(2.0f * (q1*q2 + q3*q4),
-                                  1.0f - 2.0f * (q2*q2 + q3*q3)));
+    *yaw = (float) (RAD_TO_DEGREE * atan2(2.0f * (q1*q4 + q2*q3),
+                                          1.0f - 2.0f * (q3*q3 + q4*q4) ));
     
     *pitch = (float) (RAD_TO_DEGREE * asin(min(max(2.0f * (q1*q3 - q4*q2),-1),1)));
     
-    *yaw = (float) (RAD_TO_DEGREE * atan2(2.0f * (q1*q4 + q2*q3),
-                                 1.0f - 2.0f * (q3*q3 + q4*q4) ));
+    
+    *roll= (float) (RAD_TO_DEGREE * atan2(2.0f * (q1*q2 + q3*q4),
+                                          1.0f - 2.0f * (q2*q2 + q3*q3)));
+}
+
+void quaternion2RollPitchYaw(float q1, float q2, float q3, float q4, float *yaw, float *pitch, float *roll) {
+    // xyz Talt-Bryan rotation sequence
+    
+    *roll = (float) (RAD_TO_DEGREE * atan2(2.0f * (q1*q2 - q3*q4),
+                                          1.0f - 2.0f * (q2*q2 + q3*q3) ));
+    
+    *pitch = (float) (RAD_TO_DEGREE * asin(min(max(2.0f * (q1*q3 + q4*q2),-1),1)));
+    
+    
+    *yaw= (float) (RAD_TO_DEGREE * atan2(2.0f * (q1*q4 - q2*q3),
+                                          1.0f - 2.0f * (q3*q3 + q4*q4)));
 }
 
 void quaternionComposition(float q01, float q02, float q03, float q04, float q11, float q12, float q13, float q14, float *q21, float *q22, float *q23, float *q24) {
@@ -1631,6 +1681,26 @@ void quaternionComposition(float q01, float q02, float q03, float q04, float q11
     *q23 = q01 * q13 - q02 * q14 + q03 * q11 + q04 * q12;
     *q24 = q01 * q14 + q02 * q13 - q03 * q12 + q04 * q11;
 }
+
+void changeQuaternionReference(headtrackerData *trackingData) {
+    // change the axes references of the quaternion if it does not fit the standard (X->right, Y->back, Z->down)
+    float qtemp;
+    switch (trackingData->axesReference) {
+        case 1: // X->right, Y->front, Z->up
+            trackingData->qcent3 *= -1.0f; // Y -> -Y
+            trackingData->qcent4 *= -1.0f; // Z -> -Z
+            break;
+        case 2: //X->front, Y->left, Z->up
+            qtemp = trackingData->qcent2; // store X
+            trackingData->qcent2 = -trackingData->qcent3; // Y -> -X
+            trackingData->qcent3 = -qtemp; // X -> -Y
+            trackingData->qcent4 *= -1.0f; // Z -> -Z
+            break;
+            // if 0 does nothing
+    }
+
+}
+
 
 int stringToFloats(char* valueBuffer, float* data, int nvalues) {
     int i=0;

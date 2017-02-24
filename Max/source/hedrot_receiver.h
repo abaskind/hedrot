@@ -73,6 +73,9 @@ typedef struct hedrot_receiver
     float           MadgwickBetaMax;
     float           MadgwickBetaGain;
     float           accLPtimeConstant;
+    char            axesReference;
+    char            rotationOrder;
+    char            invertRotation;
     
     
     // output data
@@ -171,5 +174,8 @@ t_max_err hedrot_receiver_outputDataPeriod_set(t_hedrot_receiver *x, t_object *a
 t_max_err hedrot_receiver_MadgwickBetaGain_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_MadgwickBetaMax_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_accLPtimeConstant_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
+t_max_err hedrot_receiver_axesReference_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
+t_max_err hedrot_receiver_rotationOrder_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
+t_max_err hedrot_receiver_invertRotation_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 
 #endif

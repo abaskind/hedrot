@@ -7,7 +7,8 @@
 				"name" : "default",
 				"data" : 				{
 					"autodiscover" : [ 1 ],
-					"serialport" : [ "1 /dev/cu.usbmodem568201" ],
+					"invertRotation" : [ 0 ],
+					"serialport" : [ "1 /dev/cu.usbmodem2383251" ],
 					"values_to_transmit" : [ 1 ],
 					"osc_settings::IPaddress" : [ "127.0.0.1" ],
 					"osc_settings::pitchOSCpattern" : [ "/hedrot/pitch" ],
@@ -26,36 +27,109 @@
 					"ReceiverSettings::MadgwickBetaGain" : [ 1.0 ],
 					"ReceiverSettings::MadgwickBetaMax" : [ 2.5 ],
 					"ReceiverSettings::accLPalpha" : [ 0.01 ],
-					"ReceiverSettings::outputDataPeriod" : [ 5 ]
+					"ReceiverSettings::axesReference" : [ 0 ],
+					"ReceiverSettings::invertRotation" : [ 0 ],
+					"ReceiverSettings::outputDataPeriod" : [ 5 ],
+					"ReceiverSettings::rotationOrder" : [ 0 ]
 				}
 
 			}
 ,
 			"2" : 			{
 				"id" : 2,
-				"name" : "Reaper: yaw/pitch/roll scaled to 0/1",
+				"name" : "mybino",
 				"data" : 				{
 					"autodiscover" : [ 1 ],
+					"invertRotation" : [ 0 ],
+					"serialport" : [ "1 /dev/cu.usbmodem568201" ],
+					"values_to_transmit" : [ 1 ],
+					"osc_settings::IPaddress" : [ "127.0.0.1" ],
+					"osc_settings::pitchOSCpattern" : [ "/hedrot/pitch" ],
+					"osc_settings::pitch_scaling" : [ 0 ],
+					"osc_settings::pitch_transmit" : [ 1 ],
+					"osc_settings::portNumber" : [ 3001 ],
+					"osc_settings::quaternionOSCpattern" : [ "/hedrot/quaternion" ],
+					"osc_settings::quaternion_order" : [ 0 ],
+					"osc_settings::quaternion_transmit" : [ 0 ],
+					"osc_settings::rollOSCpattern" : [ "/hedrot/roll" ],
+					"osc_settings::roll_scaling" : [ 0 ],
+					"osc_settings::roll_transmit" : [ 1 ],
+					"osc_settings::yawOSCpattern" : [ "/hedrot/yaw" ],
+					"osc_settings::yaw_scaling" : [ 0 ],
+					"osc_settings::yaw_transmit" : [ 1 ],
+					"ReceiverSettings::MadgwickBetaGain" : [ 1.0 ],
+					"ReceiverSettings::MadgwickBetaMax" : [ 2.5 ],
+					"ReceiverSettings::accLPalpha" : [ 0.01 ],
+					"ReceiverSettings::axesReference" : [ 0 ],
+					"ReceiverSettings::invertRotation" : [ 0 ],
+					"ReceiverSettings::outputDataPeriod" : [ 5 ],
+					"ReceiverSettings::rotationOrder" : [ 0 ]
+				}
+
+			}
+,
+			"3" : 			{
+				"id" : 3,
+				"name" : "Reaper/ambix",
+				"data" : 				{
+					"autodiscover" : [ 1 ],
+					"invertRotation" : [ 1 ],
 					"serialport" : [ "1 /dev/cu.usbmodem2383251" ],
 					"values_to_transmit" : [ 1 ],
 					"osc_settings::IPaddress" : [ "127.0.0.1" ],
 					"osc_settings::pitchOSCpattern" : [ "/hedrot/pitch" ],
-					"osc_settings::pitch_scaling" : [ 4 ],
+					"osc_settings::pitch_scaling" : [ 2 ],
 					"osc_settings::pitch_transmit" : [ 1 ],
 					"osc_settings::portNumber" : [ 2001 ],
 					"osc_settings::quaternionOSCpattern" : [ "/hedrot/quaternion" ],
 					"osc_settings::quaternion_order" : [ 0 ],
 					"osc_settings::quaternion_transmit" : [ 0 ],
 					"osc_settings::rollOSCpattern" : [ "/hedrot/roll" ],
-					"osc_settings::roll_scaling" : [ 2 ],
+					"osc_settings::roll_scaling" : [ 1 ],
 					"osc_settings::roll_transmit" : [ 1 ],
 					"osc_settings::yawOSCpattern" : [ "/hedrot/yaw" ],
-					"osc_settings::yaw_scaling" : [ 2 ],
+					"osc_settings::yaw_scaling" : [ 1 ],
 					"osc_settings::yaw_transmit" : [ 1 ],
 					"ReceiverSettings::MadgwickBetaGain" : [ 1.0 ],
 					"ReceiverSettings::MadgwickBetaMax" : [ 2.5 ],
 					"ReceiverSettings::accLPalpha" : [ 0.01 ],
-					"ReceiverSettings::outputDataPeriod" : [ 5 ]
+					"ReceiverSettings::axesReference" : [ 2 ],
+					"ReceiverSettings::invertRotation" : [ 1 ],
+					"ReceiverSettings::outputDataPeriod" : [ 5 ],
+					"ReceiverSettings::rotationOrder" : [ 1 ]
+				}
+
+			}
+,
+			"4" : 			{
+				"id" : 4,
+				"name" : "IRCAM spat",
+				"data" : 				{
+					"autodiscover" : [ 1 ],
+					"invertRotation" : [  ],
+					"serialport" : [ "1 /dev/cu.usbmodem2383251" ],
+					"values_to_transmit" : [ 1 ],
+					"osc_settings::IPaddress" : [ "127.0.0.1" ],
+					"osc_settings::pitchOSCpattern" : [ "/hedrot/pitch" ],
+					"osc_settings::pitch_scaling" : [ 0 ],
+					"osc_settings::pitch_transmit" : [ 1 ],
+					"osc_settings::portNumber" : [ 2001 ],
+					"osc_settings::quaternionOSCpattern" : [ "/hedrot/quaternion" ],
+					"osc_settings::quaternion_order" : [ 0 ],
+					"osc_settings::quaternion_transmit" : [ 0 ],
+					"osc_settings::rollOSCpattern" : [ "/hedrot/roll" ],
+					"osc_settings::roll_scaling" : [ 0 ],
+					"osc_settings::roll_transmit" : [ 1 ],
+					"osc_settings::yawOSCpattern" : [ "/hedrot/yaw" ],
+					"osc_settings::yaw_scaling" : [ 0 ],
+					"osc_settings::yaw_transmit" : [ 1 ],
+					"ReceiverSettings::MadgwickBetaGain" : [ 1.0 ],
+					"ReceiverSettings::MadgwickBetaMax" : [ 2.5 ],
+					"ReceiverSettings::accLPalpha" : [ 0.01 ],
+					"ReceiverSettings::axesReference" : [ 1 ],
+					"ReceiverSettings::invertRotation" : [  ],
+					"ReceiverSettings::outputDataPeriod" : [ 5 ],
+					"ReceiverSettings::rotationOrder" : [ 0 ]
 				}
 
 			}

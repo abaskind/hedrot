@@ -97,12 +97,30 @@ typedef struct _headtrackerData {
     // configuration flags
     char            autoDiscover;
     
+    
+    //------------------------- HEAD TRACKER SETTINGS ------------------------
+    
     // angle estimation coefficients
     float           MadgwickBetaMax;
     float           MadgwickBetaGain;
     float           accLPtimeConstant; // lowpass filter time constant in seconds for the accel data
     float           accLPalpha; // lowpass filter coefficient for the accel data (internal)
     
+    // axes reference setting
+    // 0: X->right, Y->back, Z->down
+    // 1: X->right, Y->front, Z->up
+    // 2: X->front, Y->left, Z->up
+    char            axesReference;
+    
+    // rotation sequence setting
+    // 0: Yaw-Pitch-Roll (YZX)
+    // 1: Roll-Pitch-Yaw (XZZ)
+    char            rotationOrder;
+    
+    // invert angles flag
+    // 0: don't invert
+    // 1: invert
+    char            invertRotation;
     
     // sensor infos and settings
     char            firmwareVersion; //headtracker firmware version
@@ -144,7 +162,9 @@ typedef struct _headtrackerData {
     float           accScaling[3], accScalingFactor[3];
     float           magOffset[3];
     float           magScaling[3], magScalingFactor[3];
+
     
+    //--------------- OUTPUTS AND STATUS FROM THE HEAD TRACKER -------------------
     
     // info status variables and flags
     char            infoReceptionStatus; //see constants "communication states"
@@ -155,9 +175,9 @@ typedef struct _headtrackerData {
     int             rawDataBufferIndex;
     
     // raw data pro sensor
-    short         magRawData[3];
-    short         accRawData[3];
-    short         gyroRawData[3];
+    short           magRawData[3];
+    short           accRawData[3];
+    short           gyroRawData[3];
     
     // calibrated data pro sensor
     float           magCalData[3];
@@ -165,7 +185,7 @@ typedef struct _headtrackerData {
     float           gyroCalData[3];
     
     // estimated quaternion
-    float           q1, q2, q3, q4; //quaternion values (should be set to zero when chaning method)
+    float           q1, q2, q3, q4; //quaternion values W,X,Y,Z (should be set to zero when chaning method)
     
     // estimated angles (yaw,pitch,roll)
     float           yaw,pitch,roll;
@@ -221,6 +241,9 @@ void setGyroOffsetAutocalThreshold(headtrackerData *trackingData, long gyroOffse
 void setMadgwickBetaGain(headtrackerData *trackingData, float MadgwickBetaGain);
 void setMadgwickBetaMax(headtrackerData *trackingData, float MadgwickBetaMax);
 void setAccLPtimeConstant(headtrackerData *trackingData, float accLPtimeConstant);
+void setAxesReference(headtrackerData *trackingData, char axesReference);
+void setRotationOrder(headtrackerData *trackingData, char rotationOrder);
+void setInvertRotation(headtrackerData *trackingData, char invertRotation);
 
 
 
@@ -249,7 +272,6 @@ void setAccScaling(headtrackerData *trackingData, float* accScaling, char reques
 void setMagOffset(headtrackerData *trackingData, float* magOffset, char requestSettingsFlag);
 void setMagScaling(headtrackerData *trackingData, float* magScaling, char requestSettingsFlag);
 
-
 //=====================================================================================================
 // "private" setters
 //=====================================================================================================
@@ -271,6 +293,7 @@ void headtracker_sendFloatArray2Headtracker(headtrackerData *trackingData, float
 void headtracker_sendSignedCharArray2Headtracker(headtrackerData *trackingData, char* data, int numValues, unsigned char StartTransmitChar, unsigned char StopTransmitChar);
 void resetGyroOffsetCalibration(headtrackerData *trackingData);
 int  processKeyValueSettingPair(headtrackerData *trackingData, char *key, char *value, char UpdateHeadtrackerFlag);
+void changeQuaternionReference(headtrackerData *trackingData);
 
 
 
@@ -279,7 +302,8 @@ int  processKeyValueSettingPair(headtrackerData *trackingData, char *key, char *
 //=====================================================================================================
 double mod(double a, double N);
 float invSqrt(float x);
-void quaternion2Euler(float q1, float q2, float q3, float q4, float *yaw, float *pitch, float *roll);
+void quaternion2YawPitchRoll(float q1, float q2, float q3, float q4, float *yaw, float *pitch, float *roll);
+void quaternion2RollPitchYaw(float q1, float q2, float q3, float q4, float *yaw, float *pitch, float *roll);
 void quaternionComposition(float q01, float q02, float q03, float q04, float q11, float q12, float q13, float q14, float *q21, float *q22, float *q23, float *q24);
 int stringToFloats(char* valueBuffer, float* data, int nvalues);
 int stringToChars(char* valueBuffer, char* data, int nvalues);

@@ -1,9 +1,13 @@
 # hedrot
 
 ## What is hedrot?
-Hedrot (for "head rotation tracker") is a low-cost and efficient open-source hardware/solution for head tracking. Contrary to several generic open-source head tracking solutions, hedrot relies on and has been optimized for specific widely spread and efficient hardware parts, i.e. a Teensy 3 board (optimized Arduino-like board) combined to a IMU/MARG daughter board with 3 common sensors (Analog Devices ADXL345 accelerometer, Honeywell HMC5883L magnetometer and Invensense ITG-3200 gyroscope). 
+Hedrot (for "head rotation tracker") is a low-cost (less than 40 euros) and efficient open-source hardware/software solution for head tracking. Hedrot is especially suitable for binaural rendering (3D-Audio on headphones), and has been initially designed for use with the binaural renderer Bipan as part of the Bili Project http://www.bili-project.org/.
 
-The estimation algorithm is based on a modified version of the precise and efficient open-source gradient descent algorithm from Sebastian Madgwick. The technology was dramatically optimized for speed: the head tracker can deliver data at a rates up to 2 kHz. The hardware latency of the Teensy board and USB communication relies below 2 ms. The overall latency (including sensor latency and time constant of the algorithm) was estimated to remain between 10 and 15 ms for typical settings, further experiments are currently being done to measure it. 
+Hedrot provides an estimation of the rotation of the sensor (thus of the head if the sensor is attached to headphones) for the most usual x-y-z coordinate systems, either as a quaternion, or as a set of 3 orientation angles yaw, pitch and roll with two different orders (yaw-pitch-roll or roll-pitch-yaw). The main application provided with the distribution, hedrotReceiver, sends this information as OSC streams, with the extra possibility to scale each stream independently.
+
+Contrary to several generic open-source head tracking solutions, hedrot relies on and has been optimized for specific widely spread and efficient hardware parts, i.e. a Teensy 3 board (optimized Arduino-like board) combined to a IMU/MARG daughter board with 3 common sensors (Analog Devices ADXL345 accelerometer, Honeywell HMC5883L magnetometer and Invensense ITG-3200 gyroscope). 
+
+The estimation algorithm is based on a modified version of the precise and efficient open-source gradient descent algorithm from Sebastian Madgwick. The technology was dramatically optimized for speed: the head tracker can deliver data at rates up to 2 kHz. The hardware latency of the Teensy board and USB communication relies below 2 ms. The overall latency (including sensor latency and time constant of the algorithm) is being currently measured. 
 
 ## Licensing and Credits
 The first development phase of Hedrot has achieved in collaboration with the Conservatoire National Supérieur de Musique et de Danse de Paris (http://www.conservatoiredeparis.fr/) as part of the "Bili" project (http://www.bili-project.org/).

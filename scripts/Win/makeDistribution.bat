@@ -59,6 +59,10 @@ copy "%rootDirectory%\Max\patches\*.maxpat" "%packageFolder%\Max\" > nul
 copy "%rootDirectory%\Max\hedrot_receiver.mxe" "%packageFolder%\Max\" > nul
 copy "%rootDirectory%\Max\hedrot_receiver.mxe64" "%packageFolder%\Max\" > nul
 
+REM ######### copy the examples folder #############################
+md "%packageFolder%\examples"
+xcopy "%rootDirectory%\examples" "%packageFolder%\examples" /Y /Q /i /s
+
 REM ######### copy the doc #############################
 copy "%rootDirectory%\doc\hedrot user manual.pdf" "%packageFolder%" > nul
 

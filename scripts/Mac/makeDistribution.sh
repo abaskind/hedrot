@@ -57,6 +57,10 @@ cp $rootDirectory/Max/hedrotReceiver.json $packageFolder/Max/
 cp $rootDirectory/Max/patches/*.maxpat $packageFolder/Max/
 cp -R $rootDirectory/Max/hedrot_receiver.mxo $packageFolder/Max/
 
+######### copy the examples folder #############################
+mkdir $packageFolder/examples
+cp -R $rootDirectory/examples $packageFolder/examples
+
 ######### copy the doc #############################
 cp "$rootDirectory/doc/hedrot user manual.pdf" "$packageFolder/"
 

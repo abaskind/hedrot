@@ -48,11 +48,12 @@ Part of code is derived from Yuri Petrov "ellipsoid fit" algorithm (initially wr
 - Teensyduino 1.35 (teensy support for the Arduino IDE and the teensy USB serial driver on Windows), with at least the i2c_t3 library. Note: Teensyduino already includes the Teensy serial driver on Windows
 
 ## Project organisation
+- the empty folder "build" is where the distribution will be built
+- the folder "command-line-demo" contains the sources of the command-line demonstration
 - the folder "doc" contains the documentation
+- the folder "examples" contains application examples
 - the folder "firmware" contains the sources of the firmware to be uploaded in the teensy board
 - the folder "libhedrot" contains the sources of the receiver library
-- the folder "Max" contains the sources of the main receiver application, written in Max
 - the folder "matlab" contains programs for matlab and octave
-- the folder "command-line-demo" contains the sources of the command-line demonstration
+- the folder "Max" contains the sources of the main receiver application, written in Max
 - the folder "scripts" contains the scripts for building binaries and the distribution
-- the empty folder "build" is where the distribution will be built

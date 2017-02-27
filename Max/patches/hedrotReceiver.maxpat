@@ -5665,8 +5665,8 @@
 						"audiosupport" : 1,
 						"bundleidentifier" : "com.mycompany.myprogram",
 						"cantclosetoplevelpatchers" : 0,
-						"cefsupport" : 1,
-						"copysupport" : 1,
+						"cefsupport" : 0,
+						"copysupport" : 0,
 						"database" : 0,
 						"extensions" : 1,
 						"gensupport" : 1,
@@ -6914,7 +6914,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u736002379"
+									"varname" : "u209001305"
 								}
 
 							}
@@ -12659,7 +12659,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u111002378"
+									"varname" : "u687001304"
 								}
 
 							}
@@ -34753,7 +34753,7 @@
 									"bgfillcolor_type" : "color",
 									"fontsize" : 18.0,
 									"id" : "obj-28",
-									"items" : [ 1, "default", ",", 2, "mybino", ",", 3, "Reaper/ambix", ",", 4, "IRCAM spat" ],
+									"items" : [ 1, "default", ",", 2, "mybino", ",", 3, "IRCAM Spat", ",", 4, "Reaper/ambix" ],
 									"maxclass" : "umenu",
 									"numinlets" : 1,
 									"numoutlets" : 3,
@@ -35424,7 +35424,7 @@
 													"presentation_linecount" : 2,
 													"presentation_rect" : [ 8.0, 6.0, 368.0, 47.0 ],
 													"style" : "",
-													"text" : "delete preset <<mybino>> in slot 4 . Confirm ?"
+													"text" : "delete preset <<Reaper/ambix>> in slot 5 . Confirm ?"
 												}
 
 											}
@@ -36087,8 +36087,7 @@
 													"patching_rect" : [ 51.0, 145.0, 168.0, 35.0 ],
 													"presentation" : 1,
 													"presentation_rect" : [ 3.0, 27.0, 238.0, 23.0 ],
-													"style" : "",
-													"text" : "default"
+													"style" : ""
 												}
 
 											}
@@ -36656,7 +36655,7 @@
 													"presentation_linecount" : 2,
 													"presentation_rect" : [ 8.0, 6.0, 331.0, 47.0 ],
 													"style" : "",
-													"text" : "slot 1 already used by preset <<default>>. Confirm ?"
+													"text" : "slot 4 already used by preset <<IRCAM spat>>. Confirm ?"
 												}
 
 											}
@@ -38541,7 +38540,7 @@
 ,
 					"style" : "",
 					"text" : "autopattr @autorestore 0",
-					"varname" : "u654002380"
+					"varname" : "u371001306"
 				}
 
 			}

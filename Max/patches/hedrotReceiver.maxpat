@@ -39,6 +39,49 @@
 		"title" : "hedrot Receiver",
 		"boxes" : [ 			{
 				"box" : 				{
+					"id" : "obj-140",
+					"maxclass" : "message",
+					"numinlets" : 2,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 351.5, 1094.0, 61.0, 22.0 ],
+					"style" : "",
+					"text" : "1. 0. 0. 0."
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-112",
+					"maxclass" : "newobj",
+					"numinlets" : 1,
+					"numoutlets" : 2,
+					"outlettype" : [ "bang", "bang" ],
+					"patching_rect" : [ 341.0, 1065.0, 29.5, 22.0 ],
+					"style" : "",
+					"text" : "b 2"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"fontname" : "Arial",
+					"fontsize" : 11.0,
+					"id" : "obj-98",
+					"maxclass" : "newobj",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 253.0, 1153.0, 29.0, 21.0 ],
+					"presentation_rect" : [ 253.81073, 1155.0, 0.0, 0.0 ],
+					"style" : "",
+					"text" : "thru",
+					"varname" : "output_thru[1]"
+				}
+
+			}
+, 			{
+				"box" : 				{
 					"id" : "obj-77",
 					"maxclass" : "newobj",
 					"numinlets" : 1,
@@ -6914,7 +6957,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u209001305"
+									"varname" : "u764001316"
 								}
 
 							}
@@ -12659,7 +12702,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u687001304"
+									"varname" : "u444001315"
 								}
 
 							}
@@ -28182,6 +28225,7 @@
 						"tags" : "",
 						"style" : "",
 						"subpatcher_template" : "",
+						"visible" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
 									"fontname" : "Arial",
@@ -28191,7 +28235,7 @@
 									"numinlets" : 0,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 50.0, 107.0, 116.0, 20.0 ],
+									"patching_rect" : [ 50.0, 107.0, 116.0, 22.0 ],
 									"style" : "",
 									"text" : "r Headtracker_onoff"
 								}
@@ -28205,7 +28249,7 @@
 									"maxclass" : "newobj",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 50.0, 77.0, 118.0, 20.0 ],
+									"patching_rect" : [ 50.0, 77.0, 118.0, 22.0 ],
 									"style" : "",
 									"text" : "s Headtracker_onoff"
 								}
@@ -28220,7 +28264,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 50.0, 138.0, 43.0, 18.0 ],
+									"patching_rect" : [ 50.0, 138.0, 43.0, 22.0 ],
 									"style" : "",
 									"text" : "set $1"
 								}
@@ -33742,7 +33786,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 341.0, 1081.0, 56.0, 22.0 ],
+					"patching_rect" : [ 341.0, 1006.0, 56.0, 22.0 ],
 					"style" : "",
 					"text" : "deferlow"
 				}
@@ -38540,7 +38584,7 @@
 ,
 					"style" : "",
 					"text" : "autopattr @autorestore 0",
-					"varname" : "u371001306"
+					"varname" : "u425001317"
 				}
 
 			}
@@ -38855,7 +38899,7 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 341.0, 1107.0, 47.0, 22.0 ],
+					"patching_rect" : [ 198.0, 1118.0, 47.0, 22.0 ],
 					"style" : "",
 					"text" : "0. 0. 0."
 				}
@@ -38870,7 +38914,7 @@
 					"numinlets" : 2,
 					"numoutlets" : 2,
 					"outlettype" : [ "bang", "" ],
-					"patching_rect" : [ 341.0, 1061.0, 36.0, 22.0 ],
+					"patching_rect" : [ 341.0, 986.0, 36.0, 22.0 ],
 					"style" : "",
 					"text" : "sel 0"
 				}
@@ -38900,7 +38944,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 2,
 					"outlettype" : [ "int", "int" ],
-					"patching_rect" : [ 341.0, 1029.0, 32.5, 22.0 ],
+					"patching_rect" : [ 341.0, 954.0, 32.5, 22.0 ],
 					"style" : "",
 					"text" : "t i i"
 				}
@@ -38915,7 +38959,7 @@
 					"numinlets" : 0,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 341.0, 996.0, 116.0, 22.0 ],
+					"patching_rect" : [ 341.0, 921.0, 116.0, 22.0 ],
 					"style" : "",
 					"text" : "r Headtracker_onoff"
 				}
@@ -38930,7 +38974,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 156.81073, 1153.0, 71.0, 21.0 ],
+					"patching_rect" : [ 156.81073, 1153.0, 29.0, 21.0 ],
 					"style" : "",
 					"text" : "thru",
 					"varname" : "output_thru"
@@ -39132,6 +39176,24 @@
 			}
 , 			{
 				"patchline" : 				{
+					"destination" : [ "obj-116", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-112", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-140", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-112", 1 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
 					"destination" : [ "obj-129", 0 ],
 					"disabled" : 0,
 					"hidden" : 0,
@@ -39298,6 +39360,15 @@
 					"disabled" : 0,
 					"hidden" : 0,
 					"source" : [ "obj-139", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-98", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"source" : [ "obj-140", 0 ]
 				}
 
 			}
@@ -39566,7 +39637,7 @@
 			}
 , 			{
 				"patchline" : 				{
-					"destination" : [ "obj-116", 0 ],
+					"destination" : [ "obj-112", 0 ],
 					"disabled" : 0,
 					"hidden" : 0,
 					"source" : [ "obj-4", 0 ]
@@ -39761,20 +39832,9 @@
 			}
 , 			{
 				"patchline" : 				{
-					"destination" : [ "obj-37", 0 ],
+					"destination" : [ "obj-98", 0 ],
 					"disabled" : 0,
 					"hidden" : 0,
-					"order" : 1,
-					"source" : [ "obj-57", 0 ]
-				}
-
-			}
-, 			{
-				"patchline" : 				{
-					"destination" : [ "obj-84", 1 ],
-					"disabled" : 0,
-					"hidden" : 0,
-					"order" : 0,
 					"source" : [ "obj-57", 0 ]
 				}
 
@@ -40151,6 +40211,26 @@
 					"disabled" : 0,
 					"hidden" : 0,
 					"source" : [ "obj-96", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-37", 0 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"order" : 1,
+					"source" : [ "obj-98", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-84", 1 ],
+					"disabled" : 0,
+					"hidden" : 0,
+					"order" : 0,
+					"source" : [ "obj-98", 0 ]
 				}
 
 			}

@@ -30,7 +30,6 @@ echo %hedrotFirmwareVersionMessage%
 set "packageName=hedrot-%hedrotVersion%-%today%-Win64"
 set "packageFolder=%destDirectory%\tmpPackageFolder\%packageName%"
 
-
 REM ######### create destination folder #############################
 rmdir /s /q "%destDirectory%\tmpPackageFolder"
 md "%packageFolder%"

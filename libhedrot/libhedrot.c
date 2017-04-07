@@ -14,6 +14,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#if defined(_WIN32) || defined(_WIN64)
+#include <stdint.h>
+#endif
 
 
 //=====================================================================================================

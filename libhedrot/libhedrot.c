@@ -812,13 +812,17 @@ char MadgwickAHRSupdateModified(headtrackerData *trackingData) {
     trackingData->q2 += qDot2 * trackingData->samplePeriod;
     trackingData->q3 += qDot3 * trackingData->samplePeriod;
     trackingData->q4 += qDot4 * trackingData->samplePeriod;
+    printf("estimated quaternion 1 : %f %f %f %f\r\n", trackingData->q1, trackingData->q2, trackingData->q3, trackingData->q4);
     
     // Normalise quaternion
     recipNorm = invSqrt(trackingData->q1 * trackingData->q1 + trackingData->q2 * trackingData->q2 + trackingData->q3 * trackingData->q3 + trackingData->q4 * trackingData->q4);
+    printf("%f, recipNorm = %f\r\n", trackingData->q1 * trackingData->q1 + trackingData->q2 * trackingData->q2 + trackingData->q3 * trackingData->q3 + trackingData->q4 * trackingData->q4, recipNorm);
     trackingData->q1 *= recipNorm;
     trackingData->q2 *= recipNorm;
     trackingData->q3 *= recipNorm;
     trackingData->q4 *= recipNorm;
+    
+    printf("estimated quaternion 2 : %f %f %f %f\r\n", trackingData->q1, trackingData->q2, trackingData->q3, trackingData->q4);
     
     return 0;
 }
@@ -949,7 +953,7 @@ int  processKeyValueSettingPair(headtrackerData *trackingData, char *keyBuffer, 
             }
             
             if(UpdateHeadtrackerFlag) setAccScaling(trackingData, trackingData->accScaling, 0);
-            if((trackingData->accScaling[0]==0) || (trackingData->accScaling[1]==0) || (trackingData->accScaling[2]==0)) { // calibration not valid
+            if(!((trackingData->accScaling[0]>0) && (trackingData->accScaling[1]>0) && (trackingData->accScaling[2]>0))) { // calibration not valid
                 trackingData->calibrationValid = 0;
                 pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_CALIBRATION_NOT_VALID);
             }
@@ -980,7 +984,7 @@ int  processKeyValueSettingPair(headtrackerData *trackingData, char *keyBuffer, 
             }
             
             if(UpdateHeadtrackerFlag) setMagScaling(trackingData, trackingData->magScaling, 0);
-            if((trackingData->magScaling[0]==0) || (trackingData->magScaling[1]==0) || (trackingData->magScaling[2]==0)) { // calibration not valid
+            if(!((trackingData->magScaling[0]>0) || (trackingData->magScaling[1]>0) || (trackingData->magScaling[2]>0))) { // calibration not valid
                 trackingData->calibrationValid = 0;
                 pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_CALIBRATION_NOT_VALID);
             }
@@ -1617,7 +1621,7 @@ double mod(double a, double N) {return a - N*floor(a/N);} //return in range [0, 
 float invSqrt(float x) {
     float halfx = 0.5f * x;
     float y = x;
-    long i = *(long*)&y;
+    int32_t i = *(int32_t*)&y;
     i = 0x5f3759df - (i>>1);
     y = *(float*)&i;
     y = y * (1.5f - (halfx * y * y));

@@ -4,7 +4,7 @@
 		"appversion" : 		{
 			"major" : 7,
 			"minor" : 3,
-			"revision" : 2,
+			"revision" : 3,
 			"architecture" : "x64",
 			"modernui" : 1
 		}
@@ -515,10 +515,10 @@
 					"sourceproportion" : [ 0.07 ],
 					"sourceseditable" : [ 1 ],
 					"sourceslevels" : [ -60.0 ],
-					"sourcespositions" : [ 0.097216, 2.991505, 0.04411 ],
+					"sourcespositions" : [ 0.12242, 2.990905, 0.0 ],
 					"speakerseditable" : [ 0 ],
 					"speakerslevels" : [ -60.0, -60.0, -60.0, -60.0 ],
-					"speakerspositions" : [ -0.712835, 0.701297, -0.007, 0.700936, 0.712733, 0.026486, 0.712835, -0.701297, 0.007, -0.700936, -0.712732, -0.026486 ],
+					"speakerspositions" : [ -0.707107, 0.707107, 0.0, 0.707107, 0.707107, 0.0, 0.707107, -0.707107, 0.0, -0.707107, -0.707107, 0.0 ],
 					"speakersproportion" : [ 0.1 ],
 					"useopengl" : [ 0 ],
 					"viewpoint" : [ "top" ],
@@ -1088,23 +1088,23 @@
 			}
  ],
 		"parameters" : 		{
-			"obj-25::obj-74" : [ "live.tab[1]", "live.tab", 0 ],
-			"obj-4::obj-6.1::obj-9::obj-26::obj-58" : [ "live.toggle[1]", "live.toggle[1]", 0 ],
-			"obj-4::obj-6.1::obj-9::obj-43::obj-8" : [ "live.dial", "freq", 0 ],
-			"obj-4::obj-6.1::obj-9::obj-182" : [ "live.text[1]", "live.text[1]", 0 ],
-			"obj-25::obj-76" : [ "live.tab[2]", "live.tab", 0 ],
-			"obj-4::obj-6.1::obj-9::obj-5::obj-12" : [ "live.button", "live.button", 0 ],
-			"obj-4::obj-6.1::obj-9::obj-26::obj-56" : [ "live.button[1]", "live.button[1]", 0 ],
-			"obj-25::obj-14" : [ "live.menu[1]", "live.menu", 0 ],
-			"obj-4::obj-6.1::obj-9::obj-26::obj-59" : [ "live.numbox[1]", "live.numbox[1]", 0 ],
-			"obj-25::obj-53" : [ "live.tab", "live.tab", 0 ],
-			"obj-4::obj-6.1::obj-9::obj-2" : [ "live.gain~", " ", 0 ],
-			"obj-4::obj-6.1::obj-9::obj-12::obj-4" : [ "live.numbox", "live.numbox", 0 ],
 			"obj-4::obj-6.1::obj-9::obj-23" : [ "live.toggle", "live.toggle", 0 ],
 			"obj-4::obj-6.1::obj-9::obj-1" : [ "live.menu", "live.menu", 0 ],
 			"obj-15" : [ "live.gain~[1]", "live.gain~[1]", 0 ],
+			"obj-25::obj-74" : [ "live.tab[1]", "live.tab", 0 ],
+			"obj-25::obj-14" : [ "live.menu[1]", "live.menu", 0 ],
+			"obj-4::obj-6.1::obj-9::obj-46::obj-6" : [ "live.text[3]", "live.text[1]", 0 ],
 			"obj-4::obj-6.1::obj-9::obj-46::obj-36" : [ "select folder[1]", "select folder", 0 ],
-			"obj-4::obj-6.1::obj-9::obj-46::obj-6" : [ "live.text[3]", "live.text[1]", 0 ]
+			"obj-4::obj-6.1::obj-9::obj-5::obj-12" : [ "live.button", "live.button", 0 ],
+			"obj-4::obj-6.1::obj-9::obj-43::obj-8" : [ "live.dial", "freq", 0 ],
+			"obj-25::obj-53" : [ "live.tab", "live.tab", 0 ],
+			"obj-25::obj-76" : [ "live.tab[2]", "live.tab", 0 ],
+			"obj-4::obj-6.1::obj-9::obj-26::obj-56" : [ "live.button[1]", "live.button[1]", 0 ],
+			"obj-4::obj-6.1::obj-9::obj-26::obj-58" : [ "live.toggle[1]", "live.toggle[1]", 0 ],
+			"obj-4::obj-6.1::obj-9::obj-2" : [ "live.gain~", " ", 0 ],
+			"obj-4::obj-6.1::obj-9::obj-12::obj-4" : [ "live.numbox", "live.numbox", 0 ],
+			"obj-4::obj-6.1::obj-9::obj-26::obj-59" : [ "live.numbox[1]", "live.numbox[1]", 0 ],
+			"obj-4::obj-6.1::obj-9::obj-182" : [ "live.text[1]", "live.text[1]", 0 ]
 		}
 ,
 		"dependency_cache" : [ 			{

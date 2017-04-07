@@ -4,12 +4,12 @@
 		"appversion" : 		{
 			"major" : 7,
 			"minor" : 3,
-			"revision" : 2,
-			"architecture" : "x86",
+			"revision" : 3,
+			"architecture" : "x64",
 			"modernui" : 1
 		}
 ,
-		"rect" : [ 1.0, 44.0, 745.0, 647.0 ],
+		"rect" : [ 34.0, 78.0, 805.0, 934.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -105,8 +105,8 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
@@ -438,8 +438,8 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
@@ -771,8 +771,8 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
@@ -1105,8 +1105,8 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
@@ -1395,8 +1395,8 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
@@ -1789,10 +1789,10 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1163.5, 260.319519, 150.0, 34.0 ],
+					"patching_rect" : [ 1163.5, 260.319519, 150.0, 33.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 2,
-					"presentation_rect" : [ 582.0, 322.319519, 142.0, 34.0 ],
+					"presentation_rect" : [ 582.0, 322.319519, 142.0, 33.0 ],
 					"style" : "",
 					"text" : "2/ rotation references (in rotation order)"
 				}
@@ -1837,8 +1837,8 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
@@ -2163,10 +2163,10 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1160.5, 427.319519, 160.0, 48.0 ],
+					"patching_rect" : [ 1160.5, 427.319519, 160.0, 47.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 3,
-					"presentation_rect" : [ 582.0, 419.0, 142.0, 48.0 ],
+					"presentation_rect" : [ 582.0, 419.0, 142.0, 47.0 ],
 					"style" : "",
 					"text" : "(those settings can be changed in \"receiver settings\")"
 				}
@@ -2186,8 +2186,8 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
@@ -2569,7 +2569,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1163.5, 146.0, 150.0, 34.0 ],
+					"patching_rect" : [ 1163.5, 146.0, 150.0, 33.0 ],
 					"presentation" : 1,
 					"presentation_rect" : [ 582.0, 251.0, 159.0, 20.0 ],
 					"style" : "",
@@ -2639,8 +2639,8 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
@@ -2947,8 +2947,8 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
@@ -3680,8 +3680,8 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
@@ -3816,8 +3816,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -5044,8 +5044,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -5771,8 +5771,8 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
@@ -5976,10 +5976,10 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 627.0, 1621.5, 485.0, 48.0 ],
+					"patching_rect" : [ 627.0, 1621.5, 485.0, 47.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 3,
-					"presentation_rect" : [ 331.0, 596.0, 374.0, 48.0 ],
+					"presentation_rect" : [ 331.0, 596.0, 374.0, 47.0 ],
 					"style" : "",
 					"text" : " hedrot is free software: you can redistribute it and/or modify it under the terms of the version 3 of the GNU General Public License as published by the Free Software Foundation"
 				}
@@ -5994,9 +5994,9 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 632.0, 1568.5, 504.0, 52.0 ],
+					"patching_rect" : [ 632.0, 1568.5, 504.0, 51.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 6.0, 570.0, 314.0, 52.0 ],
+					"presentation_rect" : [ 6.0, 570.0, 314.0, 51.0 ],
 					"style" : "",
 					"text" : "hedrot Receiver"
 				}
@@ -6045,12 +6045,12 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
-						"rect" : [ 788.0, 78.0, 345.0, 391.0 ],
+						"rect" : [ 423.0, 78.0, 345.0, 391.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 1,
 						"default_fontsize" : 12.0,
@@ -6314,9 +6314,9 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 535.0, 915.0, 217.0, 23.0 ],
+									"patching_rect" : [ 535.0, 915.0, 217.0, 22.0 ],
 									"presentation" : 1,
-									"presentation_rect" : [ 21.0, 302.0, 123.0, 23.0 ],
+									"presentation_rect" : [ 21.0, 302.0, 123.0, 22.0 ],
 									"style" : "",
 									"text" : "invert Rotation?",
 									"varname" : "invertRotationComment"
@@ -6422,9 +6422,9 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 535.0, 742.0, 217.0, 23.0 ],
+									"patching_rect" : [ 535.0, 742.0, 217.0, 22.0 ],
 									"presentation" : 1,
-									"presentation_rect" : [ 21.0, 274.0, 111.0, 23.0 ],
+									"presentation_rect" : [ 21.0, 274.0, 111.0, 22.0 ],
 									"style" : "",
 									"text" : "Rotation Order",
 									"varname" : "rotationOrderComment"
@@ -6530,9 +6530,9 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 535.0, 583.0, 217.0, 23.0 ],
+									"patching_rect" : [ 535.0, 583.0, 217.0, 22.0 ],
 									"presentation" : 1,
-									"presentation_rect" : [ 21.0, 246.0, 111.0, 23.0 ],
+									"presentation_rect" : [ 21.0, 246.0, 111.0, 22.0 ],
 									"style" : "",
 									"text" : "Axes reference",
 									"varname" : "axesReferenceComment"
@@ -6641,7 +6641,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 17.963989, 567.0, 455.0, 35.0 ],
 									"style" : "",
-									"text" : ";\r\ngetHeadtrackerAttributes bang"
+									"text" : ";\rgetHeadtrackerAttributes bang"
 								}
 
 							}
@@ -6733,10 +6733,10 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 535.0, 430.0, 217.0, 55.0 ],
+									"patching_rect" : [ 535.0, 430.0, 217.0, 53.0 ],
 									"presentation" : 1,
 									"presentation_linecount" : 3,
-									"presentation_rect" : [ 21.0, 187.0, 210.0, 55.0 ],
+									"presentation_rect" : [ 21.0, 187.0, 210.0, 53.0 ],
 									"style" : "",
 									"text" : "Gradient Descent: Beta Variation according to movement"
 								}
@@ -6829,9 +6829,9 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 535.0, 321.0, 217.0, 23.0 ],
+									"patching_rect" : [ 535.0, 321.0, 217.0, 22.0 ],
 									"presentation" : 1,
-									"presentation_rect" : [ 21.0, 163.0, 236.0, 23.0 ],
+									"presentation_rect" : [ 21.0, 163.0, 236.0, 22.0 ],
 									"style" : "",
 									"text" : "Gradient Descent: max Beta"
 								}
@@ -6925,10 +6925,10 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 535.0, 172.0, 217.0, 39.0 ],
+									"patching_rect" : [ 535.0, 172.0, 217.0, 38.0 ],
 									"presentation" : 1,
 									"presentation_linecount" : 2,
-									"presentation_rect" : [ 21.0, 108.0, 196.0, 39.0 ],
+									"presentation_rect" : [ 21.0, 108.0, 196.0, 38.0 ],
 									"style" : "",
 									"text" : "Accelerometer low-pass filter time constant (s)"
 								}
@@ -6946,7 +6946,7 @@
 									"patching_rect" : [ 357.0, 21.0, 144.0, 22.0 ],
 									"restore" : 									{
 										"MadgwickBetaGain" : [ 1.0 ],
-										"MadgwickBetaMax" : [ 2.5 ],
+										"MadgwickBetaMax" : [ 1.0 ],
 										"accLPalpha" : [ 0.01 ],
 										"axesReference" : [ 0 ],
 										"invertRotation" : [ 0 ],
@@ -6956,7 +6956,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u376001238"
+									"varname" : "u264001281"
 								}
 
 							}
@@ -6972,7 +6972,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 17.963989, 462.5, 322.0, 62.0 ],
 									"style" : "",
-									"text" : "bang;\r\n>hedrot_receiver outputDataPeriod 1, accLPtimeConstant 0.01, MadgwickBetaMax 2.5, MadgwickBetaGain 1, axesReference 0, rotationOrder 0, invertRotation 0;\r\n"
+									"text" : "bang;\r>hedrot_receiver outputDataPeriod 1, accLPtimeConstant 0.01, MadgwickBetaMax 2.5, MadgwickBetaGain 1, axesReference 0, rotationOrder 0, invertRotation 0;\r"
 								}
 
 							}
@@ -7005,8 +7005,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -7558,10 +7558,10 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 30.0, 759.0, 358.0, 34.0 ],
+									"patching_rect" : [ 30.0, 759.0, 358.0, 33.0 ],
 									"presentation" : 1,
 									"presentation_linecount" : 2,
-									"presentation_rect" : [ 84.0, 9.0, 238.0, 62.0 ],
+									"presentation_rect" : [ 84.0, 9.0, 238.0, 60.0 ],
 									"style" : "",
 									"text" : "RECEIVER SETTINGS"
 								}
@@ -7596,8 +7596,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -8698,9 +8698,9 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 535.0, 48.0, 217.0, 23.0 ],
+									"patching_rect" : [ 535.0, 48.0, 217.0, 22.0 ],
 									"presentation" : 1,
-									"presentation_rect" : [ 47.0, 72.5, 236.0, 23.0 ],
+									"presentation_rect" : [ 47.0, 72.5, 236.0, 22.0 ],
 									"style" : "",
 									"text" : "Receiver Poll Period (ms)"
 								}
@@ -9316,8 +9316,8 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
@@ -9606,8 +9606,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -9843,8 +9843,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -10113,8 +10113,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -10450,8 +10450,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -11077,8 +11077,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -12701,7 +12701,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u304001237"
+									"varname" : "u360001280"
 								}
 
 							}
@@ -13493,8 +13493,8 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
@@ -13554,8 +13554,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -14262,7 +14262,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 1365.5, 203.319519, 177.0, 102.0 ],
 					"style" : "",
-					"text" : ";\r\nmax seteventinterval 1;\r\nmax setpollthrottle 2000;\r\nmax setqueuethrottle 2000;\r\nmax setslop 25;\r\nmax setsysqelemthrottle 2000;\r\nmax preempt 1"
+					"text" : ";\rmax seteventinterval 1;\rmax setpollthrottle 2000;\rmax setqueuethrottle 2000;\rmax setslop 25;\rmax setsysqelemthrottle 2000;\rmax preempt 1"
 				}
 
 			}
@@ -14320,7 +14320,7 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 26.0, 84.0, 512.67334, 29.0 ],
 					"style" : "",
-					"text" : "no headtracker connected",
+					"text" : "headtracker transmitting...",
 					"textcolor" : [ 0.0, 0.501961, 1.0, 1.0 ],
 					"textjustification" : 1
 				}
@@ -14355,8 +14355,8 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
@@ -14833,12 +14833,12 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
-						"rect" : [ 788.0, 78.0, 386.0, 766.0 ],
+						"rect" : [ 295.0, 100.0, 386.0, 766.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 1,
 						"default_fontsize" : 12.0,
@@ -15649,7 +15649,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 17.963989, 455.0, 476.0, 102.0 ],
 									"style" : "",
-									"text" : ";\r\n>hedrot_receiver samplerate 1000;\r\n>hedrot_receiver gyroDataRate 0, gyroClockSource 1, gyroDLPFBandwidth 0;\r\n>hedrot_receiver accHardOffset 0 0 0, accRange 3, accFullResolutionBit 1, accDataRate 13;\r\n>hedrot_receiver magMeasurementBias 0, magSampleAveraging 0, magDataRate 6, magGain 4, magMeasurementMode 3"
+									"text" : ";\r>hedrot_receiver samplerate 1000;\r>hedrot_receiver gyroDataRate 0, gyroClockSource 1, gyroDLPFBandwidth 0;\r>hedrot_receiver accHardOffset 0 0 0, accRange 3, accFullResolutionBit 1, accDataRate 13;\r>hedrot_receiver magMeasurementBias 0, magSampleAveraging 0, magDataRate 6, magGain 4, magMeasurementMode 3"
 								}
 
 							}
@@ -15683,8 +15683,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -16472,8 +16472,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -18833,12 +18833,12 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
-						"rect" : [ 79.0, 100.0, 479.0, 637.0 ],
+						"rect" : [ 1024.0, 95.0, 479.0, 637.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -19275,8 +19275,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -19459,8 +19459,8 @@
 														"appversion" : 														{
 															"major" : 7,
 															"minor" : 3,
-															"revision" : 2,
-															"architecture" : "x86",
+															"revision" : 3,
+															"architecture" : "x64",
 															"modernui" : 1
 														}
 ,
@@ -21113,8 +21113,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -21297,8 +21297,8 @@
 														"appversion" : 														{
 															"major" : 7,
 															"minor" : 3,
-															"revision" : 2,
-															"architecture" : "x86",
+															"revision" : 3,
+															"architecture" : "x64",
 															"modernui" : 1
 														}
 ,
@@ -22996,8 +22996,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -23521,8 +23521,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -23992,8 +23992,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -24801,8 +24801,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -26085,8 +26085,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -28192,8 +28192,8 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
@@ -28502,8 +28502,8 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
@@ -29578,7 +29578,7 @@
 					"patching_rect" : [ 1393.0, 48.0, 174.0, 20.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 2,
-					"presentation_rect" : [ 124.5, 476.0, 124.0, 34.0 ],
+					"presentation_rect" : [ 124.5, 476.0, 124.0, 33.0 ],
 					"style" : "",
 					"text" : "save window size and position"
 				}
@@ -29663,10 +29663,10 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 29.0, 466.0, 61.0, 34.0 ],
+					"patching_rect" : [ 29.0, 466.0, 61.0, 33.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 2,
-					"presentation_rect" : [ 500.0, 4.54998, 64.0, 34.0 ],
+					"presentation_rect" : [ 500.0, 4.54998, 64.0, 33.0 ],
 					"style" : "",
 					"text" : "reception state"
 				}
@@ -29762,7 +29762,7 @@
 					"fontsize" : 18.0,
 					"id" : "obj-86",
 					"ignoreclick" : 1,
-					"items" : "<empty>",
+					"items" : [ 0, "/dev/cu.Bluetooth-Incoming-Port", ",", 1, "/dev/cu.usbmodem2390101" ],
 					"labelclick" : 1,
 					"maxclass" : "umenu",
 					"numinlets" : 1,
@@ -30006,8 +30006,8 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
@@ -30203,8 +30203,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -30343,8 +30343,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -31159,8 +31159,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -31218,7 +31218,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 152.666672, 308.0, 173.0, 35.0 ],
 													"style" : "",
-													"text" : ";\r\ngetHeadtrackerAttributes bang"
+													"text" : ";\rgetHeadtrackerAttributes bang"
 												}
 
 											}
@@ -31379,8 +31379,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -32173,8 +32173,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -32777,7 +32777,7 @@
 									"patching_rect" : [ 479.333313, 449.5, 274.4375, 19.0 ],
 									"saved_object_attributes" : 									{
 										"MadgwickBetaGain" : 1.0,
-										"MadgwickBetaMax" : 2.5,
+										"MadgwickBetaMax" : 1.0,
 										"accLPtimeConstant" : 0.01,
 										"autoDiscover" : 1,
 										"axesReference" : 0,
@@ -33811,8 +33811,8 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 2,
-							"architecture" : "x86",
+							"revision" : 3,
+							"architecture" : "x64",
 							"modernui" : 1
 						}
 ,
@@ -33853,7 +33853,7 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 140.0, 14.0, 150.0, 34.0 ],
+									"patching_rect" : [ 140.0, 14.0, 150.0, 33.0 ],
 									"presentation" : 1,
 									"presentation_rect" : [ 121.0, 3.0, 239.0, 20.0 ],
 									"style" : "",
@@ -34097,7 +34097,7 @@
 									"presentation" : 1,
 									"presentation_rect" : [ 145.5, 77.0, 388.0, 17.0 ],
 									"style" : "",
-									"text" : "C:/Users/Baskind/Desktop/Developpement/hedrot-headtracker/hedrot/Max/hedrotReceiver.json"
+									"text" : "Data:/Developpement/hedrot-headtracker/hedrot/Max/hedrotReceiver.json"
 								}
 
 							}
@@ -34208,8 +34208,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -34900,9 +34900,9 @@
 									"numoutlets" : 2,
 									"outlettype" : [ "", "bang" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 168.0, 93.0, 74.0, 25.0 ],
+									"patching_rect" : [ 168.0, 93.0, 74.0, 24.0 ],
 									"presentation" : 1,
-									"presentation_rect" : [ 111.0, 63.0, 31.0, 25.0 ],
+									"presentation_rect" : [ 111.0, 63.0, 31.0, 24.0 ],
 									"style" : "",
 									"textcolor" : [ 0.0, 0.0, 0.0, 1.0 ],
 									"tricolor" : [ 0.75, 0.75, 0.75, 1.0 ],
@@ -35190,8 +35190,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -35868,8 +35868,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -36421,8 +36421,8 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 2,
-											"architecture" : "x86",
+											"revision" : 3,
+											"architecture" : "x64",
 											"modernui" : 1
 										}
 ,
@@ -38576,13 +38576,13 @@
 					"restore" : 					{
 						"autodiscover" : [ 1 ],
 						"invertRotation" : [ 0 ],
-						"serialport" : [ "" ],
+						"serialport" : [ "1 /dev/cu.usbmodem2390101" ],
 						"values_to_transmit" : [ 1 ]
 					}
 ,
 					"style" : "",
 					"text" : "autopattr @autorestore 0",
-					"varname" : "u195001239"
+					"varname" : "u501001282"
 				}
 
 			}
@@ -40240,24 +40240,26 @@
 				"implicit" : 1
 			}
 , 			{
+				"name" : "controle_pattrstorage.maxpat",
+				"bootpath" : "/Volumes/Data/Max/librairies/mes_libs/controle_pattrstorage",
+				"type" : "JSON",
+				"implicit" : 1
+			}
+, 			{
 				"name" : "hedrotReceiver_calibration.maxpat",
-				"bootpath" : "~/Desktop/Developpement/hedrot-headtracker/hedrot/Max/patches",
+				"bootpath" : "/Volumes/Data/Developpement/hedrot-headtracker/hedrot/Max/patches",
 				"type" : "JSON",
 				"implicit" : 1
 			}
 , 			{
 				"name" : "rs_set.maxpat",
-				"bootpath" : "~/Desktop/Developpement/hedrot-headtracker/hedrot/Max/patches",
+				"bootpath" : "/Volumes/Data/Developpement/hedrot-headtracker/hedrot/Max/patches",
 				"type" : "JSON",
 				"implicit" : 1
 			}
 , 			{
-				"name" : "hedrot_receiver.mxe",
-				"type" : "iLaF"
-			}
-, 			{
-				"name" : "jit.pass.mxe",
-				"type" : "iLaF"
+				"name" : "hedrot_receiver.mxo",
+				"type" : "iLaX"
 			}
  ],
 		"autosave" : 0

@@ -19,7 +19,7 @@
 
 
 // hedrot version
-#define HEDROT_VERSION "1.1.1"
+#define HEDROT_VERSION "1.2.0beta1"
 
 //=====================================================================================================
 // static definitions
@@ -30,6 +30,9 @@
 // time constants
 #define PINGTIME                0.5  // time delay in seconds between two pings when the headtracker has been found
 #define AUTODISCOVER_MAX_TIME   0.1  // max time period in seconds between autodiscover ping and headtracker response
+
+// other constants
+#define MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION 100000
 
 // math utils
 #define M_PI_float (float)      3.14159265358979323846264338327950288
@@ -78,6 +81,10 @@
 #define NOTIFICATION_MESSAGE_GYRO_CALIBRATION_STARTED   10
 #define NOTIFICATION_MESSAGE_GYRO_CALIBRATION_FINISHED  11
 #define NOTIFICATION_MESSAGE_BOARD_OVERLOAD             12
+#define NOTIFICATION_MESSAGE_MAG_CALIBRATION_STARTED    13
+#define NOTIFICATION_MESSAGE_MAG_CALIBRATION_SUCCEEDED  14
+#define NOTIFICATION_MESSAGE_MAG_CALIBRATION_FAILED     15
+#define NOTIFICATION_MESSAGE_EXPORT_MAGCALRAWSAMPLES_FAILED 16
 
 
 
@@ -146,7 +153,7 @@ typedef struct _headtrackerData {
     unsigned char   magGain;
     unsigned char   magMeasurementMode;
     
-    // calibration values
+    // calibration values und settings
     float           gyroOffset[3];
     float           gyroOffsetAutocalTime; // in ms
     long            gyroOffsetAutocalThreshold; //in LSB units
@@ -162,6 +169,9 @@ typedef struct _headtrackerData {
     float           accScaling[3], accScalingFactor[3];
     float           magOffset[3];
     float           magScaling[3], magScalingFactor[3];
+    short           magCalRawSamples[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION][3];  // calibration internal data
+    long            magCalNumberOfRawSamples;
+    char            magCalibratingFlag;
 
     
     //--------------- OUTPUTS AND STATUS FROM THE HEAD TRACKER -------------------
@@ -227,6 +237,7 @@ int  pullNotificationMessage(headtrackerData *trackingData);
 void headtracker_list_comm_ports(headtrackerData *trackingData);
 int export_headtracker_settings(headtrackerData *trackingData, char* filename);
 int import_headtracker_settings(headtrackerData *trackingData, char* filename);
+int export_magCalRawSamples(headtrackerData *trackingData, char* filename);
 
 
 //=====================================================================================================
@@ -244,6 +255,7 @@ void setAccLPtimeConstant(headtrackerData *trackingData, float accLPtimeConstant
 void setAxesReference(headtrackerData *trackingData, char axesReference);
 void setRotationOrder(headtrackerData *trackingData, char rotationOrder);
 void setInvertRotation(headtrackerData *trackingData, char invertRotation);
+void setMagCalibratingFlag(headtrackerData *trackingData, char magCalibratingFlag);
 
 
 
@@ -294,6 +306,7 @@ void headtracker_sendSignedCharArray2Headtracker(headtrackerData *trackingData, 
 void resetGyroOffsetCalibration(headtrackerData *trackingData);
 int  processKeyValueSettingPair(headtrackerData *trackingData, char *key, char *value, char UpdateHeadtrackerFlag);
 void changeQuaternionReference(headtrackerData *trackingData);
+int ellipsoidFit(short rawData[][3], int numberOfSamples, float* accOffset, float* accScaling);
 
 
 

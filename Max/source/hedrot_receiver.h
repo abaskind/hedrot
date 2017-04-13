@@ -115,17 +115,26 @@ void hedrot_receiver_close(t_hedrot_receiver *x);
 void hedrot_receiver_devices(t_hedrot_receiver *x);
 void hedrot_receiver_assist(t_hedrot_receiver *x, void *b, long m, long a, char *s);
 void hedrot_receiver_center_angles(t_hedrot_receiver *x);
+
+// methods for importing/exporting headtracker settings
 void hedrot_receiver_export_settings(t_hedrot_receiver *x, t_symbol *s);
 void hedrot_receiver_defered_export_settings(t_hedrot_receiver *x, t_symbol *s);
 void hedrot_receiver_import_settings(t_hedrot_receiver *x, t_symbol *s);
 void hedrot_receiver_defered_import_settings(t_hedrot_receiver *x, t_symbol *s);
 void hedrot_receiver_printVersion(t_hedrot_receiver *x, t_symbol *s);
 
-
+// methods for recording data into a text file
 void hedrot_receiver_opendestinationtextfile(t_hedrot_receiver *x, t_symbol *s);
 void hedrot_receiver_doopenforwrite(t_hedrot_receiver *x, t_symbol *s);
 void hedrot_receiver_startrec(t_hedrot_receiver *x);
 void hedrot_receiver_stoprec(t_hedrot_receiver *x);
+
+// methods for mag calibration
+void hedrot_receiver_startMagCalibration(t_hedrot_receiver *x);
+void hedrot_receiver_stopMagCalibration(t_hedrot_receiver *x);
+void hedrot_receiver_saveMagCalibration(t_hedrot_receiver *x);
+void hedrot_receiver_exportMagRawCalData(t_hedrot_receiver *x, t_symbol *s);
+void hedrot_receiver_defered_exportMagRawCalData(t_hedrot_receiver *x, t_symbol *s);
 
 void hedrot_receiver_output_data(t_hedrot_receiver *x);
 
@@ -142,6 +151,9 @@ void hedrot_receiver_mirrorHeadtrackerInfo(t_hedrot_receiver *x);
 void hedrot_receiver_outputCalibrationNotValidNotice(t_hedrot_receiver *x);
 void hedrot_receiver_outputGyroCalibrationStartedNotice(t_hedrot_receiver *x);
 void hedrot_receiver_outputGyroCalibrationFinishedNotice(t_hedrot_receiver *x);
+void hedrot_receiver_outputMagCalibrationStartedNotice(t_hedrot_receiver *x);
+void hedrot_receiver_outputMagCalibrationSucceededNotice(t_hedrot_receiver *x);
+void hedrot_receiver_outputMagCalibrationFailedNotice(t_hedrot_receiver *x);
 
 
 //getters and setters

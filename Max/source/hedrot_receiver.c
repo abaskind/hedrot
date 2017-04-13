@@ -93,8 +93,20 @@ void hedrot_receiver_tick(t_hedrot_receiver *x) {
             case NOTIFICATION_MESSAGE_BOARD_OVERLOAD:
                 if(x->verbose) post("[hedrot_receiver] : board too slow, reduce samplerate");
                 break;
+            case NOTIFICATION_MESSAGE_MAG_CALIBRATION_STARTED:
+                hedrot_receiver_outputMagCalibrationStartedNotice(x);
+                break;
+            case NOTIFICATION_MESSAGE_MAG_CALIBRATION_SUCCEEDED:
+                hedrot_receiver_outputMagCalibrationSucceededNotice(x);
+                break;
+            case NOTIFICATION_MESSAGE_MAG_CALIBRATION_FAILED:
+                hedrot_receiver_outputMagCalibrationFailedNotice(x);
+                break;
+            case NOTIFICATION_MESSAGE_EXPORT_MAGCALRAWSAMPLES_FAILED:
+                if(x->verbose) post("[hedrot_receiver] : could not save mag raw calibration data");
+                break;
             default:
-                post("[hedrot_receiver] : unknown message from libhedrot");
+                post("[hedrot_receiver] : unknown message %ld from libhedrot", messageNumber);
                 break;
 
         }
@@ -271,6 +283,9 @@ void hedrot_receiver_center_angles(t_hedrot_receiver *x) {
     center_angles(x->trackingData);
 }
 
+// methods for importing/exporting headtracker settings
+
+
 void hedrot_receiver_export_settings(t_hedrot_receiver *x, t_symbol *s) {
     defer((t_object *)x, (method)hedrot_receiver_defered_export_settings, s, 0, NULL);
 }
@@ -345,6 +360,54 @@ void hedrot_receiver_printVersion(t_hedrot_receiver *x, t_symbol *s) {
 
 }
 
+// methods for mag calibration
+void hedrot_receiver_startMagCalibration(t_hedrot_receiver *x) {
+    setMagCalibratingFlag(x->trackingData, 1);
+}
+
+void hedrot_receiver_stopMagCalibration(t_hedrot_receiver *x) {
+    setMagCalibratingFlag(x->trackingData, 0);
+}
+
+void hedrot_receiver_saveMagCalibration(t_hedrot_receiver *x) {
+    setMagScaling(x->trackingData, x->magScaling, 0);
+    setMagOffset(x->trackingData, x->magOffset, 1);
+    if(x->verbose) post("[hedrot_receiver]: mag calibration data saved");
+}
+
+
+void hedrot_receiver_exportMagRawCalData(t_hedrot_receiver *x, t_symbol *s) {
+    defer((t_object *)x, (method)hedrot_receiver_defered_exportMagRawCalData, s, 0, NULL);
+}
+
+
+void hedrot_receiver_defered_exportMagRawCalData(t_hedrot_receiver *x, t_symbol *s) {
+    t_fourcc filetype = FOUR_CHAR_CODE('TEXT'), outtype;
+    char filename[MAX_PATH_CHARS], fullfilename[MAX_PATH_CHARS];
+    short path=0;
+    
+    if (s == gensym("")) {      // if no argument supplied, ask for file
+        sprintf(filename, "headtrackerRawMagCalibrationData.txt");
+        
+        saveas_promptset("Save raw magnetometer calibration data as...");
+        if (saveasdialog_extended(filename, &path, &outtype, &filetype, 1))
+            // non-zero: user cancelled
+            return;
+    } else {
+        strcpy(filename, s->s_name);
+    }
+    
+    path_toabsolutesystempath( path, filename, fullfilename);
+    
+    post("[hedrot_receiver]: try to open file %s for storing raw magnetometer calibration data", fullfilename);
+    
+    if(!export_magCalRawSamples(x->trackingData, fullfilename))
+        error("[hedrot_receiver] Error while exporting raw magnetometer calibration data");
+    
+}
+
+
+
 
 
 void hedrot_receiver_outputPortList(t_hedrot_receiver *x) {
@@ -399,27 +462,61 @@ void hedrot_receiver_outputWrongFirmwareVersionNotice(t_hedrot_receiver *x) {
 void hedrot_receiver_outputGyroCalibrationStartedNotice(t_hedrot_receiver *x) {
     t_atom output;
     atom_setlong(&output, 1);
-    outlet_anything( x->x_status_outlet, gensym("calibrating_gyro"), 1, &output);
+    outlet_anything( x->x_status_outlet, gensym("calibrating_gyro_offset"), 1, &output);
     
-    if(x->verbose) post("[hedrot_receiver]: gyroscope calibration started");
+    if(x->verbose) post("[hedrot_receiver]: gyroscope offsetcalibration started");
 }
 
 
 void hedrot_receiver_outputGyroCalibrationFinishedNotice(t_hedrot_receiver *x) {
     t_atom output, output3[3];
     atom_setlong(&output, 0);
-    outlet_anything( x->x_status_outlet, gensym("calibrating_gyro"), 1, &output);
+    outlet_anything( x->x_status_outlet, gensym("calibrating_gyro_offset"), 1, &output);
     
     atom_setfloat_array( 3, output3, 3, x->trackingData->gyroOffset);
     outlet_anything( x->x_debug_outlet, gensym("gyroOffset"), 3, output3);
     
-    if(x->verbose) post("[hedrot_receiver]: gyroscope calibration finished");
+    if(x->verbose) post("[hedrot_receiver]: gyroscope offset calibration finished");
+}
+
+void hedrot_receiver_outputMagCalibrationStartedNotice(t_hedrot_receiver *x) {
+    t_atom output;
+    atom_setlong(&output, 1);
+    outlet_anything( x->x_status_outlet, gensym("calibrating_mag"), 1, &output);
+    
+    if(x->verbose) post("[hedrot_receiver]: magnetometer calibration started");
+}
+
+
+void hedrot_receiver_outputMagCalibrationSucceededNotice(t_hedrot_receiver *x) {
+    t_atom output;
+    int i;
+    
+    for(i=0;i<3;i++) x->magOffset[i] = x->trackingData->magOffset[i];
+    object_attr_touch( (t_object *)x, gensym("magOffset"));
+    
+    for(i=0;i<3;i++) x->magScaling[i] = x->trackingData->magScaling[i];
+    object_attr_touch( (t_object *)x, gensym("magScaling"));
+    
+    atom_setlong(&output, 0);
+    outlet_anything( x->x_status_outlet, gensym("calibrating_mag"), 1, &output);
+    
+    if(x->verbose) post("[hedrot_receiver]: magnetometer calibration succeeded");
+}
+
+void hedrot_receiver_outputMagCalibrationFailedNotice(t_hedrot_receiver *x) {
+    t_atom output;
+    atom_setlong(&output, -1);
+    outlet_anything( x->x_status_outlet, gensym("calibrating_mag"), 1, &output);
+    
+    if(x->verbose) post("[hedrot_receiver]: magnetometer calibration failed");
 }
 
 
 
+
 void hedrot_receiver_outputReceptionStatus(t_hedrot_receiver *x) {
-    t_atom sym[2], output;
+    t_atom sym[2];
     
     if(x->verbose) post("new reception status: %ld",x->trackingData->infoReceptionStatus);
     
@@ -451,16 +548,17 @@ void hedrot_receiver_outputReceptionStatus(t_hedrot_receiver *x) {
             break;
     }
     
-    // in case the panel remains open after a disconnection
-    if(x->trackingData->infoReceptionStatus != COMMUNICATION_STATE_HEADTRACKER_TRANSMITTING) {
-        atom_setlong(&output, 0);
-        outlet_anything( x->x_status_outlet, gensym("calibrating_gyro"), 1, &output);
-    }
-    
     outlet_anything( x->x_status_outlet, gensym("headtracker"), 2, sym);
     
     if(x->verbose) post("[hedrot_receiver]: communication status changed to %ld", x->trackingData->infoReceptionStatus);
 }
+
+void hedrot_receiver_outputMagCalibrationFlag(t_hedrot_receiver *x) {
+    t_atom output;
+    atom_setlong(&output, 0);
+    outlet_anything( x->x_status_outlet, gensym("calibrating_gyro"), 1, &output);
+}
+
 
 // update the headtracker settings for the GUI
 void hedrot_receiver_mirrorHeadtrackerInfo(t_hedrot_receiver *x) {
@@ -1084,11 +1182,17 @@ int C74_EXPORT main()
     class_addmethod(c, (method)hedrot_receiver_import_settings, "import_settings", A_DEFSYM, 0);
     class_addmethod(c, (method)hedrot_receiver_printVersion, "version", A_DEFSYM, 0);
     
-    
     // methods for recording data into a text file
     class_addmethod(c, (method)hedrot_receiver_opendestinationtextfile,	"opendestinationtextfile",		A_DEFSYM, 0);
     class_addmethod(c, (method)hedrot_receiver_startrec,         "startrec", 0);
     class_addmethod(c, (method)hedrot_receiver_stoprec,          "stoprec", 0);
+    
+    // methods for mag calibration
+    class_addmethod(c, (method)hedrot_receiver_startMagCalibration,   "startMagCalibration", 0);
+    class_addmethod(c, (method)hedrot_receiver_stopMagCalibration,   "stopMagCalibration", 0);
+    class_addmethod(c, (method)hedrot_receiver_saveMagCalibration,   "saveMagCalibration", 0);
+    class_addmethod(c, (method)hedrot_receiver_exportMagRawCalData,   "exportMagRawCalData", A_DEFSYM, 0);
+    
     
     // --------------------------------------- define attributes --------------------------------------------------------
     CLASS_ATTR_CHAR(c,    "verbose",    0,  t_hedrot_receiver,  verbose);

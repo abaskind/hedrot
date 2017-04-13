@@ -14,8 +14,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
 #if defined(_WIN32) || defined(_WIN64)
 #include <stdint.h>
+#endif
+
+// include cblas and lapack for matrix operations
+#ifdef __MACH__  // if mach (mac os X)
+#include <Accelerate/Accelerate.h>
+#else
+#if defined(_WIN32) || defined(_WIN64)
+// not made yet
+#endif
 #endif
 
 
@@ -45,6 +55,7 @@ double get_monotonic_time() {
 }
 #endif /* #if defined(_WIN32) || defined(_WIN64) */
 #endif /* #ifdef __MACH__ */
+
 
 
 //=====================================================================================================
@@ -128,6 +139,9 @@ headtrackerData* headtracker_new() {
     trackingData->gyroOffsetCalibratedState = 0;
     resetGyroOffsetCalibration(trackingData);
     
+    trackingData->magCalNumberOfRawSamples = 0;
+    trackingData->magCalibratingFlag = 0;
+
     headtracker_setReceptionStatus(trackingData, COMMUNICATION_STATE_NO_CONNECTED_HEADTRACKER);
     
     return trackingData;
@@ -316,6 +330,57 @@ int import_headtracker_settings(headtrackerData *trackingData, char* filename) {
     return 1;
 }
 
+
+//=====================================================================================================
+// function export_magCalRawSamples
+//=====================================================================================================
+//
+// export magnetometer calibration data if available
+//
+// the format for each line is:
+//      sample_number, X Y Z;
+//
+// returns 1 if no error
+// returns 0 if error
+//
+int export_magCalRawSamples(headtrackerData *trackingData, char* filename) {
+    FILE *fd;
+    int i;
+    
+    if(!trackingData->magCalNumberOfRawSamples) {
+        printf("Error: no samples to save");
+        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_EXPORT_MAGCALRAWSAMPLES_FAILED);
+        return 0;
+    }
+    
+    // open file for writing, returns 0 if it fails
+#if defined(_WIN32) || defined(_WIN64)
+    fopen_s( &fd, filename, "w");
+#else /* #if defined(_WIN32) || defined(_WIN64) */
+    fd = fopen( filename, "w");
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
+    
+    if( fd == NULL) {
+        printf("Error: file %s could not be opened for writing", filename);
+        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_EXPORT_MAGCALRAWSAMPLES_FAILED);
+        return 0;
+    }
+    
+    // dump all values in the text file
+    for(i = 0; i<trackingData->magCalNumberOfRawSamples; i++) {
+        fprintf(fd, "%d, %d %d %d;\n", i, trackingData->magCalRawSamples[i][0], trackingData->magCalRawSamples[i][1], trackingData->magCalRawSamples[i][2]);
+    }
+    
+    
+    // close (save) the file, returns 0 if it fails
+    if(fclose(fd)) {
+        printf("Error: file %s could not be closed properly", filename);
+        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_EXPORT_MAGCALRAWSAMPLES_FAILED);
+        return 0;
+    }
+    
+    return 1;
+}
 
 
 //=====================================================================================================
@@ -628,6 +693,20 @@ void headtracker_compute_data(headtrackerData *trackingData) {
                 break;
         }
     }
+    
+    // record raw data for the magnetometer if calibration is running
+    if(trackingData->magCalibratingFlag) {
+        trackingData->magCalRawSamples[trackingData->magCalNumberOfRawSamples][0] = trackingData->magRawData[0];
+        trackingData->magCalRawSamples[trackingData->magCalNumberOfRawSamples][1] = trackingData->magRawData[1];
+        trackingData->magCalRawSamples[trackingData->magCalNumberOfRawSamples][2] = trackingData->magRawData[2];
+        
+        trackingData->magCalNumberOfRawSamples++;
+        if(trackingData->magCalNumberOfRawSamples>=MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION) {
+            setMagCalibratingFlag(trackingData, 0);
+        }
+    }
+    
+    
     // center according to reference1
     quaternionComposition(trackingData->qref1, trackingData->qref2, trackingData->qref3, trackingData->qref4,
                           trackingData->q1, trackingData->q2, trackingData->q3, trackingData->q4,
@@ -654,6 +733,94 @@ void headtracker_compute_data(headtrackerData *trackingData) {
             break;
     }
 
+}
+
+
+//=====================================================================================================
+// function ellipsoidFit
+//=====================================================================================================
+//
+// find the center and raddii of a set of raw data (Nx3), assumed to be on an ellipsoid
+// The calculation is done in double precision, the result is converted to single.
+//
+// method:
+// classical ellipsoid fit algorithm without rotation = least-squares optimization on the linearized problem (after variable changes):
+// a*X^2 + b*Y^2 + c*Z^2 + d*2*X + e*2*Y + f*2*Z = 1;
+//
+// the radii and offset are calculated afterwards as follows:
+// radii = [-d/a -e/b -f/c]
+// offsets = [sqrt(gamma/a) sqrt(gamma/b) sqrt(gamma/c)]
+// ... with gamma = 1 + ( d^2/a + e^2/b + f^2/c );
+//
+// returns 1 (error) if calibration failed
+int ellipsoidFit(short rawData[][3], int numberOfSamples, float* accOffset, float* accScaling) {
+    int i;
+    
+    // constants
+    __CLPK_integer one = 1, six=6;
+    double rcond = 1e-6; // reverse maximum cond
+    
+    double matrixD[numberOfSamples*6]; // internal input matrix A
+    double matrixB[numberOfSamples]; // internal input matrix B (column mit ones), output = solution
+    double vectorS[6]; //output = singular values
+    __CLPK_integer rank; // effective rank of the matrix
+    double wkopt;
+    double *work;
+    __CLPK_integer n = numberOfSamples;
+    __CLPK_integer lda = numberOfSamples, ldb = numberOfSamples;
+    __CLPK_integer lwork, info;
+    double gamma;
+    
+    
+    
+    // Build the matrix D (rows = X^2, Y^2, Z^2, 2*X, 2*Y, 2*Z) and the matrix ONES (N*1)
+    for(i=0; i<numberOfSamples; i++) {
+        matrixD[0*numberOfSamples+i] = rawData[i][0] * rawData[i][0];
+        matrixD[1*numberOfSamples+i] = rawData[i][1] * rawData[i][1];
+        matrixD[2*numberOfSamples+i] = rawData[i][2] * rawData[i][2];
+        
+        matrixD[3*numberOfSamples+i] = 2 * rawData[i][0];
+        matrixD[4*numberOfSamples+i] = 2 * rawData[i][1];
+        matrixD[5*numberOfSamples+i] = 2 * rawData[i][2];
+        
+        matrixB[i] = 1;
+    }
+    
+    /* Query and allocate the optimal workspace */
+    lwork = -1;
+    dgelss_(&n, &six, &one, matrixD, &lda, matrixB, &ldb, vectorS, &rcond, &rank, &wkopt, &lwork, &info);
+    lwork = (int)wkopt;
+    work = (double*)malloc( lwork*sizeof(double) );
+    /* Solve the equations A*X = B */
+    dgelss_(&n, &six, &one, matrixD, &lda, matrixB, &ldb, vectorS, &rcond, &rank, work, &lwork, &info);
+    /* Check for the full rank */
+    if( info > 0 ) {
+        printf( "The diagonal element %i of the triangular factor ", (int) info );
+        printf( "of A is zero, so that A does not have full rank;\n" );
+        printf( "the least squares solution could not be computed.\n" );
+        return 1;
+    }
+    
+    // print debug data
+    printf("calibration solution: %f %f %f %f %f %f\r\n", matrixB[0], matrixB[1], matrixB[2], matrixB[3], matrixB[4], matrixB[5]);
+    printf("singular values: %f %f %f %f %f %f\r\n", vectorS[0], vectorS[1], vectorS[2], vectorS[3], vectorS[4], vectorS[5]);
+    printf("matrix condition number: %f\r\n", vectorS[0]/vectorS[5]);
+    
+    
+    // compute the radii and offsets from the results
+    accOffset[0] = (float) -matrixB[3]/matrixB[0];
+    accOffset[1] = (float) -matrixB[4]/matrixB[1];
+    accOffset[2] = (float) -matrixB[5]/matrixB[2];
+    
+    gamma = 1 + ( matrixB[3]*matrixB[3] / matrixB[0] + matrixB[4]*matrixB[4] / matrixB[1] + matrixB[5]*matrixB[5] / matrixB[2] );
+    accScaling[0] = (float) sqrt(gamma/matrixB[0]);
+    accScaling[1] = (float) sqrt(gamma/matrixB[1]);
+    accScaling[2] = (float) sqrt(gamma/matrixB[2]);
+    
+    /* Free workspace */
+    free( (void*)work );
+
+    return 0;
 }
 
 //=====================================================================================================
@@ -815,17 +982,13 @@ char MadgwickAHRSupdateModified(headtrackerData *trackingData) {
     trackingData->q2 += qDot2 * trackingData->samplePeriod;
     trackingData->q3 += qDot3 * trackingData->samplePeriod;
     trackingData->q4 += qDot4 * trackingData->samplePeriod;
-    printf("estimated quaternion 1 : %f %f %f %f\r\n", trackingData->q1, trackingData->q2, trackingData->q3, trackingData->q4);
     
     // Normalise quaternion
     recipNorm = invSqrt(trackingData->q1 * trackingData->q1 + trackingData->q2 * trackingData->q2 + trackingData->q3 * trackingData->q3 + trackingData->q4 * trackingData->q4);
-    printf("%f, recipNorm = %f\r\n", trackingData->q1 * trackingData->q1 + trackingData->q2 * trackingData->q2 + trackingData->q3 * trackingData->q3 + trackingData->q4 * trackingData->q4, recipNorm);
     trackingData->q1 *= recipNorm;
     trackingData->q2 *= recipNorm;
     trackingData->q3 *= recipNorm;
     trackingData->q4 *= recipNorm;
-    
-    printf("estimated quaternion 2 : %f %f %f %f\r\n", trackingData->q1, trackingData->q2, trackingData->q3, trackingData->q4);
     
     return 0;
 }
@@ -1299,6 +1462,35 @@ void setRotationOrder(headtrackerData *trackingData, char rotationOrder) {
 //=====================================================================================================
 void setInvertRotation(headtrackerData *trackingData, char invertRotation){
     trackingData->invertRotation = invertRotation;
+}
+
+//=====================================================================================================
+// public setter to start/stop recording of raw data for mag calibration
+//=====================================================================================================
+void setMagCalibratingFlag(headtrackerData *trackingData, char magCalibratingFlag) {
+    int i;
+    trackingData->magCalibratingFlag = magCalibratingFlag;
+    
+    if(trackingData->magCalibratingFlag) {
+        trackingData->magCalNumberOfRawSamples = 0;
+        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_MAG_CALIBRATION_STARTED);
+        if(trackingData->verbose) printf("magnetometer calibration started\r\n");
+    }
+    else {
+        if (!ellipsoidFit(trackingData->magCalRawSamples, trackingData->magCalNumberOfRawSamples, trackingData->magOffset, trackingData->magScaling)) {
+            for(i=0;i<3;i++) {
+                trackingData->magScalingFactor[i] = 1/trackingData->magScaling[i];
+            }
+            pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_MAG_CALIBRATION_SUCCEEDED);
+            if(trackingData->verbose) printf("magnetometer calibration succeeded\r\n");
+            if(trackingData->verbose) printf("magnetometer calibration radii: %f %f %f\r\n", trackingData->magScaling[0], trackingData->magScaling[1], trackingData->magScaling[2]);
+            if(trackingData->verbose) printf("magnetometer calibration offsets: %f %f %f\r\n", trackingData->magOffset[0], trackingData->magOffset[1], trackingData->magOffset[2]);
+
+        } else {
+            pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_MAG_CALIBRATION_FAILED);
+            if(trackingData->verbose) printf("magnetometer calibration failed\r\n");
+        }
+    }
 }
 
 

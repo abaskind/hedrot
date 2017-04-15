@@ -1789,10 +1789,10 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1163.5, 260.319519, 150.0, 33.0 ],
+					"patching_rect" : [ 1163.5, 260.319519, 150.0, 34.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 2,
-					"presentation_rect" : [ 582.0, 322.319519, 142.0, 33.0 ],
+					"presentation_rect" : [ 582.0, 322.319519, 142.0, 34.0 ],
 					"style" : "",
 					"text" : "2/ rotation references (in rotation order)"
 				}
@@ -2163,10 +2163,10 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1160.5, 427.319519, 160.0, 47.0 ],
+					"patching_rect" : [ 1160.5, 427.319519, 160.0, 48.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 3,
-					"presentation_rect" : [ 582.0, 419.0, 142.0, 47.0 ],
+					"presentation_rect" : [ 582.0, 419.0, 142.0, 48.0 ],
 					"style" : "",
 					"text" : "(those settings can be changed in \"receiver settings\")"
 				}
@@ -2569,7 +2569,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 1163.5, 146.0, 150.0, 33.0 ],
+					"patching_rect" : [ 1163.5, 146.0, 150.0, 34.0 ],
 					"presentation" : 1,
 					"presentation_rect" : [ 582.0, 251.0, 159.0, 20.0 ],
 					"style" : "",
@@ -5976,10 +5976,10 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 627.0, 1621.5, 485.0, 47.0 ],
+					"patching_rect" : [ 627.0, 1621.5, 485.0, 48.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 3,
-					"presentation_rect" : [ 331.0, 596.0, 374.0, 47.0 ],
+					"presentation_rect" : [ 331.0, 596.0, 374.0, 48.0 ],
 					"style" : "",
 					"text" : " hedrot is free software: you can redistribute it and/or modify it under the terms of the version 3 of the GNU General Public License as published by the Free Software Foundation"
 				}
@@ -5994,9 +5994,9 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 632.0, 1568.5, 504.0, 51.0 ],
+					"patching_rect" : [ 632.0, 1568.5, 504.0, 52.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 6.0, 570.0, 314.0, 51.0 ],
+					"presentation_rect" : [ 6.0, 570.0, 314.0, 52.0 ],
 					"style" : "",
 					"text" : "hedrot Receiver"
 				}
@@ -6641,7 +6641,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 17.963989, 567.0, 455.0, 35.0 ],
 									"style" : "",
-									"text" : ";\rgetHeadtrackerAttributes bang"
+									"text" : ";\r\ngetHeadtrackerAttributes bang"
 								}
 
 							}
@@ -6956,7 +6956,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u676001262"
+									"varname" : "u840001252"
 								}
 
 							}
@@ -6972,7 +6972,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 17.963989, 462.5, 322.0, 62.0 ],
 									"style" : "",
-									"text" : "bang;\r>hedrot_receiver outputDataPeriod 1, accLPtimeConstant 0.01, MadgwickBetaMax 2.5, MadgwickBetaGain 1, axesReference 0, rotationOrder 0, invertRotation 0;\r"
+									"text" : "bang;\r\n>hedrot_receiver outputDataPeriod 1, accLPtimeConstant 0.01, MadgwickBetaMax 2.5, MadgwickBetaGain 1, axesReference 0, rotationOrder 0, invertRotation 0;\r\n"
 								}
 
 							}
@@ -12701,7 +12701,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u200001261"
+									"varname" : "u496001251"
 								}
 
 							}
@@ -14262,7 +14262,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 1365.5, 203.319519, 177.0, 102.0 ],
 					"style" : "",
-					"text" : ";\rmax seteventinterval 1;\rmax setpollthrottle 2000;\rmax setqueuethrottle 2000;\rmax setslop 25;\rmax setsysqelemthrottle 2000;\rmax preempt 1"
+					"text" : ";\r\nmax seteventinterval 1;\r\nmax setpollthrottle 2000;\r\nmax setqueuethrottle 2000;\r\nmax setslop 25;\r\nmax setsysqelemthrottle 2000;\r\nmax preempt 1"
 				}
 
 			}
@@ -15649,7 +15649,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 17.963989, 455.0, 476.0, 102.0 ],
 									"style" : "",
-									"text" : ";\r>hedrot_receiver samplerate 1000;\r>hedrot_receiver gyroDataRate 0, gyroClockSource 1, gyroDLPFBandwidth 0;\r>hedrot_receiver accHardOffset 0 0 0, accRange 3, accFullResolutionBit 1, accDataRate 13;\r>hedrot_receiver magMeasurementBias 0, magSampleAveraging 0, magDataRate 6, magGain 4, magMeasurementMode 3"
+									"text" : ";\r\n>hedrot_receiver samplerate 1000;\r\n>hedrot_receiver gyroDataRate 0, gyroClockSource 1, gyroDLPFBandwidth 0;\r\n>hedrot_receiver accHardOffset 0 0 0, accRange 3, accFullResolutionBit 1, accDataRate 13;\r\n>hedrot_receiver magMeasurementBias 0, magSampleAveraging 0, magDataRate 6, magGain 4, magMeasurementMode 3"
 								}
 
 							}
@@ -18838,7 +18838,7 @@
 							"modernui" : 1
 						}
 ,
-						"rect" : [ -85.0, 233.0, 479.0, 637.0 ],
+						"rect" : [ 79.0, 100.0, 479.0, 637.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -18865,7 +18865,6 @@
 						"tags" : "",
 						"style" : "",
 						"subpatcher_template" : "",
-						"visible" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
 									"fontname" : "Arial",
@@ -26739,10 +26738,10 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 933.625, 261.5, 150.0, 33.0 ],
+									"patching_rect" : [ 933.625, 261.5, 150.0, 34.0 ],
 									"presentation" : 1,
 									"presentation_linecount" : 2,
-									"presentation_rect" : [ 316.542542, 373.5, 150.0, 33.0 ],
+									"presentation_rect" : [ 316.542542, 373.5, 150.0, 34.0 ],
 									"style" : "",
 									"text" : "gyroscope\nx            y            z",
 									"textjustification" : 1
@@ -26758,10 +26757,10 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 782.625, 261.5, 150.0, 33.0 ],
+									"patching_rect" : [ 782.625, 261.5, 150.0, 34.0 ],
 									"presentation" : 1,
 									"presentation_linecount" : 2,
-									"presentation_rect" : [ 165.542542, 373.5, 150.0, 33.0 ],
+									"presentation_rect" : [ 165.542542, 373.5, 150.0, 34.0 ],
 									"style" : "",
 									"text" : "accelerometer\nx            y            z",
 									"textjustification" : 1
@@ -26777,10 +26776,10 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 630.1875, 261.5, 150.0, 33.0 ],
+									"patching_rect" : [ 630.1875, 261.5, 150.0, 34.0 ],
 									"presentation" : 1,
 									"presentation_linecount" : 2,
-									"presentation_rect" : [ 13.105042, 373.5, 150.0, 33.0 ],
+									"presentation_rect" : [ 13.105042, 373.5, 150.0, 34.0 ],
 									"style" : "",
 									"text" : "magnetometer\nx            y            z",
 									"textjustification" : 1
@@ -26829,9 +26828,9 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 795.3125, 88.5, 141.0, 22.0 ],
+									"patching_rect" : [ 795.3125, 88.5, 141.0, 23.0 ],
 									"presentation" : 1,
-									"presentation_rect" : [ 170.042542, 210.5, 141.0, 22.0 ],
+									"presentation_rect" : [ 170.042542, 210.5, 141.0, 23.0 ],
 									"style" : "",
 									"text" : "CALIBRATED DATA"
 								}
@@ -26846,10 +26845,10 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 406.4375, 261.5, 150.0, 33.0 ],
+									"patching_rect" : [ 406.4375, 261.5, 150.0, 34.0 ],
 									"presentation" : 1,
 									"presentation_linecount" : 2,
-									"presentation_rect" : [ 316.542542, 160.5, 150.0, 33.0 ],
+									"presentation_rect" : [ 316.542542, 160.5, 150.0, 34.0 ],
 									"style" : "",
 									"text" : "gyroscope\nx            y            z",
 									"textjustification" : 1
@@ -26865,10 +26864,10 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 256.4375, 261.5, 150.0, 33.0 ],
+									"patching_rect" : [ 256.4375, 261.5, 150.0, 34.0 ],
 									"presentation" : 1,
 									"presentation_linecount" : 2,
-									"presentation_rect" : [ 165.542542, 160.5, 150.0, 33.0 ],
+									"presentation_rect" : [ 165.542542, 160.5, 150.0, 34.0 ],
 									"style" : "",
 									"text" : "accelerometer\nx            y            z",
 									"textjustification" : 1
@@ -26884,10 +26883,10 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 98.0, 261.5, 150.0, 33.0 ],
+									"patching_rect" : [ 98.0, 261.5, 150.0, 34.0 ],
 									"presentation" : 1,
 									"presentation_linecount" : 2,
-									"presentation_rect" : [ 13.105042, 160.5, 150.0, 33.0 ],
+									"presentation_rect" : [ 13.105042, 160.5, 150.0, 34.0 ],
 									"style" : "",
 									"text" : "magnetometer\nx            y            z",
 									"textjustification" : 1
@@ -26936,9 +26935,9 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 329.984192, 90.5, 86.0, 22.0 ],
+									"patching_rect" : [ 329.984192, 90.5, 86.0, 23.0 ],
 									"presentation" : 1,
-									"presentation_rect" : [ 209.706909, 0.5, 86.0, 22.0 ],
+									"presentation_rect" : [ 209.706909, 0.5, 86.0, 23.0 ],
 									"style" : "",
 									"text" : "RAW DATA"
 								}
@@ -29579,7 +29578,7 @@
 					"patching_rect" : [ 1393.0, 48.0, 174.0, 20.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 2,
-					"presentation_rect" : [ 124.5, 476.0, 124.0, 33.0 ],
+					"presentation_rect" : [ 124.5, 476.0, 124.0, 34.0 ],
 					"style" : "",
 					"text" : "save window size and position"
 				}
@@ -29664,10 +29663,10 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 29.0, 466.0, 61.0, 33.0 ],
+					"patching_rect" : [ 29.0, 466.0, 61.0, 34.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 2,
-					"presentation_rect" : [ 500.0, 4.54998, 64.0, 33.0 ],
+					"presentation_rect" : [ 500.0, 4.54998, 64.0, 34.0 ],
 					"style" : "",
 					"text" : "reception state"
 				}
@@ -29763,7 +29762,7 @@
 					"fontsize" : 18.0,
 					"id" : "obj-86",
 					"ignoreclick" : 1,
-					"items" : [ 0, "/dev/cu.Bluetooth-Incoming-Port", ",", 1, "/dev/cu.usbmodem2390101" ],
+					"items" : [ 0, "\\\\.\\COM10" ],
 					"labelclick" : 1,
 					"maxclass" : "umenu",
 					"numinlets" : 1,
@@ -30012,7 +30011,7 @@
 							"modernui" : 1
 						}
 ,
-						"rect" : [ 147.0, 78.0, 1499.0, 933.0 ],
+						"rect" : [ 143.0, 78.0, 1499.0, 933.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -30039,7 +30038,6 @@
 						"tags" : "",
 						"style" : "",
 						"subpatcher_template" : "",
-						"visible" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
 									"id" : "obj-83",
@@ -30854,7 +30852,7 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 182.927979, 14.0, 150.0, 33.0 ],
+									"patching_rect" : [ 182.927979, 14.0, 150.0, 34.0 ],
 									"style" : "",
 									"text" : "internal headtracker samplerate in Hz",
 									"textcolor" : [ 1.0, 1.0, 1.0, 1.0 ]
@@ -31046,7 +31044,6 @@
 										"tags" : "",
 										"style" : "",
 										"subpatcher_template" : "",
-										"visible" : 1,
 										"boxes" : [ 											{
 												"box" : 												{
 													"fontname" : "Arial",
@@ -31194,10 +31191,10 @@
 													"maxclass" : "comment",
 													"numinlets" : 1,
 													"numoutlets" : 0,
-													"patching_rect" : [ 177.0, 172.0, 358.0, 47.0 ],
+													"patching_rect" : [ 177.0, 172.0, 358.0, 48.0 ],
 													"presentation" : 1,
 													"presentation_linecount" : 2,
-													"presentation_rect" : [ 41.0, 17.5, 315.0, 47.0 ],
+													"presentation_rect" : [ 41.0, 17.5, 315.0, 48.0 ],
 													"style" : "",
 													"text" : "Calibrating gyroscope offset, stay still for a short time..."
 												}
@@ -31891,7 +31888,7 @@
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 152.666672, 308.0, 173.0, 35.0 ],
 													"style" : "",
-													"text" : ";\rgetHeadtrackerAttributes bang"
+													"text" : ";\r\ngetHeadtrackerAttributes bang"
 												}
 
 											}
@@ -34562,7 +34559,7 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 140.0, 14.0, 150.0, 33.0 ],
+									"patching_rect" : [ 140.0, 14.0, 150.0, 34.0 ],
 									"presentation" : 1,
 									"presentation_rect" : [ 121.0, 3.0, 239.0, 20.0 ],
 									"style" : "",
@@ -34806,7 +34803,7 @@
 									"presentation" : 1,
 									"presentation_rect" : [ 145.5, 77.0, 388.0, 17.0 ],
 									"style" : "",
-									"text" : "Data:/Developpement/hedrot-headtracker/hedrot/Max/hedrotReceiver.json"
+									"text" : "C:/Users/Baskind/Desktop/Developpement/hedrot-headtracker/hedrot/Max/hedrotReceiver.json"
 								}
 
 							}
@@ -35609,9 +35606,9 @@
 									"numoutlets" : 2,
 									"outlettype" : [ "", "bang" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 168.0, 93.0, 74.0, 24.0 ],
+									"patching_rect" : [ 168.0, 93.0, 74.0, 25.0 ],
 									"presentation" : 1,
-									"presentation_rect" : [ 111.0, 63.0, 31.0, 24.0 ],
+									"presentation_rect" : [ 111.0, 63.0, 31.0, 25.0 ],
 									"style" : "",
 									"textcolor" : [ 0.0, 0.0, 0.0, 1.0 ],
 									"tricolor" : [ 0.75, 0.75, 0.75, 1.0 ],
@@ -39285,13 +39282,13 @@
 					"restore" : 					{
 						"autodiscover" : [ 1 ],
 						"invertRotation" : [ 0 ],
-						"serialport" : [ "1 /dev/cu.usbmodem2390101" ],
+						"serialport" : [ "0 \\\\.\\COM10" ],
 						"values_to_transmit" : [ 1 ]
 					}
 ,
 					"style" : "",
 					"text" : "autopattr @autorestore 0",
-					"varname" : "u284001263"
+					"varname" : "u275001253"
 				}
 
 			}
@@ -40949,26 +40946,24 @@
 				"implicit" : 1
 			}
 , 			{
-				"name" : "controle_pattrstorage.maxpat",
-				"bootpath" : "/Volumes/Data/Max/librairies/mes_libs/controle_pattrstorage",
-				"type" : "JSON",
-				"implicit" : 1
-			}
-, 			{
 				"name" : "hedrotReceiver_calibration.maxpat",
-				"bootpath" : "/Volumes/Data/Developpement/hedrot-headtracker/hedrot/Max/patches",
+				"bootpath" : "~/Desktop/Developpement/hedrot-headtracker/hedrot/Max/patches",
 				"type" : "JSON",
 				"implicit" : 1
 			}
 , 			{
 				"name" : "rs_set.maxpat",
-				"bootpath" : "/Volumes/Data/Developpement/hedrot-headtracker/hedrot/Max/patches",
+				"bootpath" : "~/Desktop/Developpement/hedrot-headtracker/hedrot/Max/patches",
 				"type" : "JSON",
 				"implicit" : 1
 			}
 , 			{
-				"name" : "hedrot_receiver.mxo",
-				"type" : "iLaX"
+				"name" : "hedrot_receiver.mxe64",
+				"type" : "mx64"
+			}
+, 			{
+				"name" : "jit.pass.mxe64",
+				"type" : "mx64"
 			}
  ],
 		"autosave" : 0

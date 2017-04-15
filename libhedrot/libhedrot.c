@@ -24,7 +24,7 @@
 #include <Accelerate/Accelerate.h>
 #else
 #if defined(_WIN32) || defined(_WIN64)
-// not made yet
+#include "lapacke.h"
 #endif
 #endif
 
@@ -756,6 +756,8 @@ void headtracker_compute_data(headtrackerData *trackingData) {
 int ellipsoidFit(short rawData[][3], int numberOfSamples, float* accOffset, float* accScaling) {
     int i;
     
+	// definitions
+#ifdef __MACH__  // if mach (mac os X)
     // constants
     __CLPK_integer one = 1, six=6;
     double rcond = 1e-6; // reverse maximum cond
@@ -770,9 +772,22 @@ int ellipsoidFit(short rawData[][3], int numberOfSamples, float* accOffset, floa
     __CLPK_integer lda = numberOfSamples, ldb = numberOfSamples;
     __CLPK_integer lwork, info;
     double gamma;
+#else
+#if defined(_WIN32) || defined(_WIN64)
+    // constants
+    double rcond = 1e-6; // reverse maximum cond
     
-    
-    
+    double *matrixD = (double*) malloc(numberOfSamples*6*sizeof(double)); // internal input matrix A
+    double *matrixB = (double*) malloc(numberOfSamples*6*sizeof(double)); // internal input matrix B (column mit ones), output = solution
+    double vectorS[6]; //output = singular values
+    lapack_int rank; // effective rank of the matrix
+    int n = numberOfSamples;
+    int lda = numberOfSamples, ldb = numberOfSamples;
+    double gamma;
+#endif
+#endif
+
+        
     // Build the matrix D (rows = X^2, Y^2, Z^2, 2*X, 2*Y, 2*Z) and the matrix ONES (N*1)
     for(i=0; i<numberOfSamples; i++) {
         matrixD[0*numberOfSamples+i] = rawData[i][0] * rawData[i][0];
@@ -786,20 +801,29 @@ int ellipsoidFit(short rawData[][3], int numberOfSamples, float* accOffset, floa
         matrixB[i] = 1;
     }
     
+
+#ifdef __MACH__  // if mach (mac os X)
     /* Query and allocate the optimal workspace */
     lwork = -1;
-    dgelss_(&n, &six, &one, matrixD, &lda, matrixB, &ldb, vectorS, &rcond, &rank, &wkopt, &lwork, &info);
+	dgelss_(&n, &six, &one, matrixD, &lda, matrixB, &ldb, vectorS, &rcond, &rank, &wkopt, &lwork, &info);
     lwork = (int)wkopt;
-    work = (double*)malloc( lwork*sizeof(double) );
+    work = (double*) malloc( lwork*sizeof(double) );
     /* Solve the equations A*X = B */
-    dgelss_(&n, &six, &one, matrixD, &lda, matrixB, &ldb, vectorS, &rcond, &rank, work, &lwork, &info);
-    /* Check for the full rank */
+	dgelss_(&n, &six, &one, matrixD, &lda, matrixB, &ldb, vectorS, &rcond, &rank, work, &lwork, &info);
+	
+	/* Check for the full rank */
     if( info > 0 ) {
         printf( "The diagonal element %i of the triangular factor ", (int) info );
         printf( "of A is zero, so that A does not have full rank;\n" );
         printf( "the least squares solution could not be computed.\n" );
         return 1;
     }
+#else
+#if defined(_WIN32) || defined(_WIN64)
+	LAPACKE_dgelss( LAPACK_COL_MAJOR, n, 6, 1, matrixD, lda, matrixB, ldb, vectorS, rcond, &rank );
+#endif
+#endif
+
     
     // print debug data
     printf("calibration solution: %f %f %f %f %f %f\r\n", matrixB[0], matrixB[1], matrixB[2], matrixB[3], matrixB[4], matrixB[5]);
@@ -816,9 +840,16 @@ int ellipsoidFit(short rawData[][3], int numberOfSamples, float* accOffset, floa
     accScaling[0] = (float) sqrt(gamma/matrixB[0]);
     accScaling[1] = (float) sqrt(gamma/matrixB[1]);
     accScaling[2] = (float) sqrt(gamma/matrixB[2]);
-    
+	
     /* Free workspace */
+#ifdef __MACH__  // if mach (mac os X)
     free( (void*)work );
+#else
+#if defined(_WIN32) || defined(_WIN64)
+	free(matrixD);
+	free(matrixB);
+#endif
+#endif
 
     return 0;
 }

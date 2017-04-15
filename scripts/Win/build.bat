@@ -1,11 +1,10 @@
 @echo off
-echo this builds the following binaries:
+echo this builds the following binaries (in 64 bits only):
 echo 	. the firmware (in firmware\build\hedrot-firmware.ino.hex
-echo 	. the command-line demo (in command-line-demo/xcode/hedrotReceiverDemo) (64 bit only, 32 bit version easy to build as well)
-echo 	. the max external hedrotReceiver.mxe (32 bit) and hedrotReceiver.mxe64 (64 bit)
+echo 	. the command-line demo (in command-line-demo/xcode/hedrotReceiverDemo) 
+echo 	. the max external hedrotReceiver.mxe64
 echo --
 echo The Standlone hedrotReceiver has to be rebuilt afterwards in Max!!!!
-echo     the 32 bit version of the Standlone hedrotReceiver has to be built in the folder Max\standalone-Win\x86
 echo     the 64 bit version of the Standlone hedrotReceiver has to be built in the folder Max\standalone-Win\x64
 echo --
 
@@ -25,6 +24,5 @@ rm -rf "%rootDirectory%\firmware\build\*"
 REM ######### build the command-line demo #############################
 "%MSBuildPath%\MSBuild.exe" /t:Build "%rootDirectory%\command-line-demo\visual studio\hedrotReceiverDemo.vcxproj" /p:CommonProgramFiles="C:\Program Files (x86)\Common Files" /p:PlatformToolset=v110 /p:Configuration=Release /p:Platform=x64 /p:"VCTargetsPath=%VCTargetsPath%"
 
-REM ######### build the Max external (32 and 64 bits) #############################
-"%MSBuildPath%\MSBuild.exe" /t:Build "%rootDirectory%\Max\visual studio\hedrot_receiver.vcxproj" /p:CommonProgramFiles="C:\Program Files (x86)\Common Files" /p:PlatformToolset=v110 /p:Configuration=Release /p:Platform=Win32 /p:"VCTargetsPath=%VCTargetsPath%"
+REM ######### build the Max external #############################
 "%MSBuildPath%\MSBuild.exe" /t:Build "%rootDirectory%\Max\visual studio\hedrot_receiver.vcxproj" /p:CommonProgramFiles="C:\Program Files (x86)\Common Files" /p:PlatformToolset=v110 /p:Configuration=Release /p:Platform=x64 /p:"VCTargetsPath=%VCTargetsPath%"

@@ -1131,7 +1131,7 @@ t_max_err hedrot_receiver_outputDataPeriod_set(t_hedrot_receiver *x, t_object *a
 
 t_max_err hedrot_receiver_axesReference_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->axesReference = (long) max(min(atom_getlong(argv),2),0);
+        x->axesReference = (char) max(min(atom_getlong(argv),2),0);
         setAxesReference(x->trackingData, x->axesReference);
         if(x->verbose) post("[hedrot_receiver]: axesReference set to %ld", x->axesReference);
     }
@@ -1140,7 +1140,7 @@ t_max_err hedrot_receiver_axesReference_set(t_hedrot_receiver *x, t_object *attr
 
 t_max_err hedrot_receiver_rotationOrder_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->rotationOrder = (long) max(min(atom_getlong(argv),1),0);
+        x->rotationOrder = (char) max(min(atom_getlong(argv),1),0);
         setRotationOrder(x->trackingData, x->rotationOrder);
         if(x->verbose) post("[hedrot_receiver]: rotationOrder set to %ld", x->rotationOrder);
     }
@@ -1150,7 +1150,7 @@ t_max_err hedrot_receiver_rotationOrder_set(t_hedrot_receiver *x, t_object *attr
 
 t_max_err hedrot_receiver_invertRotation_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->invertRotation = (long) max(min(atom_getlong(argv),1),0);
+        x->invertRotation = (char) max(min(atom_getlong(argv),1),0);
         setInvertRotation(x->trackingData, x->invertRotation);
         if(x->verbose) post("[hedrot_receiver]: invertRotation set to %ld", x->invertRotation);
     }

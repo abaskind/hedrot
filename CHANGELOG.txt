@@ -1,4 +1,7 @@
-hedrot distribution, changelog:
+﻿hedrot distribution, changelog:
+
+Version 1.2.0 (XX/XX/17)
+	. calibration routines ported in the library
 
 Version 1.1.1 (07/04/17)
 	. minor doc update

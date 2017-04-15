@@ -62,6 +62,10 @@ REM ######### copy the examples folder #############################
 md "%packageFolder%\examples"
 xcopy "%rootDirectory%\examples" "%packageFolder%\examples" /Y /Q /i /s
 
+REM ######### copy the dll folder #############################
+md "%packageFolder%\dll"
+xcopy "%rootDirectory%\dll" "%packageFolder%\dll" /Y /Q /i /s
+
 REM ######### copy the doc #############################
 copy "%rootDirectory%\doc\hedrot user manual.pdf" "%packageFolder%" > nul
 

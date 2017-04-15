@@ -115,7 +115,8 @@ int main(int argc, const char * argv[]) {
         // print estimated quaternion and angles if transmitting
         if(trackingData->infoReceptionStatus == COMMUNICATION_STATE_HEADTRACKER_TRANSMITTING) {
             printf("estimated quaternion: %f %f %f %f\r\n", trackingData->qcent1, trackingData->qcent2, trackingData->qcent3, trackingData->qcent4);
-            printf("estimated angles: yaw %f - pitch %f - roll %f. time elapsed since last tick = %f sec\r\n", trackingData->yaw, trackingData->pitch, trackingData->roll, currentTime2 - previousTime);
+            printf("estimated angles: yaw %f - pitch %f - roll %f\r\n", trackingData->yaw, trackingData->pitch, trackingData->roll);
+            printf("Time elapsed since last tick = %f sec\r\n", currentTime2 - previousTime);
         }
         
         previousTime = currentTime2;

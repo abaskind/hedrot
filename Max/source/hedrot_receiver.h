@@ -14,6 +14,7 @@
 #include "ext_mess.h"
 #include "ext_user.h"
 #include "ext_critical.h"
+#include "ext_dictobj.h"
 
 #include <string.h>
 #include <errno.h>
@@ -81,6 +82,8 @@ typedef struct hedrot_receiver
     // output data
     t_atom          t_estimatedAngles[3];
     t_atom          t_estimatedQuaternion[4];
+    t_dictionary	*MagCalInfoDict;
+    t_symbol        *MagCalInfoDictName;
     
     // (control) output data rate
     long            outputDataPeriod;
@@ -133,6 +136,7 @@ void hedrot_receiver_stoprec(t_hedrot_receiver *x);
 void hedrot_receiver_startMagCalibration(t_hedrot_receiver *x);
 void hedrot_receiver_stopMagCalibration(t_hedrot_receiver *x);
 void hedrot_receiver_saveMagCalibration(t_hedrot_receiver *x);
+void hedrot_receiver_dumpMagCalInfo(t_hedrot_receiver *x);
 void hedrot_receiver_exportMagRawCalData(t_hedrot_receiver *x, t_symbol *s);
 void hedrot_receiver_defered_exportMagRawCalData(t_hedrot_receiver *x, t_symbol *s);
 

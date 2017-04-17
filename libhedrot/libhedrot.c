@@ -332,7 +332,7 @@ int import_headtracker_settings(headtrackerData *trackingData, char* filename) {
 
 
 //=====================================================================================================
-// function export_magCalRawSamples
+// function export_magCalDataRawSamples
 //=====================================================================================================
 //
 // export magnetometer calibration data if available
@@ -343,13 +343,13 @@ int import_headtracker_settings(headtrackerData *trackingData, char* filename) {
 // returns 1 if no error
 // returns 0 if error
 //
-int export_magCalRawSamples(headtrackerData *trackingData, char* filename) {
+int export_magCalDataRawSamples(headtrackerData *trackingData, char* filename) {
     FILE *fd;
     int i;
     
     if(!trackingData->magCalNumberOfRawSamples) {
         printf("Error: no samples to save");
-        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_EXPORT_MAGCALRAWSAMPLES_FAILED);
+        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_EXPORT_MAGCALDATARAWSAMPLES_FAILED);
         return 0;
     }
     
@@ -362,20 +362,20 @@ int export_magCalRawSamples(headtrackerData *trackingData, char* filename) {
     
     if( fd == NULL) {
         printf("Error: file %s could not be opened for writing", filename);
-        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_EXPORT_MAGCALRAWSAMPLES_FAILED);
+        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_EXPORT_MAGCALDATARAWSAMPLES_FAILED);
         return 0;
     }
     
     // dump all values in the text file
     for(i = 0; i<trackingData->magCalNumberOfRawSamples; i++) {
-        fprintf(fd, "%d, %d %d %d;\n", i, trackingData->magCalRawSamples[i][0], trackingData->magCalRawSamples[i][1], trackingData->magCalRawSamples[i][2]);
+        fprintf(fd, "%d, %d %d %d;\n", i, trackingData->magCalDataRawSamples[i][0], trackingData->magCalDataRawSamples[i][1], trackingData->magCalDataRawSamples[i][2]);
     }
     
     
     // close (save) the file, returns 0 if it fails
     if(fclose(fd)) {
         printf("Error: file %s could not be closed properly", filename);
-        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_EXPORT_MAGCALRAWSAMPLES_FAILED);
+        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_EXPORT_MAGCALDATARAWSAMPLES_FAILED);
         return 0;
     }
     
@@ -696,9 +696,9 @@ void headtracker_compute_data(headtrackerData *trackingData) {
     
     // record raw data for the magnetometer if calibration is running
     if(trackingData->magCalibratingFlag) {
-        trackingData->magCalRawSamples[trackingData->magCalNumberOfRawSamples][0] = trackingData->magRawData[0];
-        trackingData->magCalRawSamples[trackingData->magCalNumberOfRawSamples][1] = trackingData->magRawData[1];
-        trackingData->magCalRawSamples[trackingData->magCalNumberOfRawSamples][2] = trackingData->magRawData[2];
+        trackingData->magCalDataRawSamples[trackingData->magCalNumberOfRawSamples][0] = trackingData->magRawData[0];
+        trackingData->magCalDataRawSamples[trackingData->magCalNumberOfRawSamples][1] = trackingData->magRawData[1];
+        trackingData->magCalDataRawSamples[trackingData->magCalNumberOfRawSamples][2] = trackingData->magRawData[2];
         
         trackingData->magCalNumberOfRawSamples++;
         if(trackingData->magCalNumberOfRawSamples>=MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION) {
@@ -1508,10 +1508,24 @@ void setMagCalibratingFlag(headtrackerData *trackingData, char magCalibratingFla
         if(trackingData->verbose) printf("magnetometer calibration started\r\n");
     }
     else {
-        if (!ellipsoidFit(trackingData->magCalRawSamples, trackingData->magCalNumberOfRawSamples, trackingData->magOffset, trackingData->magScaling)) {
+        if (!ellipsoidFit(trackingData->magCalDataRawSamples, trackingData->magCalNumberOfRawSamples, trackingData->magOffset, trackingData->magScaling)) {
             for(i=0;i<3;i++) {
                 trackingData->magScalingFactor[i] = 1/trackingData->magScaling[i];
             }
+            
+            // cook extra data (for displaying/debugging purposes)
+            for(i=0;i<trackingData->magCalNumberOfRawSamples;i++) {
+                // calibrated samples
+                trackingData->magCalDataCalSamples[i][0] = (trackingData->magCalDataRawSamples[i][0]-trackingData->magOffset[0]) * trackingData->magScalingFactor[0];
+                trackingData->magCalDataCalSamples[i][1] = (trackingData->magCalDataRawSamples[i][1]-trackingData->magOffset[1]) * trackingData->magScalingFactor[1];
+                trackingData->magCalDataCalSamples[i][2] = (trackingData->magCalDataRawSamples[i][2]-trackingData->magOffset[2]) * trackingData->magScalingFactor[2];
+                
+                // error
+                trackingData->magcalDataNorm[i] = sqrt(trackingData->magCalDataCalSamples[i][0]*trackingData->magCalDataCalSamples[i][0]
+                                                        + trackingData->magCalDataCalSamples[i][1]*trackingData->magCalDataCalSamples[i][1]
+                                                        + trackingData->magCalDataCalSamples[i][2]*trackingData->magCalDataCalSamples[i][2]);
+            }
+            
             pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_MAG_CALIBRATION_SUCCEEDED);
             if(trackingData->verbose) printf("magnetometer calibration succeeded\r\n");
             if(trackingData->verbose) printf("magnetometer calibration radii: %f %f %f\r\n", trackingData->magScaling[0], trackingData->magScaling[1], trackingData->magScaling[2]);

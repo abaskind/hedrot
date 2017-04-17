@@ -84,8 +84,7 @@
 #define NOTIFICATION_MESSAGE_MAG_CALIBRATION_STARTED    13
 #define NOTIFICATION_MESSAGE_MAG_CALIBRATION_SUCCEEDED  14
 #define NOTIFICATION_MESSAGE_MAG_CALIBRATION_FAILED     15
-#define NOTIFICATION_MESSAGE_EXPORT_MAGCALRAWSAMPLES_FAILED 16
-
+#define NOTIFICATION_MESSAGE_EXPORT_MAGCALDATARAWSAMPLES_FAILED 16
 
 
 //=====================================================================================================
@@ -169,7 +168,9 @@ typedef struct _headtrackerData {
     float           accScaling[3], accScalingFactor[3];
     float           magOffset[3];
     float           magScaling[3], magScalingFactor[3];
-    short           magCalRawSamples[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION][3];  // calibration internal data
+    short           magCalDataRawSamples[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION][3];  // calibration internal data, raw samples
+    float           magCalDataCalSamples[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION][3];  // calibration internal data, calibrated samples
+    float           magcalDataNorm[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION];  // calibration internal data, error
     long            magCalNumberOfRawSamples;
     char            magCalibratingFlag;
 
@@ -237,7 +238,7 @@ int  pullNotificationMessage(headtrackerData *trackingData);
 void headtracker_list_comm_ports(headtrackerData *trackingData);
 int export_headtracker_settings(headtrackerData *trackingData, char* filename);
 int import_headtracker_settings(headtrackerData *trackingData, char* filename);
-int export_magCalRawSamples(headtrackerData *trackingData, char* filename);
+int export_magCalDataRawSamples(headtrackerData *trackingData, char* filename);
 
 
 //=====================================================================================================

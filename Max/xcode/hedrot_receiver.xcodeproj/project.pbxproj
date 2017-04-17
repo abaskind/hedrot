@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1629E7D31DCBBC70006ACD46 /* hedrot_comm_protocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 1629E7D21DCBBC70006ACD46 /* hedrot_comm_protocol.h */; };
 		166427351E9F949D0081EE9E /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 166427341E9F949D0081EE9E /* Accelerate.framework */; };
+		167539AD1EA3A0F60062BDCE /* commonsyms.c in Sources */ = {isa = PBXBuildFile; fileRef = 167539AC1EA3A0F60062BDCE /* commonsyms.c */; };
 		1695F0051A87997F00708733 /* hedrot_receiver.c in Sources */ = {isa = PBXBuildFile; fileRef = 1695F0041A87997F00708733 /* hedrot_receiver.c */; };
 		16B2FC731DC9F69B003EECB3 /* libhedrot_serialcomm.c in Sources */ = {isa = PBXBuildFile; fileRef = 16B2FC6F1DC9F69B003EECB3 /* libhedrot_serialcomm.c */; };
 		16B2FC741DC9F69B003EECB3 /* libhedrot_serialcomm.h in Headers */ = {isa = PBXBuildFile; fileRef = 16B2FC701DC9F69B003EECB3 /* libhedrot_serialcomm.h */; };
@@ -20,6 +21,7 @@
 		1629E7D21DCBBC70006ACD46 /* hedrot_comm_protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hedrot_comm_protocol.h; sourceTree = "<group>"; };
 		16609A3C1A362064003CC1DC /* hedrot_receiver.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = hedrot_receiver.xcconfig; sourceTree = "<group>"; };
 		166427341E9F949D0081EE9E /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = ../../../../../../../System/Library/Frameworks/Accelerate.framework; sourceTree = "<group>"; };
+		167539AC1EA3A0F60062BDCE /* commonsyms.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = commonsyms.c; path = "../../../../SDKs/MaxSDK-6.1.4/c74support/max-includes/common/commonsyms.c"; sourceTree = "<group>"; };
 		1695F0041A87997F00708733 /* hedrot_receiver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hedrot_receiver.c; path = ../source/hedrot_receiver.c; sourceTree = "<group>"; };
 		16B2FC6F1DC9F69B003EECB3 /* libhedrot_serialcomm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = libhedrot_serialcomm.c; sourceTree = "<group>"; };
 		16B2FC701DC9F69B003EECB3 /* libhedrot_serialcomm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libhedrot_serialcomm.h; sourceTree = "<group>"; };
@@ -51,6 +53,7 @@
 				16B2FC6E1DC9F68E003EECB3 /* libhedrot */,
 				1695F0041A87997F00708733 /* hedrot_receiver.c */,
 				16DD60A41A5A7879005AE0FF /* hedrot_receiver.h */,
+				167539AC1EA3A0F60062BDCE /* commonsyms.c */,
 				16609A3C1A362064003CC1DC /* hedrot_receiver.xcconfig */,
 				19C28FB4FE9D528D11CA2CBB /* Products */,
 			);
@@ -172,6 +175,7 @@
 			files = (
 				1695F0051A87997F00708733 /* hedrot_receiver.c in Sources */,
 				16B2FC731DC9F69B003EECB3 /* libhedrot_serialcomm.c in Sources */,
+				167539AD1EA3A0F60062BDCE /* commonsyms.c in Sources */,
 				16B2FC751DC9F69B003EECB3 /* libhedrot.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -102,7 +102,7 @@ void hedrot_receiver_tick(t_hedrot_receiver *x) {
             case NOTIFICATION_MESSAGE_MAG_CALIBRATION_FAILED:
                 hedrot_receiver_outputMagCalibrationFailedNotice(x);
                 break;
-            case NOTIFICATION_MESSAGE_EXPORT_MAGCALRAWSAMPLES_FAILED:
+            case NOTIFICATION_MESSAGE_EXPORT_MAGCALDATARAWSAMPLES_FAILED:
                 if(x->verbose) post("[hedrot_receiver] : could not save mag raw calibration data");
                 break;
             default:
@@ -218,6 +218,11 @@ void *hedrot_receiver_new(t_symbol *s, short ac, t_atom *av)
     // default output data rate
     x->outputDataPeriod = 5;
     
+    // dictionaries for calibration data
+    x->MagCalInfoDict = dictionary_new();
+    x->MagCalInfoDictName = symbol_unique();
+    x->MagCalInfoDict = dictobj_register(x->MagCalInfoDict, &x->MagCalInfoDictName);
+    
     hedrot_receiver_init(x);
     
     return x;
@@ -236,6 +241,8 @@ void hedrot_receiver_free(t_hedrot_receiver *x)
     
     hedrot_receiver_close(x);
     hedrot_receiver_free_clock(x);
+    
+    object_free((t_object *)x->MagCalInfoDict); // will call object_unregister
 }
 
 
@@ -376,6 +383,59 @@ void hedrot_receiver_saveMagCalibration(t_hedrot_receiver *x) {
 }
 
 
+void hedrot_receiver_dumpMagCalInfo(t_hedrot_receiver *x) {
+    // dump extended calibration info for the magnetometer as a dictionary
+    int i;
+    t_atom output[3];
+    t_atom magOffset[3];
+    t_atom magScaling[3];
+    
+    t_atom *magCalDataCalSamples_x, *magCalDataCalSamples_y, *magCalDataCalSamples_z, *magcalDataNorm;
+    
+    dictionary_clear(x->MagCalInfoDict);
+    
+    dictionary_appendlong(x->MagCalInfoDict, gensym("numberOfSamples"), x->trackingData->magCalNumberOfRawSamples);
+    
+    // create the arrays of atoms that will be converted in an atom array when pushing to the dict
+    magCalDataCalSamples_x = malloc(x->trackingData->magCalNumberOfRawSamples * sizeof(t_atom));
+    magCalDataCalSamples_y = malloc(x->trackingData->magCalNumberOfRawSamples * sizeof(t_atom));
+    magCalDataCalSamples_z = malloc(x->trackingData->magCalNumberOfRawSamples * sizeof(t_atom));
+    magcalDataNorm = malloc(x->trackingData->magCalNumberOfRawSamples * sizeof(t_atom));
+    for(i = 0; i<x->trackingData->magCalNumberOfRawSamples; i++) {
+        atom_setfloat(magCalDataCalSamples_x + i, x->trackingData->magCalDataCalSamples[i][0]);
+        atom_setfloat(magCalDataCalSamples_y + i, x->trackingData->magCalDataCalSamples[i][1]);
+        atom_setfloat(magCalDataCalSamples_z + i, x->trackingData->magCalDataCalSamples[i][2]);
+        
+        atom_setfloat(magcalDataNorm + i, x->trackingData->magcalDataNorm[i]);
+    }
+    
+    dictionary_appendatoms(x->MagCalInfoDict, gensym("calDataCalSamples_x"), x->trackingData->magCalNumberOfRawSamples, magCalDataCalSamples_x);
+    dictionary_appendatoms(x->MagCalInfoDict, gensym("calDataCalSamples_y"), x->trackingData->magCalNumberOfRawSamples, magCalDataCalSamples_y);
+    dictionary_appendatoms(x->MagCalInfoDict, gensym("calDataCalSamples_z"), x->trackingData->magCalNumberOfRawSamples, magCalDataCalSamples_z);
+    
+    dictionary_appendatoms(x->MagCalInfoDict, gensym("calDataNorm"), x->trackingData->magCalNumberOfRawSamples, magcalDataNorm);
+    
+    atom_setfloat(magOffset, x->magOffset[0]);
+    atom_setfloat(magOffset+1, x->magOffset[1]);
+    atom_setfloat(magOffset+2, x->magOffset[2]);
+    dictionary_appendatoms(x->MagCalInfoDict, gensym("offset"), 3, magOffset);
+    
+    atom_setfloat(magScaling, x->magScaling[0]);
+    atom_setfloat(magScaling+1, x->magScaling[1]);
+    atom_setfloat(magScaling+2, x->magScaling[2]);
+    dictionary_appendatoms(x->MagCalInfoDict, gensym("scaling"), 3, magScaling);
+    
+    atom_setsym(output, gensym("calData"));
+    atom_setsym(output+1, _sym_dictionary);
+    atom_setsym(output+2, x->MagCalInfoDictName);
+    outlet_anything( x->x_status_outlet, gensym("calibrating_mag"), 3, output);
+    
+    free(magCalDataCalSamples_x);
+    free(magCalDataCalSamples_y);
+    free(magCalDataCalSamples_z);
+    free(magcalDataNorm);
+}
+
 void hedrot_receiver_exportMagRawCalData(t_hedrot_receiver *x, t_symbol *s) {
     defer((t_object *)x, (method)hedrot_receiver_defered_exportMagRawCalData, s, 0, NULL);
 }
@@ -401,7 +461,7 @@ void hedrot_receiver_defered_exportMagRawCalData(t_hedrot_receiver *x, t_symbol 
     
     post("[hedrot_receiver]: try to open file %s for storing raw magnetometer calibration data", fullfilename);
     
-    if(!export_magCalRawSamples(x->trackingData, fullfilename))
+    if(!export_magCalDataRawSamples(x->trackingData, fullfilename))
         error("[hedrot_receiver] Error while exporting raw magnetometer calibration data");
     
 }
@@ -480,16 +540,17 @@ void hedrot_receiver_outputGyroCalibrationFinishedNotice(t_hedrot_receiver *x) {
 }
 
 void hedrot_receiver_outputMagCalibrationStartedNotice(t_hedrot_receiver *x) {
-    t_atom output;
-    atom_setlong(&output, 1);
-    outlet_anything( x->x_status_outlet, gensym("calibrating_mag"), 1, &output);
+    t_atom output[2];
+    atom_setsym(output, gensym("status"));
+    atom_setlong(output+1, 1);
+    outlet_anything( x->x_status_outlet, gensym("calibrating_mag"), 2, output);
     
     if(x->verbose) post("[hedrot_receiver]: magnetometer calibration started");
 }
 
 
 void hedrot_receiver_outputMagCalibrationSucceededNotice(t_hedrot_receiver *x) {
-    t_atom output;
+    t_atom output[2];
     int i;
     
     for(i=0;i<3;i++) x->magOffset[i] = x->trackingData->magOffset[i];
@@ -498,16 +559,18 @@ void hedrot_receiver_outputMagCalibrationSucceededNotice(t_hedrot_receiver *x) {
     for(i=0;i<3;i++) x->magScaling[i] = x->trackingData->magScaling[i];
     object_attr_touch( (t_object *)x, gensym("magScaling"));
     
-    atom_setlong(&output, 0);
-    outlet_anything( x->x_status_outlet, gensym("calibrating_mag"), 1, &output);
+    atom_setsym(output, gensym("status"));
+    atom_setlong(output+1, 0);
+    outlet_anything( x->x_status_outlet, gensym("calibrating_mag"), 2, output);
     
     if(x->verbose) post("[hedrot_receiver]: magnetometer calibration succeeded");
 }
 
 void hedrot_receiver_outputMagCalibrationFailedNotice(t_hedrot_receiver *x) {
-    t_atom output;
-    atom_setlong(&output, -1);
-    outlet_anything( x->x_status_outlet, gensym("calibrating_mag"), 1, &output);
+    t_atom output[2];
+    atom_setsym(output, gensym("status"));
+    atom_setlong(output+1, -1);
+    outlet_anything( x->x_status_outlet, gensym("calibrating_mag"), 2, output);
     
     if(x->verbose) post("[hedrot_receiver]: magnetometer calibration failed");
 }
@@ -1166,6 +1229,9 @@ int C74_EXPORT main()
 {
     
     t_class *c;
+    
+    common_symbols_init();
+    
     c = class_new("hedrot_receiver", (method)hedrot_receiver_new,
                   (method)hedrot_receiver_free, sizeof(t_hedrot_receiver),
                   0L, A_GIMME, 0);
@@ -1191,6 +1257,7 @@ int C74_EXPORT main()
     class_addmethod(c, (method)hedrot_receiver_startMagCalibration,   "startMagCalibration", 0);
     class_addmethod(c, (method)hedrot_receiver_stopMagCalibration,   "stopMagCalibration", 0);
     class_addmethod(c, (method)hedrot_receiver_saveMagCalibration,   "saveMagCalibration", 0);
+    class_addmethod(c, (method)hedrot_receiver_dumpMagCalInfo,   "dumpMagCalData", 0);
     class_addmethod(c, (method)hedrot_receiver_exportMagRawCalData,   "exportMagRawCalData", A_DEFSYM, 0);
     
     

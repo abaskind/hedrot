@@ -19,16 +19,6 @@
 #include <stdint.h>
 #endif
 
-// include cblas and lapack for matrix operations
-#ifdef __MACH__  // if mach (mac os X)
-#include <Accelerate/Accelerate.h>
-#else
-#if defined(_WIN32) || defined(_WIN64)
-#include "lapacke.h"
-#endif
-#endif
-
-
 //=====================================================================================================
 // definitions and includes for clocking
 //=====================================================================================================
@@ -141,6 +131,10 @@ headtrackerData* headtracker_new() {
     
     trackingData->magCalNumberOfRawSamples = 0;
     trackingData->magCalibratingFlag = 0;
+
+    trackingData->accCalNumberOfRawSamples = 0;
+    trackingData->accCalibratingFlag = 0;
+    trackingData->accCalMaxGyroNorm = .5;
 
     headtracker_setReceptionStatus(trackingData, COMMUNICATION_STATE_NO_CONNECTED_HEADTRACKER);
     
@@ -376,6 +370,58 @@ int export_magCalDataRawSamples(headtrackerData *trackingData, char* filename) {
     if(fclose(fd)) {
         printf("Error: file %s could not be closed properly", filename);
         pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_EXPORT_MAGCALDATARAWSAMPLES_FAILED);
+        return 0;
+    }
+    
+    return 1;
+}
+
+
+//=====================================================================================================
+// function export_accCalDataRawSamples
+//=====================================================================================================
+//
+// export accelerometer calibration data if available
+//
+// the format for each line is:
+//      sample_number, X Y Z;
+//
+// returns 1 if no error
+// returns 0 if error
+//
+int export_accCalDataRawSamples(headtrackerData *trackingData, char* filename) {
+    FILE *fd;
+    int i;
+    
+    if(!trackingData->accCalNumberOfRawSamples) {
+        printf("Error: no samples to save");
+        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_EXPORT_ACCCALDATARAWSAMPLES_FAILED);
+        return 0;
+    }
+    
+    // open file for writing, returns 0 if it fails
+#if defined(_WIN32) || defined(_WIN64)
+    fopen_s( &fd, filename, "w");
+#else /* #if defined(_WIN32) || defined(_WIN64) */
+    fd = fopen( filename, "w");
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
+    
+    if( fd == NULL) {
+        printf("Error: file %s could not be opened for writing", filename);
+        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_EXPORT_ACCCALDATARAWSAMPLES_FAILED);
+        return 0;
+    }
+    
+    // dump all values in the text file
+    for(i = 0; i<trackingData->accCalNumberOfRawSamples; i++) {
+        fprintf(fd, "%d, %d %d %d;\n", i, trackingData->accCalDataRawSamples[i][0], trackingData->accCalDataRawSamples[i][1], trackingData->accCalDataRawSamples[i][2]);
+    }
+    
+    
+    // close (save) the file, returns 0 if it fails
+    if(fclose(fd)) {
+        printf("Error: file %s could not be closed properly", filename);
+        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_EXPORT_ACCCALDATARAWSAMPLES_FAILED);
         return 0;
     }
     
@@ -706,6 +752,33 @@ void headtracker_compute_data(headtrackerData *trackingData) {
         }
     }
     
+    // record raw data for the accelerometer if calibration is running
+    if(trackingData->accCalibratingFlag) {
+        // check if the norm of the gyroscope is too high (too much movement)
+        if(trackingData->gyroCalData[0]*trackingData->gyroCalData[0]
+            + trackingData->gyroCalData[1]*trackingData->gyroCalData[1]
+            + trackingData->gyroCalData[2]*trackingData->gyroCalData[2]
+           > trackingData->accCalMaxGyroNorm * trackingData->accCalMaxGyroNorm) {
+            if(!trackingData->accCalPauseStatus) {
+                trackingData->accCalPauseStatus = 1;
+                pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_ACC_CALIBRATION_PAUSED);
+            }
+        } else {
+            if(trackingData->accCalPauseStatus) {
+                trackingData->accCalPauseStatus = 0;
+                pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_ACC_CALIBRATION_RESUMED);
+            }
+            
+            trackingData->accCalDataRawSamples[trackingData->accCalNumberOfRawSamples][0] = trackingData->accRawData[0];
+            trackingData->accCalDataRawSamples[trackingData->accCalNumberOfRawSamples][1] = trackingData->accRawData[1];
+            trackingData->accCalDataRawSamples[trackingData->accCalNumberOfRawSamples][2] = trackingData->accRawData[2];
+            
+            trackingData->accCalNumberOfRawSamples++;
+            if(trackingData->accCalNumberOfRawSamples>=MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION) {
+                setAccCalibratingFlag(trackingData, 0);
+            }
+        }
+    }
     
     // center according to reference1
     quaternionComposition(trackingData->qref1, trackingData->qref2, trackingData->qref3, trackingData->qref4,
@@ -735,124 +808,6 @@ void headtracker_compute_data(headtrackerData *trackingData) {
 
 }
 
-
-//=====================================================================================================
-// function ellipsoidFit
-//=====================================================================================================
-//
-// find the center and raddii of a set of raw data (Nx3), assumed to be on an ellipsoid
-// The calculation is done in double precision, the result is converted to single.
-//
-// method:
-// classical ellipsoid fit algorithm without rotation = least-squares optimization on the linearized problem (after variable changes):
-// a*X^2 + b*Y^2 + c*Z^2 + d*2*X + e*2*Y + f*2*Z = 1;
-//
-// the radii and offset are calculated afterwards as follows:
-// radii = [-d/a -e/b -f/c]
-// offsets = [sqrt(gamma/a) sqrt(gamma/b) sqrt(gamma/c)]
-// ... with gamma = 1 + ( d^2/a + e^2/b + f^2/c );
-//
-// returns 1 (error) if calibration failed
-int ellipsoidFit(short rawData[][3], int numberOfSamples, float* accOffset, float* accScaling) {
-    int i;
-    
-	// definitions
-#ifdef __MACH__  // if mach (mac os X)
-    // constants
-    __CLPK_integer one = 1, six=6;
-    double rcond = 1e-6; // reverse maximum cond
-    
-    double matrixD[numberOfSamples*6]; // internal input matrix A
-    double matrixB[numberOfSamples]; // internal input matrix B (column mit ones), output = solution
-    double vectorS[6]; //output = singular values
-    __CLPK_integer rank; // effective rank of the matrix
-    double wkopt;
-    double *work;
-    __CLPK_integer n = numberOfSamples;
-    __CLPK_integer lda = numberOfSamples, ldb = numberOfSamples;
-    __CLPK_integer lwork, info;
-    double gamma;
-#else
-#if defined(_WIN32) || defined(_WIN64)
-    // constants
-    double rcond = 1e-6; // reverse maximum cond
-    
-    double *matrixD = (double*) malloc(numberOfSamples*6*sizeof(double)); // internal input matrix A
-    double *matrixB = (double*) malloc(numberOfSamples*6*sizeof(double)); // internal input matrix B (column mit ones), output = solution
-    double vectorS[6]; //output = singular values
-    lapack_int rank; // effective rank of the matrix
-    int n = numberOfSamples;
-    int lda = numberOfSamples, ldb = numberOfSamples;
-    double gamma;
-#endif
-#endif
-
-        
-    // Build the matrix D (rows = X^2, Y^2, Z^2, 2*X, 2*Y, 2*Z) and the matrix ONES (N*1)
-    for(i=0; i<numberOfSamples; i++) {
-        matrixD[0*numberOfSamples+i] = rawData[i][0] * rawData[i][0];
-        matrixD[1*numberOfSamples+i] = rawData[i][1] * rawData[i][1];
-        matrixD[2*numberOfSamples+i] = rawData[i][2] * rawData[i][2];
-        
-        matrixD[3*numberOfSamples+i] = 2 * rawData[i][0];
-        matrixD[4*numberOfSamples+i] = 2 * rawData[i][1];
-        matrixD[5*numberOfSamples+i] = 2 * rawData[i][2];
-        
-        matrixB[i] = 1;
-    }
-    
-
-#ifdef __MACH__  // if mach (mac os X)
-    /* Query and allocate the optimal workspace */
-    lwork = -1;
-	dgelss_(&n, &six, &one, matrixD, &lda, matrixB, &ldb, vectorS, &rcond, &rank, &wkopt, &lwork, &info);
-    lwork = (int)wkopt;
-    work = (double*) malloc( lwork*sizeof(double) );
-    /* Solve the equations A*X = B */
-	dgelss_(&n, &six, &one, matrixD, &lda, matrixB, &ldb, vectorS, &rcond, &rank, work, &lwork, &info);
-	
-	/* Check for the full rank */
-    if( info > 0 ) {
-        printf( "The diagonal element %i of the triangular factor ", (int) info );
-        printf( "of A is zero, so that A does not have full rank;\n" );
-        printf( "the least squares solution could not be computed.\n" );
-        return 1;
-    }
-#else
-#if defined(_WIN32) || defined(_WIN64)
-	LAPACKE_dgelss( LAPACK_COL_MAJOR, n, 6, 1, matrixD, lda, matrixB, ldb, vectorS, rcond, &rank );
-#endif
-#endif
-
-    
-    // print debug data
-    printf("calibration solution: %f %f %f %f %f %f\r\n", matrixB[0], matrixB[1], matrixB[2], matrixB[3], matrixB[4], matrixB[5]);
-    printf("singular values: %f %f %f %f %f %f\r\n", vectorS[0], vectorS[1], vectorS[2], vectorS[3], vectorS[4], vectorS[5]);
-    printf("matrix condition number: %f\r\n", vectorS[0]/vectorS[5]);
-    
-    
-    // compute the radii and offsets from the results
-    accOffset[0] = (float) -matrixB[3]/matrixB[0];
-    accOffset[1] = (float) -matrixB[4]/matrixB[1];
-    accOffset[2] = (float) -matrixB[5]/matrixB[2];
-    
-    gamma = 1 + ( matrixB[3]*matrixB[3] / matrixB[0] + matrixB[4]*matrixB[4] / matrixB[1] + matrixB[5]*matrixB[5] / matrixB[2] );
-    accScaling[0] = (float) sqrt(gamma/matrixB[0]);
-    accScaling[1] = (float) sqrt(gamma/matrixB[1]);
-    accScaling[2] = (float) sqrt(gamma/matrixB[2]);
-	
-    /* Free workspace */
-#ifdef __MACH__  // if mach (mac os X)
-    free( (void*)work );
-#else
-#if defined(_WIN32) || defined(_WIN64)
-	free(matrixD);
-	free(matrixB);
-#endif
-#endif
-
-    return 0;
-}
 
 //=====================================================================================================
 // function convert_7bytes_to_3int16
@@ -1496,6 +1451,15 @@ void setInvertRotation(headtrackerData *trackingData, char invertRotation){
 }
 
 //=====================================================================================================
+// public setter to change max gyro norm when acquiring accelerometer calibration data
+//=====================================================================================================
+void setAccCalMaxGyroNorm(headtrackerData *trackingData, float accCalMaxGyroNorm) {
+    trackingData->accCalMaxGyroNorm = accCalMaxGyroNorm;
+}
+
+
+
+//=====================================================================================================
 // public setter to start/stop recording of raw data for mag calibration
 //=====================================================================================================
 void setMagCalibratingFlag(headtrackerData *trackingData, char magCalibratingFlag) {
@@ -1521,7 +1485,7 @@ void setMagCalibratingFlag(headtrackerData *trackingData, char magCalibratingFla
                 trackingData->magCalDataCalSamples[i][2] = (trackingData->magCalDataRawSamples[i][2]-trackingData->magOffset[2]) * trackingData->magScalingFactor[2];
                 
                 // error
-                trackingData->magcalDataNorm[i] = sqrt(trackingData->magCalDataCalSamples[i][0]*trackingData->magCalDataCalSamples[i][0]
+                trackingData->magCalDataNorm[i] = sqrt(trackingData->magCalDataCalSamples[i][0]*trackingData->magCalDataCalSamples[i][0]
                                                         + trackingData->magCalDataCalSamples[i][1]*trackingData->magCalDataCalSamples[i][1]
                                                         + trackingData->magCalDataCalSamples[i][2]*trackingData->magCalDataCalSamples[i][2]);
             }
@@ -1534,6 +1498,51 @@ void setMagCalibratingFlag(headtrackerData *trackingData, char magCalibratingFla
         } else {
             pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_MAG_CALIBRATION_FAILED);
             if(trackingData->verbose) printf("magnetometer calibration failed\r\n");
+        }
+    }
+}
+
+
+//=====================================================================================================
+// public setter to start/stop recording of raw data for acc calibration
+//=====================================================================================================
+void setAccCalibratingFlag(headtrackerData *trackingData, char accCalibratingFlag) {
+    int i;
+    trackingData->accCalibratingFlag = accCalibratingFlag;
+    
+    if(trackingData->accCalibratingFlag) {
+        trackingData->accCalNumberOfRawSamples = 0;
+        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_ACC_CALIBRATION_STARTED);
+        trackingData->accCalPauseStatus = 0;
+        if(trackingData->verbose) printf("accelerometer calibration started\r\n");
+    }
+    else {
+        if (!ellipsoidFit(trackingData->accCalDataRawSamples, trackingData->accCalNumberOfRawSamples, trackingData->accOffset, trackingData->accScaling)) {
+            for(i=0;i<3;i++) {
+                trackingData->accScalingFactor[i] = 1/trackingData->accScaling[i];
+            }
+            
+            // cook extra data (for displaying/debugging purposes)
+            for(i=0;i<trackingData->accCalNumberOfRawSamples;i++) {
+                // calibrated samples
+                trackingData->accCalDataCalSamples[i][0] = (trackingData->accCalDataRawSamples[i][0]-trackingData->accOffset[0]) * trackingData->accScalingFactor[0];
+                trackingData->accCalDataCalSamples[i][1] = (trackingData->accCalDataRawSamples[i][1]-trackingData->accOffset[1]) * trackingData->accScalingFactor[1];
+                trackingData->accCalDataCalSamples[i][2] = (trackingData->accCalDataRawSamples[i][2]-trackingData->accOffset[2]) * trackingData->accScalingFactor[2];
+                
+                // error
+                trackingData->accCalDataNorm[i] = sqrt(trackingData->accCalDataCalSamples[i][0]*trackingData->accCalDataCalSamples[i][0]
+                                                       + trackingData->accCalDataCalSamples[i][1]*trackingData->accCalDataCalSamples[i][1]
+                                                       + trackingData->accCalDataCalSamples[i][2]*trackingData->accCalDataCalSamples[i][2]);
+            }
+            
+            pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_ACC_CALIBRATION_SUCCEEDED);
+            if(trackingData->verbose) printf("accelerometer calibration succeeded\r\n");
+            if(trackingData->verbose) printf("accelerometer calibration radii: %f %f %f\r\n", trackingData->accScaling[0], trackingData->accScaling[1], trackingData->accScaling[2]);
+            if(trackingData->verbose) printf("accelerometer calibration offsets: %f %f %f\r\n", trackingData->accOffset[0], trackingData->accOffset[1], trackingData->accOffset[2]);
+            
+        } else {
+            pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_ACC_CALIBRATION_FAILED);
+            if(trackingData->verbose) printf("accelerometer calibration failed\r\n");
         }
     }
 }
@@ -1845,87 +1854,6 @@ void headtracker_sendSignedCharArray2Headtracker(headtrackerData *trackingData, 
 }
 
 
-//=====================================================================================================
-// utils
-//=====================================================================================================
-
-// floating point modulo
-double mod(double a, double N) {return a - N*floor(a/N);} //return in range [0, N]
-
-
-//---------------------------------------------------------------------------------------------------
-// Fast inverse square-root
-
-// single precision version
-// See: http://en.wikipedia.org/wiki/Fast_inverse_square_root
-float invSqrt(float x) {
-    float halfx = 0.5f * x;
-    float y = x;
-    int32_t i = *(int32_t*)&y;
-    i = 0x5f3759df - (i>>1);
-    y = *(float*)&i;
-    y = y * (1.5f - (halfx * y * y));
-    return y;
-}
-
-
-/* double precision version
- // See: https://tbach.web.cern.ch/tbach/thesis/literature/fastinvsquare_robertson.pdf
- double invSqrt(double x) {
- uint64_t i;
- double x2, y;
- x2 = x * 0.5;
- y = x;
- i = *(uint64_t *) &y;
- i = 0x5fe6eb50c7b537a9 - (i >> 1);
- y = *(double *) &i;
- y = y * (1.5 - (x2 * y * y));
- return y;
- }
- */
-
-/*
- // not optimized (but more precise) version
- double invSqrt(double x) {
- if(x==0) return 1e40; // arbitrary very big number
- else return 1./sqrt(x);
- }*/
-
-void quaternion2YawPitchRoll(float q1, float q2, float q3, float q4, float *yaw, float *pitch, float *roll) {
-    // zyx Talt-Bryan rotation sequence
-    
-    *yaw = (float) (RAD_TO_DEGREE * atan2(2.0f * (q1*q4 + q2*q3),
-                                          1.0f - 2.0f * (q3*q3 + q4*q4) ));
-    
-    *pitch = (float) (RAD_TO_DEGREE * asin(min(max(2.0f * (q1*q3 - q4*q2),-1),1)));
-    
-    
-    *roll= (float) (RAD_TO_DEGREE * atan2(2.0f * (q1*q2 + q3*q4),
-                                          1.0f - 2.0f * (q2*q2 + q3*q3)));
-}
-
-void quaternion2RollPitchYaw(float q1, float q2, float q3, float q4, float *yaw, float *pitch, float *roll) {
-    // xyz Talt-Bryan rotation sequence
-    
-    *roll = (float) (RAD_TO_DEGREE * atan2(2.0f * (q1*q2 - q3*q4),
-                                          1.0f - 2.0f * (q2*q2 + q3*q3) ));
-    
-    *pitch = (float) (RAD_TO_DEGREE * asin(min(max(2.0f * (q1*q3 + q4*q2),-1),1)));
-    
-    
-    *yaw= (float) (RAD_TO_DEGREE * atan2(2.0f * (q1*q4 - q2*q3),
-                                          1.0f - 2.0f * (q3*q3 + q4*q4)));
-}
-
-void quaternionComposition(float q01, float q02, float q03, float q04, float q11, float q12, float q13, float q14, float *q21, float *q22, float *q23, float *q24) {
-    // compose two quaternions (Hamilton product)
-    // the quaternion (q11, q12, q13, q14) is rotated according to the reference quaternion (q01, q02, q03, q04)
-    *q21 = q01 * q11 - q02 * q12 - q03 * q13 - q04 * q14;
-    *q22 = q01 * q12 + q02 * q11 + q03 * q14 - q04 * q13;
-    *q23 = q01 * q13 - q02 * q14 + q03 * q11 + q04 * q12;
-    *q24 = q01 * q14 + q02 * q13 - q03 * q12 + q04 * q11;
-}
-
 void changeQuaternionReference(headtrackerData *trackingData) {
     // change the axes references of the quaternion if it does not fit the standard (X->right, Y->back, Z->down)
     float qtemp;
@@ -1942,50 +1870,8 @@ void changeQuaternionReference(headtrackerData *trackingData) {
             break;
             // if 0 does nothing
     }
-
+    
 }
 
 
-int stringToFloats(char* valueBuffer, float* data, int nvalues) {
-    int i=0;
-    
-    char *delim = " "; // input separated by spaces
-    char *token = NULL;
-	char *brkt;
-    
-    for (token = strtok_r(valueBuffer, delim, &brkt); token != NULL; token = strtok_r(NULL, delim, &brkt))
-    {
-        char *unconverted;
-        data[i] = (float) strtod(token, &unconverted);
-        i++;
-    }
-    
-    if(i<nvalues-1) {
-        return 0; //error
-    } else {
-        return 1; //ok
-    }
-}
-
-
-int stringToChars(char* valueBuffer, char* data, int nvalues) {
-    int i=0;
-    
-    char *delim = " "; // input separated by spaces
-    char *token = NULL;
-	char *brkt;
-    
-    for (token = strtok_r(valueBuffer, delim, &brkt); token != NULL; token = strtok_r(NULL, delim, &brkt))
-    {
-        char *unconverted;
-        data[i] = (char) strtol(token, &unconverted,10);
-        i++;
-    }
-    
-    if(i<nvalues-1) {
-        return 0; //error
-    } else {
-        return 1; //ok
-    }
-}
 

@@ -15,6 +15,10 @@
 		16B2FC741DC9F69B003EECB3 /* libhedrot_serialcomm.h in Headers */ = {isa = PBXBuildFile; fileRef = 16B2FC701DC9F69B003EECB3 /* libhedrot_serialcomm.h */; };
 		16B2FC751DC9F69B003EECB3 /* libhedrot.c in Sources */ = {isa = PBXBuildFile; fileRef = 16B2FC711DC9F69B003EECB3 /* libhedrot.c */; };
 		16B2FC761DC9F69B003EECB3 /* libhedrot.h in Headers */ = {isa = PBXBuildFile; fileRef = 16B2FC721DC9F69B003EECB3 /* libhedrot.h */; };
+		16F0E6821EA4CAC500365603 /* libhedrot_calibration.c in Sources */ = {isa = PBXBuildFile; fileRef = 16F0E6801EA4CAC500365603 /* libhedrot_calibration.c */; };
+		16F0E6831EA4CAC500365603 /* libhedrot_calibration.h in Headers */ = {isa = PBXBuildFile; fileRef = 16F0E6811EA4CAC500365603 /* libhedrot_calibration.h */; };
+		16F0E6861EA4CB6F00365603 /* libhedrot_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 16F0E6841EA4CB6F00365603 /* libhedrot_utils.c */; };
+		16F0E6871EA4CB6F00365603 /* libhedrot_utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 16F0E6851EA4CB6F00365603 /* libhedrot_utils.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +33,10 @@
 		16B2FC721DC9F69B003EECB3 /* libhedrot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libhedrot.h; sourceTree = "<group>"; };
 		16B6BF111E193823009E5E99 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		16DD60A41A5A7879005AE0FF /* hedrot_receiver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hedrot_receiver.h; path = ../source/hedrot_receiver.h; sourceTree = "<group>"; };
+		16F0E6801EA4CAC500365603 /* libhedrot_calibration.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = libhedrot_calibration.c; sourceTree = "<group>"; };
+		16F0E6811EA4CAC500365603 /* libhedrot_calibration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libhedrot_calibration.h; sourceTree = "<group>"; };
+		16F0E6841EA4CB6F00365603 /* libhedrot_utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = libhedrot_utils.c; sourceTree = "<group>"; };
+		16F0E6851EA4CB6F00365603 /* libhedrot_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libhedrot_utils.h; sourceTree = "<group>"; };
 		2FBBEAE508F335360078DB84 /* hedrot_receiver.mxo */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = hedrot_receiver.mxo; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -72,10 +80,14 @@
 		16B2FC6E1DC9F68E003EECB3 /* libhedrot */ = {
 			isa = PBXGroup;
 			children = (
-				16B2FC6F1DC9F69B003EECB3 /* libhedrot_serialcomm.c */,
-				16B2FC701DC9F69B003EECB3 /* libhedrot_serialcomm.h */,
 				16B2FC711DC9F69B003EECB3 /* libhedrot.c */,
 				16B2FC721DC9F69B003EECB3 /* libhedrot.h */,
+				16F0E6801EA4CAC500365603 /* libhedrot_calibration.c */,
+				16F0E6811EA4CAC500365603 /* libhedrot_calibration.h */,
+				16B2FC6F1DC9F69B003EECB3 /* libhedrot_serialcomm.c */,
+				16B2FC701DC9F69B003EECB3 /* libhedrot_serialcomm.h */,
+				16F0E6841EA4CB6F00365603 /* libhedrot_utils.c */,
+				16F0E6851EA4CB6F00365603 /* libhedrot_utils.h */,
 			);
 			name = libhedrot;
 			path = ../../libhedrot;
@@ -97,7 +109,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				1629E7D31DCBBC70006ACD46 /* hedrot_comm_protocol.h in Headers */,
+				16F0E6831EA4CAC500365603 /* libhedrot_calibration.h in Headers */,
 				16B2FC761DC9F69B003EECB3 /* libhedrot.h in Headers */,
+				16F0E6871EA4CB6F00365603 /* libhedrot_utils.h in Headers */,
 				16B2FC741DC9F69B003EECB3 /* libhedrot_serialcomm.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -176,7 +190,9 @@
 				1695F0051A87997F00708733 /* hedrot_receiver.c in Sources */,
 				16B2FC731DC9F69B003EECB3 /* libhedrot_serialcomm.c in Sources */,
 				167539AD1EA3A0F60062BDCE /* commonsyms.c in Sources */,
+				16F0E6861EA4CB6F00365603 /* libhedrot_utils.c in Sources */,
 				16B2FC751DC9F69B003EECB3 /* libhedrot.c in Sources */,
+				16F0E6821EA4CAC500365603 /* libhedrot_calibration.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

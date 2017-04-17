@@ -77,6 +77,7 @@ typedef struct hedrot_receiver
     char            axesReference;
     char            rotationOrder;
     char            invertRotation;
+    float           accCalMaxGyroNorm;
     
     
     // output data
@@ -84,6 +85,9 @@ typedef struct hedrot_receiver
     t_atom          t_estimatedQuaternion[4];
     t_dictionary	*MagCalInfoDict;
     t_symbol        *MagCalInfoDictName;
+    t_dictionary	*AccCalInfoDict;
+    t_symbol        *AccCalInfoDictName;
+    
     
     // (control) output data rate
     long            outputDataPeriod;
@@ -140,6 +144,15 @@ void hedrot_receiver_dumpMagCalInfo(t_hedrot_receiver *x);
 void hedrot_receiver_exportMagRawCalData(t_hedrot_receiver *x, t_symbol *s);
 void hedrot_receiver_defered_exportMagRawCalData(t_hedrot_receiver *x, t_symbol *s);
 
+// methods for acc calibration
+void hedrot_receiver_startAccCalibration(t_hedrot_receiver *x);
+void hedrot_receiver_stopAccCalibration(t_hedrot_receiver *x);
+void hedrot_receiver_saveAccCalibration(t_hedrot_receiver *x);
+void hedrot_receiver_dumpAccCalInfo(t_hedrot_receiver *x);
+void hedrot_receiver_exportAccRawCalData(t_hedrot_receiver *x, t_symbol *s);
+void hedrot_receiver_defered_exportAccRawCalData(t_hedrot_receiver *x, t_symbol *s);
+
+
 void hedrot_receiver_output_data(t_hedrot_receiver *x);
 
 
@@ -158,6 +171,11 @@ void hedrot_receiver_outputGyroCalibrationFinishedNotice(t_hedrot_receiver *x);
 void hedrot_receiver_outputMagCalibrationStartedNotice(t_hedrot_receiver *x);
 void hedrot_receiver_outputMagCalibrationSucceededNotice(t_hedrot_receiver *x);
 void hedrot_receiver_outputMagCalibrationFailedNotice(t_hedrot_receiver *x);
+void hedrot_receiver_outputAccCalibrationStartedNotice(t_hedrot_receiver *x);
+void hedrot_receiver_outputAccCalibrationSucceededNotice(t_hedrot_receiver *x);
+void hedrot_receiver_outputAccCalibrationFailedNotice(t_hedrot_receiver *x);
+void hedrot_receiver_outputAccCalibrationPausedNotice(t_hedrot_receiver *x);
+void hedrot_receiver_outputAccCalibrationResumedNotice(t_hedrot_receiver *x);
 
 
 //getters and setters
@@ -193,5 +211,6 @@ t_max_err hedrot_receiver_accLPtimeConstant_set(t_hedrot_receiver *x, t_object *
 t_max_err hedrot_receiver_axesReference_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_rotationOrder_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_invertRotation_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
+t_max_err hedrot_receiver_accCalMaxGyroNorm_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 
 #endif

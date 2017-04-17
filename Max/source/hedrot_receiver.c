@@ -105,6 +105,25 @@ void hedrot_receiver_tick(t_hedrot_receiver *x) {
             case NOTIFICATION_MESSAGE_EXPORT_MAGCALDATARAWSAMPLES_FAILED:
                 if(x->verbose) post("[hedrot_receiver] : could not save mag raw calibration data");
                 break;
+            case NOTIFICATION_MESSAGE_ACC_CALIBRATION_STARTED:
+                hedrot_receiver_outputAccCalibrationStartedNotice(x);
+                break;
+            case NOTIFICATION_MESSAGE_ACC_CALIBRATION_SUCCEEDED:
+                hedrot_receiver_outputAccCalibrationSucceededNotice(x);
+                break;
+            case NOTIFICATION_MESSAGE_ACC_CALIBRATION_FAILED:
+                hedrot_receiver_outputAccCalibrationFailedNotice(x);
+                break;
+            case NOTIFICATION_MESSAGE_ACC_CALIBRATION_PAUSED:
+                hedrot_receiver_outputAccCalibrationPausedNotice(x);
+                break;
+            case NOTIFICATION_MESSAGE_ACC_CALIBRATION_RESUMED:
+                hedrot_receiver_outputAccCalibrationResumedNotice(x);
+                break;
+                
+            case NOTIFICATION_MESSAGE_EXPORT_ACCCALDATARAWSAMPLES_FAILED:
+                if(x->verbose) post("[hedrot_receiver] : could not save acc raw calibration data");
+                break;
             default:
                 post("[hedrot_receiver] : unknown message %ld from libhedrot", messageNumber);
                 break;
@@ -223,6 +242,10 @@ void *hedrot_receiver_new(t_symbol *s, short ac, t_atom *av)
     x->MagCalInfoDictName = symbol_unique();
     x->MagCalInfoDict = dictobj_register(x->MagCalInfoDict, &x->MagCalInfoDictName);
     
+    x->AccCalInfoDict = dictionary_new();
+    x->AccCalInfoDictName = symbol_unique();
+    x->AccCalInfoDict = dictobj_register(x->AccCalInfoDict, &x->AccCalInfoDictName);
+    
     hedrot_receiver_init(x);
     
     return x;
@@ -243,6 +266,7 @@ void hedrot_receiver_free(t_hedrot_receiver *x)
     hedrot_receiver_free_clock(x);
     
     object_free((t_object *)x->MagCalInfoDict); // will call object_unregister
+    object_free((t_object *)x->AccCalInfoDict); // will call object_unregister
 }
 
 
@@ -290,8 +314,8 @@ void hedrot_receiver_center_angles(t_hedrot_receiver *x) {
     center_angles(x->trackingData);
 }
 
-// methods for importing/exporting headtracker settings
 
+/* ------------------- methods for importing/exporting headtracker settings --------------------------- */
 
 void hedrot_receiver_export_settings(t_hedrot_receiver *x, t_symbol *s) {
     defer((t_object *)x, (method)hedrot_receiver_defered_export_settings, s, 0, NULL);
@@ -367,7 +391,8 @@ void hedrot_receiver_printVersion(t_hedrot_receiver *x, t_symbol *s) {
 
 }
 
-// methods for mag calibration
+/* ------------------- methods for mag calibration --------------------------- */
+
 void hedrot_receiver_startMagCalibration(t_hedrot_receiver *x) {
     setMagCalibratingFlag(x->trackingData, 1);
 }
@@ -390,7 +415,7 @@ void hedrot_receiver_dumpMagCalInfo(t_hedrot_receiver *x) {
     t_atom magOffset[3];
     t_atom magScaling[3];
     
-    t_atom *magCalDataCalSamples_x, *magCalDataCalSamples_y, *magCalDataCalSamples_z, *magcalDataNorm;
+    t_atom *magCalDataCalSamples_x, *magCalDataCalSamples_y, *magCalDataCalSamples_z, *magCalDataNorm;
     
     dictionary_clear(x->MagCalInfoDict);
     
@@ -400,20 +425,20 @@ void hedrot_receiver_dumpMagCalInfo(t_hedrot_receiver *x) {
     magCalDataCalSamples_x = malloc(x->trackingData->magCalNumberOfRawSamples * sizeof(t_atom));
     magCalDataCalSamples_y = malloc(x->trackingData->magCalNumberOfRawSamples * sizeof(t_atom));
     magCalDataCalSamples_z = malloc(x->trackingData->magCalNumberOfRawSamples * sizeof(t_atom));
-    magcalDataNorm = malloc(x->trackingData->magCalNumberOfRawSamples * sizeof(t_atom));
+    magCalDataNorm = malloc(x->trackingData->magCalNumberOfRawSamples * sizeof(t_atom));
     for(i = 0; i<x->trackingData->magCalNumberOfRawSamples; i++) {
         atom_setfloat(magCalDataCalSamples_x + i, x->trackingData->magCalDataCalSamples[i][0]);
         atom_setfloat(magCalDataCalSamples_y + i, x->trackingData->magCalDataCalSamples[i][1]);
         atom_setfloat(magCalDataCalSamples_z + i, x->trackingData->magCalDataCalSamples[i][2]);
         
-        atom_setfloat(magcalDataNorm + i, x->trackingData->magcalDataNorm[i]);
+        atom_setfloat(magCalDataNorm + i, x->trackingData->magCalDataNorm[i]);
     }
     
     dictionary_appendatoms(x->MagCalInfoDict, gensym("calDataCalSamples_x"), x->trackingData->magCalNumberOfRawSamples, magCalDataCalSamples_x);
     dictionary_appendatoms(x->MagCalInfoDict, gensym("calDataCalSamples_y"), x->trackingData->magCalNumberOfRawSamples, magCalDataCalSamples_y);
     dictionary_appendatoms(x->MagCalInfoDict, gensym("calDataCalSamples_z"), x->trackingData->magCalNumberOfRawSamples, magCalDataCalSamples_z);
     
-    dictionary_appendatoms(x->MagCalInfoDict, gensym("calDataNorm"), x->trackingData->magCalNumberOfRawSamples, magcalDataNorm);
+    dictionary_appendatoms(x->MagCalInfoDict, gensym("calDataNorm"), x->trackingData->magCalNumberOfRawSamples, magCalDataNorm);
     
     atom_setfloat(magOffset, x->magOffset[0]);
     atom_setfloat(magOffset+1, x->magOffset[1]);
@@ -433,7 +458,7 @@ void hedrot_receiver_dumpMagCalInfo(t_hedrot_receiver *x) {
     free(magCalDataCalSamples_x);
     free(magCalDataCalSamples_y);
     free(magCalDataCalSamples_z);
-    free(magcalDataNorm);
+    free(magCalDataNorm);
 }
 
 void hedrot_receiver_exportMagRawCalData(t_hedrot_receiver *x, t_symbol *s) {
@@ -463,6 +488,107 @@ void hedrot_receiver_defered_exportMagRawCalData(t_hedrot_receiver *x, t_symbol 
     
     if(!export_magCalDataRawSamples(x->trackingData, fullfilename))
         error("[hedrot_receiver] Error while exporting raw magnetometer calibration data");
+    
+}
+
+
+/* ------------------- methods for acc calibration --------------------------- */
+
+void hedrot_receiver_startAccCalibration(t_hedrot_receiver *x) {
+    setAccCalibratingFlag(x->trackingData, 1);
+}
+
+void hedrot_receiver_stopAccCalibration(t_hedrot_receiver *x) {
+    setAccCalibratingFlag(x->trackingData, 0);
+}
+
+void hedrot_receiver_saveAccCalibration(t_hedrot_receiver *x) {
+    setAccScaling(x->trackingData, x->accScaling, 0);
+    setAccOffset(x->trackingData, x->accOffset, 1);
+    if(x->verbose) post("[hedrot_receiver]: acc calibration data saved");
+}
+
+
+void hedrot_receiver_dumpAccCalInfo(t_hedrot_receiver *x) {
+    // dump extended calibration info for the accelerometer as a dictionary
+    int i;
+    t_atom output[3];
+    t_atom accOffset[3];
+    t_atom accScaling[3];
+    
+    t_atom *accCalDataCalSamples_x, *accCalDataCalSamples_y, *accCalDataCalSamples_z, *accCalDataNorm;
+    
+    dictionary_clear(x->AccCalInfoDict);
+    
+    dictionary_appendlong(x->AccCalInfoDict, gensym("numberOfSamples"), x->trackingData->accCalNumberOfRawSamples);
+    
+    // create the arrays of atoms that will be converted in an atom array when pushing to the dict
+    accCalDataCalSamples_x = malloc(x->trackingData->accCalNumberOfRawSamples * sizeof(t_atom));
+    accCalDataCalSamples_y = malloc(x->trackingData->accCalNumberOfRawSamples * sizeof(t_atom));
+    accCalDataCalSamples_z = malloc(x->trackingData->accCalNumberOfRawSamples * sizeof(t_atom));
+    accCalDataNorm = malloc(x->trackingData->accCalNumberOfRawSamples * sizeof(t_atom));
+    for(i = 0; i<x->trackingData->accCalNumberOfRawSamples; i++) {
+        atom_setfloat(accCalDataCalSamples_x + i, x->trackingData->accCalDataCalSamples[i][0]);
+        atom_setfloat(accCalDataCalSamples_y + i, x->trackingData->accCalDataCalSamples[i][1]);
+        atom_setfloat(accCalDataCalSamples_z + i, x->trackingData->accCalDataCalSamples[i][2]);
+        
+        atom_setfloat(accCalDataNorm + i, x->trackingData->accCalDataNorm[i]);
+    }
+    
+    dictionary_appendatoms(x->AccCalInfoDict, gensym("calDataCalSamples_x"), x->trackingData->accCalNumberOfRawSamples, accCalDataCalSamples_x);
+    dictionary_appendatoms(x->AccCalInfoDict, gensym("calDataCalSamples_y"), x->trackingData->accCalNumberOfRawSamples, accCalDataCalSamples_y);
+    dictionary_appendatoms(x->AccCalInfoDict, gensym("calDataCalSamples_z"), x->trackingData->accCalNumberOfRawSamples, accCalDataCalSamples_z);
+    
+    dictionary_appendatoms(x->AccCalInfoDict, gensym("calDataNorm"), x->trackingData->accCalNumberOfRawSamples, accCalDataNorm);
+    
+    atom_setfloat(accOffset, x->accOffset[0]);
+    atom_setfloat(accOffset+1, x->accOffset[1]);
+    atom_setfloat(accOffset+2, x->accOffset[2]);
+    dictionary_appendatoms(x->AccCalInfoDict, gensym("offset"), 3, accOffset);
+    
+    atom_setfloat(accScaling, x->accScaling[0]);
+    atom_setfloat(accScaling+1, x->accScaling[1]);
+    atom_setfloat(accScaling+2, x->accScaling[2]);
+    dictionary_appendatoms(x->AccCalInfoDict, gensym("scaling"), 3, accScaling);
+    
+    atom_setsym(output, gensym("calData"));
+    atom_setsym(output+1, _sym_dictionary);
+    atom_setsym(output+2, x->AccCalInfoDictName);
+    outlet_anything( x->x_status_outlet, gensym("calibrating_acc"), 3, output);
+    
+    free(accCalDataCalSamples_x);
+    free(accCalDataCalSamples_y);
+    free(accCalDataCalSamples_z);
+    free(accCalDataNorm);
+}
+
+void hedrot_receiver_exportAccRawCalData(t_hedrot_receiver *x, t_symbol *s) {
+    defer((t_object *)x, (method)hedrot_receiver_defered_exportAccRawCalData, s, 0, NULL);
+}
+
+
+void hedrot_receiver_defered_exportAccRawCalData(t_hedrot_receiver *x, t_symbol *s) {
+    t_fourcc filetype = FOUR_CHAR_CODE('TEXT'), outtype;
+    char filename[MAX_PATH_CHARS], fullfilename[MAX_PATH_CHARS];
+    short path=0;
+    
+    if (s == gensym("")) {      // if no argument supplied, ask for file
+        sprintf(filename, "headtrackerRawAccCalibrationData.txt");
+        
+        saveas_promptset("Save raw accelerometer calibration data as...");
+        if (saveasdialog_extended(filename, &path, &outtype, &filetype, 1))
+            // non-zero: user cancelled
+            return;
+    } else {
+        strcpy(filename, s->s_name);
+    }
+    
+    path_toabsolutesystempath( path, filename, fullfilename);
+    
+    post("[hedrot_receiver]: try to open file %s for storing raw accelerometer calibration data", fullfilename);
+    
+    if(!export_accCalDataRawSamples(x->trackingData, fullfilename))
+        error("[hedrot_receiver] Error while exporting raw accelerometer calibration data");
     
 }
 
@@ -542,7 +668,7 @@ void hedrot_receiver_outputGyroCalibrationFinishedNotice(t_hedrot_receiver *x) {
 void hedrot_receiver_outputMagCalibrationStartedNotice(t_hedrot_receiver *x) {
     t_atom output[2];
     atom_setsym(output, gensym("status"));
-    atom_setlong(output+1, 1);
+    atom_setsym(output+1, gensym("started"));
     outlet_anything( x->x_status_outlet, gensym("calibrating_mag"), 2, output);
     
     if(x->verbose) post("[hedrot_receiver]: magnetometer calibration started");
@@ -560,7 +686,7 @@ void hedrot_receiver_outputMagCalibrationSucceededNotice(t_hedrot_receiver *x) {
     object_attr_touch( (t_object *)x, gensym("magScaling"));
     
     atom_setsym(output, gensym("status"));
-    atom_setlong(output+1, 0);
+    atom_setsym(output+1, gensym("succeeded"));
     outlet_anything( x->x_status_outlet, gensym("calibrating_mag"), 2, output);
     
     if(x->verbose) post("[hedrot_receiver]: magnetometer calibration succeeded");
@@ -569,10 +695,64 @@ void hedrot_receiver_outputMagCalibrationSucceededNotice(t_hedrot_receiver *x) {
 void hedrot_receiver_outputMagCalibrationFailedNotice(t_hedrot_receiver *x) {
     t_atom output[2];
     atom_setsym(output, gensym("status"));
-    atom_setlong(output+1, -1);
+    atom_setsym(output+1, gensym("failed"));
     outlet_anything( x->x_status_outlet, gensym("calibrating_mag"), 2, output);
     
     if(x->verbose) post("[hedrot_receiver]: magnetometer calibration failed");
+}
+
+void hedrot_receiver_outputAccCalibrationStartedNotice(t_hedrot_receiver *x) {
+    t_atom output[2];
+    atom_setsym(output, gensym("status"));
+    atom_setsym(output+1, gensym("started"));
+    outlet_anything( x->x_status_outlet, gensym("calibrating_acc"), 2, output);
+    
+    if(x->verbose) post("[hedrot_receiver]: accelerometer calibration started");
+}
+
+
+void hedrot_receiver_outputAccCalibrationSucceededNotice(t_hedrot_receiver *x) {
+    t_atom output[2];
+    int i;
+    
+    for(i=0;i<3;i++) x->accOffset[i] = x->trackingData->accOffset[i];
+    object_attr_touch( (t_object *)x, gensym("accOffset"));
+    
+    for(i=0;i<3;i++) x->accScaling[i] = x->trackingData->accScaling[i];
+    object_attr_touch( (t_object *)x, gensym("accScaling"));
+    
+    atom_setsym(output, gensym("status"));
+    atom_setsym(output+1, gensym("succeeded"));
+    outlet_anything( x->x_status_outlet, gensym("calibrating_acc"), 2, output);
+    
+    if(x->verbose) post("[hedrot_receiver]: accelerometer calibration succeeded");
+}
+
+void hedrot_receiver_outputAccCalibrationFailedNotice(t_hedrot_receiver *x) {
+    t_atom output[2];
+    atom_setsym(output, gensym("status"));
+    atom_setsym(output+1, gensym("failed"));
+    outlet_anything( x->x_status_outlet, gensym("calibrating_acc"), 2, output);
+    
+    if(x->verbose) post("[hedrot_receiver]: accelerometer calibration failed");
+}
+
+void hedrot_receiver_outputAccCalibrationPausedNotice(t_hedrot_receiver *x) {
+    t_atom output[2];
+    atom_setsym(output, gensym("status"));
+    atom_setsym(output+1, gensym("paused"));
+    outlet_anything( x->x_status_outlet, gensym("calibrating_acc"), 2, output);
+    
+    if(x->verbose) post("[hedrot_receiver]: accelerometer calibration paused");
+}
+
+void hedrot_receiver_outputAccCalibrationResumedNotice(t_hedrot_receiver *x) {
+    t_atom output[2];
+    atom_setsym(output, gensym("status"));
+    atom_setsym(output+1, gensym("resumed"));
+    outlet_anything( x->x_status_outlet, gensym("calibrating_acc"), 2, output);
+    
+    if(x->verbose) post("[hedrot_receiver]: accelerometer calibration resumed");
 }
 
 
@@ -614,12 +794,6 @@ void hedrot_receiver_outputReceptionStatus(t_hedrot_receiver *x) {
     outlet_anything( x->x_status_outlet, gensym("headtracker"), 2, sym);
     
     if(x->verbose) post("[hedrot_receiver]: communication status changed to %ld", x->trackingData->infoReceptionStatus);
-}
-
-void hedrot_receiver_outputMagCalibrationFlag(t_hedrot_receiver *x) {
-    t_atom output;
-    atom_setlong(&output, 0);
-    outlet_anything( x->x_status_outlet, gensym("calibrating_gyro"), 1, &output);
 }
 
 
@@ -722,6 +896,9 @@ void hedrot_receiver_mirrorHeadtrackerInfo(t_hedrot_receiver *x) {
     
     x->invertRotation = x->trackingData->invertRotation;
     object_attr_touch( (t_object *)x, gensym("invertRotation"));
+    
+    x->accCalMaxGyroNorm = x->trackingData->accCalMaxGyroNorm;
+    object_attr_touch( (t_object *)x, gensym("accCalMaxGyroNorm"));
 }
 
 void hedrot_receiver_outputCalibrationNotValidNotice(t_hedrot_receiver *x) {
@@ -861,6 +1038,10 @@ void hedrot_receiver_doopenforwrite(t_hedrot_receiver *x, t_symbol *s) {
     sysfile_write(x->fh_write, &len, str);
     
     sprintf(str, "invertRotation, %hhi;\n", x->trackingData->invertRotation);
+    len = strlen(str);
+    sysfile_write(x->fh_write, &len, str);
+    
+    sprintf(str, "accCalMaxGyroNorm, %f;\n", x->trackingData->accCalMaxGyroNorm);
     len = strlen(str);
     sysfile_write(x->fh_write, &len, str);
     
@@ -1221,6 +1402,14 @@ t_max_err hedrot_receiver_invertRotation_set(t_hedrot_receiver *x, t_object *att
 }
 
 
+t_max_err hedrot_receiver_accCalMaxGyroNorm_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
+    if (argc && argv) {
+        x->accCalMaxGyroNorm = (float) max(atom_getfloat(argv),0);
+        setAccCalMaxGyroNorm(x->trackingData, x->accCalMaxGyroNorm);
+    }
+    return MAX_ERR_NONE;
+}
+
 
 
 
@@ -1259,6 +1448,14 @@ int C74_EXPORT main()
     class_addmethod(c, (method)hedrot_receiver_saveMagCalibration,   "saveMagCalibration", 0);
     class_addmethod(c, (method)hedrot_receiver_dumpMagCalInfo,   "dumpMagCalData", 0);
     class_addmethod(c, (method)hedrot_receiver_exportMagRawCalData,   "exportMagRawCalData", A_DEFSYM, 0);
+    
+    // methods for acc calibration
+    class_addmethod(c, (method)hedrot_receiver_startAccCalibration,   "startAccCalibration", 0);
+    class_addmethod(c, (method)hedrot_receiver_stopAccCalibration,   "stopAccCalibration", 0);
+    class_addmethod(c, (method)hedrot_receiver_saveAccCalibration,   "saveAccCalibration", 0);
+    class_addmethod(c, (method)hedrot_receiver_dumpAccCalInfo,   "dumpAccCalData", 0);
+    class_addmethod(c, (method)hedrot_receiver_exportAccRawCalData,   "exportAccRawCalData", A_DEFSYM, 0);
+    
     
     
     // --------------------------------------- define attributes --------------------------------------------------------
@@ -1381,6 +1578,9 @@ int C74_EXPORT main()
     CLASS_ATTR_ACCESSORS(c, "invertRotation", NULL, hedrot_receiver_invertRotation_set);
     CLASS_ATTR_SAVE(c,    "invertRotation",   0);
 
+    CLASS_ATTR_FLOAT(c,    "accCalMaxGyroNorm",    0,  t_hedrot_receiver,  accCalMaxGyroNorm);
+    CLASS_ATTR_ACCESSORS(c, "accCalMaxGyroNorm", NULL, hedrot_receiver_accCalMaxGyroNorm_set);
+    CLASS_ATTR_SAVE(c,    "accCalMaxGyroNorm",   0);
     
     // output settings
     CLASS_ATTR_LONG(c,    "outputDataPeriod",    0,  t_hedrot_receiver,  outputDataPeriod);

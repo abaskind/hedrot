@@ -16,6 +16,8 @@
 //=====================================================================================================
 
 #include "libhedrot_serialcomm.h"
+#include "libhedrot_calibration.h"
+#include "libhedrot_utils.h"
 
 
 // hedrot version
@@ -33,17 +35,6 @@
 
 // other constants
 #define MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION 100000
-
-// math utils
-#define M_PI_float (float)      3.14159265358979323846264338327950288
-#define	DEGREE_TO_RAD           M_PI_float / 180.0f
-#define	RAD_TO_DEGREE           180.0f / M_PI_float
-#ifndef min
-#define min(a,b) (((a)<(b))?(a):(b))
-#endif
-#ifndef max
-#define max(a,b) (((a)>(b))?(a):(b))
-#endif
 
 // prototypes
 #if defined(_WIN32) || defined(_WIN64)
@@ -80,11 +71,17 @@
 #define NOTIFICATION_MESSAGE_CALIBRATION_NOT_VALID      9
 #define NOTIFICATION_MESSAGE_GYRO_CALIBRATION_STARTED   10
 #define NOTIFICATION_MESSAGE_GYRO_CALIBRATION_FINISHED  11
-#define NOTIFICATION_MESSAGE_BOARD_OVERLOAD             12
-#define NOTIFICATION_MESSAGE_MAG_CALIBRATION_STARTED    13
-#define NOTIFICATION_MESSAGE_MAG_CALIBRATION_SUCCEEDED  14
-#define NOTIFICATION_MESSAGE_MAG_CALIBRATION_FAILED     15
-#define NOTIFICATION_MESSAGE_EXPORT_MAGCALDATARAWSAMPLES_FAILED 16
+#define NOTIFICATION_MESSAGE_MAG_CALIBRATION_STARTED    21
+#define NOTIFICATION_MESSAGE_MAG_CALIBRATION_SUCCEEDED  22
+#define NOTIFICATION_MESSAGE_MAG_CALIBRATION_FAILED     23
+#define NOTIFICATION_MESSAGE_EXPORT_MAGCALDATARAWSAMPLES_FAILED 24
+#define NOTIFICATION_MESSAGE_ACC_CALIBRATION_STARTED    31
+#define NOTIFICATION_MESSAGE_ACC_CALIBRATION_SUCCEEDED  32
+#define NOTIFICATION_MESSAGE_ACC_CALIBRATION_FAILED     33
+#define NOTIFICATION_MESSAGE_ACC_CALIBRATION_PAUSED     34
+#define NOTIFICATION_MESSAGE_ACC_CALIBRATION_RESUMED     35
+#define NOTIFICATION_MESSAGE_EXPORT_ACCCALDATARAWSAMPLES_FAILED 36
+#define NOTIFICATION_MESSAGE_BOARD_OVERLOAD             40
 
 
 //=====================================================================================================
@@ -164,15 +161,24 @@ typedef struct _headtrackerData {
     char            gyroOffsetCalibratedState; // internal
     long            gyroHalfScaleSensitivity; // internal
     long            gyroBitDepth; // internal
-    float           accOffset[3];
-    float           accScaling[3], accScalingFactor[3];
+    
     float           magOffset[3];
     float           magScaling[3], magScalingFactor[3];
     short           magCalDataRawSamples[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION][3];  // calibration internal data, raw samples
     float           magCalDataCalSamples[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION][3];  // calibration internal data, calibrated samples
-    float           magcalDataNorm[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION];  // calibration internal data, error
+    float           magCalDataNorm[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION];  // calibration internal data, error
     long            magCalNumberOfRawSamples;
     char            magCalibratingFlag;
+    
+    float           accOffset[3];
+    float           accScaling[3], accScalingFactor[3];
+    short           accCalDataRawSamples[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION][3];  // calibration internal data, raw samples
+    float           accCalDataCalSamples[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION][3];  // calibration internal data, calibrated samples
+    float           accCalDataNorm[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION];  // calibration internal data, error
+    long            accCalNumberOfRawSamples;
+    char            accCalibratingFlag;
+    float           accCalMaxGyroNorm; // maximum allowed norm for the gyroscope when calibrating accelerometer
+    char            accCalPauseStatus; // 0 if acquiring samples, 1 if paused because norm for the gyroscope too high
 
     
     //--------------- OUTPUTS AND STATUS FROM THE HEAD TRACKER -------------------
@@ -239,6 +245,7 @@ void headtracker_list_comm_ports(headtrackerData *trackingData);
 int export_headtracker_settings(headtrackerData *trackingData, char* filename);
 int import_headtracker_settings(headtrackerData *trackingData, char* filename);
 int export_magCalDataRawSamples(headtrackerData *trackingData, char* filename);
+int export_accCalDataRawSamples(headtrackerData *trackingData, char* filename);
 
 
 //=====================================================================================================
@@ -257,6 +264,9 @@ void setAxesReference(headtrackerData *trackingData, char axesReference);
 void setRotationOrder(headtrackerData *trackingData, char rotationOrder);
 void setInvertRotation(headtrackerData *trackingData, char invertRotation);
 void setMagCalibratingFlag(headtrackerData *trackingData, char magCalibratingFlag);
+void setAccCalibratingFlag(headtrackerData *trackingData, char accCalibratingFlag);
+void setAccCalMaxGyroNorm(headtrackerData *trackingData, float accCalMaxGyroNorm);
+
 
 
 
@@ -307,20 +317,6 @@ void headtracker_sendSignedCharArray2Headtracker(headtrackerData *trackingData, 
 void resetGyroOffsetCalibration(headtrackerData *trackingData);
 int  processKeyValueSettingPair(headtrackerData *trackingData, char *key, char *value, char UpdateHeadtrackerFlag);
 void changeQuaternionReference(headtrackerData *trackingData);
-int ellipsoidFit(short rawData[][3], int numberOfSamples, float* accOffset, float* accScaling);
-
-
-
-//=====================================================================================================
-// utils
-//=====================================================================================================
-double mod(double a, double N);
-float invSqrt(float x);
-void quaternion2YawPitchRoll(float q1, float q2, float q3, float q4, float *yaw, float *pitch, float *roll);
-void quaternion2RollPitchYaw(float q1, float q2, float q3, float q4, float *yaw, float *pitch, float *roll);
-void quaternionComposition(float q01, float q02, float q03, float q04, float q11, float q12, float q13, float q14, float *q21, float *q22, float *q23, float *q24);
-int stringToFloats(char* valueBuffer, float* data, int nvalues);
-int stringToChars(char* valueBuffer, char* data, int nvalues);
 
 
 #endif

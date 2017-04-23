@@ -6956,7 +6956,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u239001047"
+									"varname" : "u400001052"
 								}
 
 							}
@@ -12701,7 +12701,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u670001046"
+									"varname" : "u521001051"
 								}
 
 							}
@@ -18865,7 +18865,6 @@
 						"tags" : "",
 						"style" : "",
 						"subpatcher_template" : "",
-						"visible" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
 									"fontname" : "Arial",
@@ -22396,7 +22395,7 @@
 											"modernui" : 1
 										}
 ,
-										"rect" : [ 877.0, 295.0, 758.0, 342.0 ],
+										"rect" : [ 798.0, 129.0, 758.0, 342.0 ],
 										"bglocked" : 0,
 										"openinpresentation" : 1,
 										"default_fontsize" : 12.0,
@@ -22423,7 +22422,6 @@
 										"tags" : "",
 										"style" : "",
 										"subpatcher_template" : "",
-										"visible" : 1,
 										"boxes" : [ 											{
 												"box" : 												{
 													"fontname" : "Arial",
@@ -22434,7 +22432,6 @@
 													"numoutlets" : 1,
 													"outlettype" : [ "" ],
 													"patching_rect" : [ 552.018005, 617.0, 276.0, 22.0 ],
-													"presentation_rect" : [ 596.0, 618.0, 0.0, 0.0 ],
 													"style" : "",
 													"text" : "set TOO FAST! Accelerometer calibration paused."
 												}
@@ -22449,7 +22446,7 @@
 													"patching_rect" : [ 1280.0, 607.0, 365.0, 20.0 ],
 													"presentation" : 1,
 													"presentation_linecount" : 2,
-													"presentation_rect" : [ 8.0, 236.0, 195.036011, 33.0 ],
+													"presentation_rect" : [ 8.0, 236.0, 197.0, 33.0 ],
 													"style" : "",
 													"text" : "maximum allowed gyroscope norm when calibration accelerometer"
 												}
@@ -23678,7 +23675,6 @@
 , 											{
 												"box" : 												{
 													"fontsize" : 14.0,
-													"hidden" : 1,
 													"id" : "obj-5",
 													"legacytextcolor" : 1,
 													"maxclass" : "textbutton",
@@ -25051,7 +25047,7 @@
 													"presentation" : 1,
 													"presentation_rect" : [ 209.036011, 282.0, 538.0, 27.0 ],
 													"style" : "",
-													"text" : "TOO FAST! Accelerometer calibration paused."
+													"text" : "calibration succeeded"
 												}
 
 											}
@@ -25060,7 +25056,6 @@
 													"bgcolor" : [ 0.0, 0.0, 1.0, 1.0 ],
 													"bgoncolor" : [ 0.55, 0.55, 0.55, 1.0 ],
 													"fontsize" : 18.0,
-													"hidden" : 1,
 													"id" : "obj-30",
 													"legacytextcolor" : 1,
 													"maxclass" : "textbutton",
@@ -25103,6 +25098,7 @@
 													"bgcolor" : [ 0.0, 0.0, 1.0, 1.0 ],
 													"bgoncolor" : [ 0.55, 0.55, 0.55, 1.0 ],
 													"fontsize" : 18.0,
+													"hidden" : 1,
 													"id" : "obj-12",
 													"legacytextcolor" : 1,
 													"maxclass" : "textbutton",
@@ -25944,7 +25940,7 @@
 									"presentation_rect" : [ 24.0, 583.0, 404.0, 28.0 ],
 									"readonly" : 1,
 									"style" : "",
-									"text" : "headtracking off, calibrating magnetometer..."
+									"text" : "headtracking on, calibrating off..."
 								}
 
 							}
@@ -30966,7 +30962,7 @@
 							"modernui" : 1
 						}
 ,
-						"rect" : [ 34.0, 78.0, 1612.0, 934.0 ],
+						"rect" : [ 663.0, 78.0, 805.0, 934.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -30993,6 +30989,7 @@
 						"tags" : "",
 						"style" : "",
 						"subpatcher_template" : "",
+						"visible" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
 									"attr" : "accCalMaxGyroNorm",
@@ -31004,7 +31001,6 @@
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 367.0, 653.5, 172.0, 22.0 ],
-									"presentation_rect" : [ 409.333313, 451.5, 0.0, 0.0 ],
 									"style" : "",
 									"text_width" : 136.0
 								}
@@ -39827,7 +39823,7 @@
 ,
 					"style" : "",
 					"text" : "autopattr @autorestore 0",
-					"varname" : "u335001048"
+					"varname" : "u143001053"
 				}
 
 			}

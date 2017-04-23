@@ -9,10 +9,10 @@
 
 void hedrot_receiver_tick(t_hedrot_receiver *x) {
     t_atom output;
-	t_ptr_size len;
-	
+    t_ptr_size len;
+    
     char messageNumber;
-
+    
     if(x->trackingData->headtracker_on) {
         headtracker_tick(x->trackingData);
         
@@ -127,7 +127,7 @@ void hedrot_receiver_tick(t_hedrot_receiver *x) {
             default:
                 post("[hedrot_receiver] : unknown message %ld from libhedrot", messageNumber);
                 break;
-
+                
         }
     }
     
@@ -160,7 +160,7 @@ void hedrot_receiver_autodiscover_deferedTick(t_hedrot_receiver *x, t_symbol *s,
 void hedrot_receiver_output_data(t_hedrot_receiver *x)
 {
     int i;
-
+    
     for (i=0; i < 3; i++) {
         //prepare the lists (raw and calibrated)
         atom_setlong(x->rawData+i,x->trackingData->magRawData[i]);
@@ -216,6 +216,9 @@ void hedrot_receiver_init(t_hedrot_receiver *x) {
 void *hedrot_receiver_new(t_symbol *s, short ac, t_atom *av)
 {
     t_hedrot_receiver *x;
+    
+    t_atom temp_atom[2];
+    
     x = (t_hedrot_receiver *)object_alloc(hedrot_receiver_class);
     
     // create outlets
@@ -237,16 +240,32 @@ void *hedrot_receiver_new(t_symbol *s, short ac, t_atom *av)
     // default output data rate
     x->outputDataPeriod = 5;
     
-    // dictionaries for calibration data
+    // dictionaries and buffers for calibration data
     x->MagCalInfoDict = dictionary_new();
     x->MagCalInfoDictName = symbol_unique();
     x->MagCalInfoDict = dictobj_register(x->MagCalInfoDict, &x->MagCalInfoDictName);
     
+    
     x->AccCalInfoDict = dictionary_new();
     x->AccCalInfoDictName = symbol_unique();
     x->AccCalInfoDict = dictobj_register(x->AccCalInfoDict, &x->AccCalInfoDictName);
+    // creates the embedded buffer (for norm of the acc Cal Data)
+    x->accCalDataCalNorm_BufferObjName = symbol_unique();
+    atom_setsym(temp_atom, x->accCalDataCalNorm_BufferObjName);
+    x->accCalDataCalNorm_BufferObj = (t_buffer_obj*) object_new_typed(CLASS_BOX, gensym("buffer~"), 1, temp_atom);
+    if(x->accCalDataCalNorm_BufferObj) {
+        // resize the buffer
+        atom_setlong(temp_atom, MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION);
+        if(!object_method_typed (x->accCalDataCalNorm_BufferObj, gensym("sizeinsamps"), 1L, temp_atom, temp_atom + 1) == MAX_ERR_NONE) {
+            error("[hedrot_receiver] (method dumpAccCalInfo): problem while changing buffer size");
+        }
+    } else {
+        object_error( (t_object *)x, "problem while changing buffer size");
+    }
+    
     
     hedrot_receiver_init(x);
+    
     
     return x;
 }
@@ -267,6 +286,8 @@ void hedrot_receiver_free(t_hedrot_receiver *x)
     
     object_free((t_object *)x->MagCalInfoDict); // will call object_unregister
     object_free((t_object *)x->AccCalInfoDict); // will call object_unregister
+    
+    object_free(x->accCalDataCalNorm_BufferObj);
 }
 
 
@@ -383,12 +404,12 @@ void hedrot_receiver_printVersion(t_hedrot_receiver *x, t_symbol *s) {
     
     post("[hedrot_receiver] Max object based on hedrot version %s, compiled on "__DATE__, HEDROT_VERSION);
     post("[hedrot_receiver] Required firmware version %d", HEDROT_FIRMWARE_VERSION);
-
+    
     // output version number on status outlet
     atom_setsym(&message_version, gensym(HEDROT_VERSION));
     outlet_anything(x->x_status_outlet, gensym("version"), 1, &message_version);
     
-
+    
 }
 
 /* ------------------- methods for mag calibration --------------------------- */
@@ -515,31 +536,17 @@ void hedrot_receiver_dumpAccCalInfo(t_hedrot_receiver *x) {
     t_atom output[3];
     t_atom accOffset[3];
     t_atom accScaling[3];
+    t_float *tab; // buffer values
     
-    t_atom *accCalDataCalSamples_x, *accCalDataCalSamples_y, *accCalDataCalSamples_z, *accCalDataNorm;
+    t_jit_matrix_info samplesMatrix_info;
+    t_symbol *accCalDataCalSamples_matrixName;
+    void *accCalDataCalSamples_matrixPointer;
+    float *accCalDataCalSamples_matrixPointer_bp, *samples_matrixPointer;
+    long savelock;
     
     dictionary_clear(x->AccCalInfoDict);
     
     dictionary_appendlong(x->AccCalInfoDict, gensym("numberOfSamples"), x->trackingData->accCalNumberOfRawSamples);
-    
-    // create the arrays of atoms that will be converted in an atom array when pushing to the dict
-    accCalDataCalSamples_x = malloc(x->trackingData->accCalNumberOfRawSamples * sizeof(t_atom));
-    accCalDataCalSamples_y = malloc(x->trackingData->accCalNumberOfRawSamples * sizeof(t_atom));
-    accCalDataCalSamples_z = malloc(x->trackingData->accCalNumberOfRawSamples * sizeof(t_atom));
-    accCalDataNorm = malloc(x->trackingData->accCalNumberOfRawSamples * sizeof(t_atom));
-    for(i = 0; i<x->trackingData->accCalNumberOfRawSamples; i++) {
-        atom_setfloat(accCalDataCalSamples_x + i, x->trackingData->accCalDataCalSamples[i][0]);
-        atom_setfloat(accCalDataCalSamples_y + i, x->trackingData->accCalDataCalSamples[i][1]);
-        atom_setfloat(accCalDataCalSamples_z + i, x->trackingData->accCalDataCalSamples[i][2]);
-        
-        atom_setfloat(accCalDataNorm + i, x->trackingData->accCalDataNorm[i]);
-    }
-    
-    dictionary_appendatoms(x->AccCalInfoDict, gensym("calDataCalSamples_x"), x->trackingData->accCalNumberOfRawSamples, accCalDataCalSamples_x);
-    dictionary_appendatoms(x->AccCalInfoDict, gensym("calDataCalSamples_y"), x->trackingData->accCalNumberOfRawSamples, accCalDataCalSamples_y);
-    dictionary_appendatoms(x->AccCalInfoDict, gensym("calDataCalSamples_z"), x->trackingData->accCalNumberOfRawSamples, accCalDataCalSamples_z);
-    
-    dictionary_appendatoms(x->AccCalInfoDict, gensym("calDataNorm"), x->trackingData->accCalNumberOfRawSamples, accCalDataNorm);
     
     atom_setfloat(accOffset, x->accOffset[0]);
     atom_setfloat(accOffset+1, x->accOffset[1]);
@@ -551,15 +558,79 @@ void hedrot_receiver_dumpAccCalInfo(t_hedrot_receiver *x) {
     atom_setfloat(accScaling+2, x->accScaling[2]);
     dictionary_appendatoms(x->AccCalInfoDict, gensym("scaling"), 3, accScaling);
     
-    atom_setsym(output, gensym("calData"));
-    atom_setsym(output+1, _sym_dictionary);
-    atom_setsym(output+2, x->AccCalInfoDictName);
-    outlet_anything( x->x_status_outlet, gensym("calibrating_acc"), 3, output);
+    // create the matrix that store the calibrated samples
+    jit_matrix_info_default(&samplesMatrix_info);
+    samplesMatrix_info.dimcount = 1;
+    samplesMatrix_info.type = _jit_sym_float32;
+    samplesMatrix_info.planecount = 3;
+    samplesMatrix_info.dim[ 0 ] = x->trackingData->accCalNumberOfRawSamples;    if(x->accCalDataCalSamples_Matrix) jit_object_free(x->accCalDataCalSamples_Matrix); // free the matrix if it already exists
+    x->accCalDataCalSamples_Matrix = jit_object_new( _jit_sym_jit_matrix, &samplesMatrix_info ); // create the matrix
+    accCalDataCalSamples_matrixName = symbol_unique();
+    jit_object_register( x->accCalDataCalSamples_Matrix, accCalDataCalSamples_matrixName );
     
-    free(accCalDataCalSamples_x);
-    free(accCalDataCalSamples_y);
-    free(accCalDataCalSamples_z);
-    free(accCalDataNorm);
+    // get the zeroth index from the corresponding list
+    accCalDataCalSamples_matrixPointer    = jit_object_method(x->accCalDataCalSamples_Matrix,_jit_sym_getindex,0);
+    
+    if(accCalDataCalSamples_matrixPointer) {
+        // lock the matrix
+        savelock = (long) jit_object_method(accCalDataCalSamples_matrixPointer, _jit_sym_lock, 1);
+        
+        // get the matrix data pointer
+        jit_object_method(accCalDataCalSamples_matrixPointer, _jit_sym_getdata, &accCalDataCalSamples_matrixPointer_bp);
+        
+        // fill the matrix
+        if (accCalDataCalSamples_matrixPointer_bp) {
+            
+            // initialization
+            samples_matrixPointer = accCalDataCalSamples_matrixPointer_bp;
+            
+            for(i = 0; i<x->trackingData->accCalNumberOfRawSamples; i++) {
+                // samples matrix: fill for each plane (corresponding to x,y and z coordinates)
+                *samples_matrixPointer++ = x->trackingData->accCalDataCalSamples[i][0]; // x
+                *samples_matrixPointer++ = x->trackingData->accCalDataCalSamples[i][1]; // y
+                *samples_matrixPointer++ = x->trackingData->accCalDataCalSamples[i][2]; // z
+            }
+            
+            // at the end of the loop, add the reference to the matrix to the dictionary
+            dictionary_appendsym( x->AccCalInfoDict, gensym("CalData"), accCalDataCalSamples_matrixName);
+        } else {
+            error("[hedrot_receiver] (method dumpAccCalInfo): error creating output jitter matrices");
+        }
+        // restore matrix lock state to previous value
+        jit_object_method(accCalDataCalSamples_matrixPointer, _jit_sym_lock, savelock);
+        
+        tab = buffer_locksamples(x->accCalDataCalNorm_BufferObj);
+        
+        if (tab) {
+            for(i = 0; i < x->trackingData->accCalNumberOfRawSamples; i++) {
+                tab[i] = x->trackingData->accCalDataNorm[i];
+            }
+            
+            for(i = x->trackingData->accCalNumberOfRawSamples; i < MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION; i++) {
+                tab[i] = 0;
+            }
+            
+            buffer_unlocksamples(x->accCalDataCalNorm_BufferObj);
+            
+            // call the dirty flag to refresh the waveform views
+            buffer_setdirty(x->accCalDataCalNorm_BufferObj);
+            
+            // at the end of the loop, add the reference to the buffer to the dictionary and output the dictionary
+            dictionary_appendsym( x->AccCalInfoDict, gensym("calDataNorm"), x->accCalDataCalNorm_BufferObjName);
+            
+            // output the dictionary
+            atom_setsym(output, gensym("calData"));
+            atom_setsym(output+1, _sym_dictionary);
+            atom_setsym(output+2, x->AccCalInfoDictName);
+            outlet_anything( x->x_status_outlet, gensym("calibrating_acc"), 3, output);
+        } else
+        {
+            error("[hedrot_receiver] (method dumpAccCalInfo):Write error on buffer");
+        }
+    } else {
+        error("[hedrot_receiver] (method dumpAccCalInfo): error creating output jitter matrix");
+    }
+    
 }
 
 void hedrot_receiver_exportAccRawCalData(t_hedrot_receiver *x, t_symbol *s) {
@@ -598,7 +669,7 @@ void hedrot_receiver_defered_exportAccRawCalData(t_hedrot_receiver *x, t_symbol 
 
 void hedrot_receiver_outputPortList(t_hedrot_receiver *x) {
     t_atom message_clear[2], outptr[4];
-	int i;
+    int i;
     
     atom_setsym(message_clear, gensym("available_ports"));
     atom_setsym(message_clear+1, gensym("clear"));
@@ -617,7 +688,7 @@ void hedrot_receiver_outputPortList(t_hedrot_receiver *x) {
         if(x->verbose == VERBOSE_STATE_ALL_MESSAGES) post("[hedrot_receiver]: port %ld, %s", i, x->trackingData->serialcomm->availablePorts[i]);
         
     }
-
+    
 }
 
 
@@ -800,8 +871,8 @@ void hedrot_receiver_outputReceptionStatus(t_hedrot_receiver *x) {
 // update the headtracker settings for the GUI
 void hedrot_receiver_mirrorHeadtrackerInfo(t_hedrot_receiver *x) {
     t_atom sym[2];
-
-	int i;
+    
+    int i;
     
     if(x->verbose) post("Headtracker settings retrieved\n");
     
@@ -925,8 +996,8 @@ void hedrot_receiver_doopenforwrite(t_hedrot_receiver *x, t_symbol *s) {
     t_filehandle fh_write;
     char str[1024];
     t_ptr_size len;
-
-
+    
+    
     if (s == gensym("")) {      // if no argument supplied, ask for file
         filename[0] = 0;
         if (saveasdialog_extended(filename, &path, &outtype, &filetype, 1))
@@ -1166,8 +1237,8 @@ t_max_err hedrot_receiver_accRange_set(t_hedrot_receiver *x, t_object *attr, lon
 
 t_max_err hedrot_receiver_accHardOffset_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     int i;
-	
-	if (!argc)
+    
+    if (!argc)
         return MAX_ERR_GENERIC;
     
     for(i=0;i<3;i++,argv++) {
@@ -1279,8 +1350,8 @@ t_max_err hedrot_receiver_gyroOffsetAutocalThreshold_set(t_hedrot_receiver *x, t
 
 t_max_err hedrot_receiver_accOffset_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     int i;
-	
-	if (!argc)
+    
+    if (!argc)
         return MAX_ERR_GENERIC;
     
     for(i=0;i<3;i++,argv++)
@@ -1294,8 +1365,8 @@ t_max_err hedrot_receiver_accOffset_set(t_hedrot_receiver *x, t_object *attr, lo
 
 t_max_err hedrot_receiver_accScaling_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     int i;
-	
-	if (!argc)
+    
+    if (!argc)
         return MAX_ERR_GENERIC;
     
     
@@ -1310,8 +1381,8 @@ t_max_err hedrot_receiver_accScaling_set(t_hedrot_receiver *x, t_object *attr, l
 
 t_max_err hedrot_receiver_magOffset_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     int i;
-	
-	if (!argc)
+    
+    if (!argc)
         return MAX_ERR_GENERIC;
     
     for(i=0;i<3;i++,argv++)
@@ -1325,8 +1396,8 @@ t_max_err hedrot_receiver_magOffset_set(t_hedrot_receiver *x, t_object *attr, lo
 
 t_max_err hedrot_receiver_magScaling_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     int i;
-	
-	if (!argc)
+    
+    if (!argc)
         return MAX_ERR_GENERIC;
     
     for(i=0;i<3;i++,argv++)
@@ -1572,12 +1643,12 @@ int C74_EXPORT main()
     CLASS_ATTR_ENUMINDEX(c, "rotationOrder", 0, "\"Yaw-Pitch-Roll (ZYX)\" \"Roll-Pitch-Yaw (XYZ)\"");
     CLASS_ATTR_ACCESSORS(c, "rotationOrder", NULL, hedrot_receiver_rotationOrder_set);
     CLASS_ATTR_SAVE(c,    "rotationOrder",   0);
-
+    
     CLASS_ATTR_CHAR(c,    "invertRotation",    0,  t_hedrot_receiver,  invertRotation);
     CLASS_ATTR_ENUMINDEX(c, "invertRotation", 0, "\"Don't invert rotation\" \"Invert rotation\"");
     CLASS_ATTR_ACCESSORS(c, "invertRotation", NULL, hedrot_receiver_invertRotation_set);
     CLASS_ATTR_SAVE(c,    "invertRotation",   0);
-
+    
     CLASS_ATTR_FLOAT(c,    "accCalMaxGyroNorm",    0,  t_hedrot_receiver,  accCalMaxGyroNorm);
     CLASS_ATTR_ACCESSORS(c, "accCalMaxGyroNorm", NULL, hedrot_receiver_accCalMaxGyroNorm_set);
     CLASS_ATTR_SAVE(c,    "accCalMaxGyroNorm",   0);

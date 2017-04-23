@@ -15,6 +15,9 @@
 #include "ext_user.h"
 #include "ext_critical.h"
 #include "ext_dictobj.h"
+#include "jit.common.h"
+#include "z_dsp.h"
+#include "ext_buffer.h"
 
 #include <string.h>
 #include <errno.h>
@@ -87,6 +90,9 @@ typedef struct hedrot_receiver
     t_symbol        *MagCalInfoDictName;
     t_dictionary	*AccCalInfoDict;
     t_symbol        *AccCalInfoDictName;
+    t_jit_object    *accCalDataCalSamples_Matrix;
+    t_buffer_obj    *accCalDataCalNorm_BufferObj;
+    t_symbol        *accCalDataCalNorm_BufferObjName;
     
     
     // (control) output data rate

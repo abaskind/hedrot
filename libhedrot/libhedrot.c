@@ -65,6 +65,11 @@ headtrackerData* headtracker_new() {
     // allocate memory for the serial comm structure
     trackingData->serialcomm = (headtrackerSerialcomm*) malloc(sizeof(headtrackerSerialcomm));
     
+    // allocate memory for the calibrationData structures
+    trackingData->magCalibrationData = (calibrationData*) malloc(sizeof(calibrationData));
+    trackingData->accCalibrationData = (calibrationData*) malloc(sizeof(calibrationData));
+
+    
     headtracker_init(trackingData);
     
     // default values (headtracker)
@@ -129,10 +134,10 @@ headtrackerData* headtracker_new() {
     trackingData->gyroOffsetCalibratedState = 0;
     resetGyroOffsetCalibration(trackingData);
     
-    trackingData->magCalNumberOfRawSamples = 0;
+    trackingData->magCalibrationData->numberOfSamples = 0;
     trackingData->magCalibratingFlag = 0;
 
-    trackingData->accCalNumberOfRawSamples = 0;
+    trackingData->accCalibrationData->numberOfSamples = 0;
     trackingData->accCalibratingFlag = 0;
     trackingData->accCalMaxGyroNorm = .5;
 
@@ -341,7 +346,7 @@ int export_magCalDataRawSamples(headtrackerData *trackingData, char* filename) {
     FILE *fd;
     int i;
     
-    if(!trackingData->magCalNumberOfRawSamples) {
+    if(!trackingData->magCalibrationData->numberOfSamples) {
         printf("Error: no samples to save");
         pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_EXPORT_MAGCALDATARAWSAMPLES_FAILED);
         return 0;
@@ -361,8 +366,8 @@ int export_magCalDataRawSamples(headtrackerData *trackingData, char* filename) {
     }
     
     // dump all values in the text file
-    for(i = 0; i<trackingData->magCalNumberOfRawSamples; i++) {
-        fprintf(fd, "%d, %d %d %d;\n", i, trackingData->magCalDataRawSamples[i][0], trackingData->magCalDataRawSamples[i][1], trackingData->magCalDataRawSamples[i][2]);
+    for(i = 0; i<trackingData->magCalibrationData->numberOfSamples; i++) {
+        fprintf(fd, "%d, %d %d %d;\n", i, trackingData->magCalibrationData->rawSamples[i][0], trackingData->magCalibrationData->rawSamples[i][1], trackingData->magCalibrationData->rawSamples[i][2]);
     }
     
     
@@ -393,7 +398,7 @@ int export_accCalDataRawSamples(headtrackerData *trackingData, char* filename) {
     FILE *fd;
     int i;
     
-    if(!trackingData->accCalNumberOfRawSamples) {
+    if(!trackingData->accCalibrationData->numberOfSamples) {
         printf("Error: no samples to save");
         pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_EXPORT_ACCCALDATARAWSAMPLES_FAILED);
         return 0;
@@ -413,8 +418,8 @@ int export_accCalDataRawSamples(headtrackerData *trackingData, char* filename) {
     }
     
     // dump all values in the text file
-    for(i = 0; i<trackingData->accCalNumberOfRawSamples; i++) {
-        fprintf(fd, "%d, %d %d %d;\n", i, trackingData->accCalDataRawSamples[i][0], trackingData->accCalDataRawSamples[i][1], trackingData->accCalDataRawSamples[i][2]);
+    for(i = 0; i<trackingData->accCalibrationData->numberOfSamples; i++) {
+        fprintf(fd, "%d, %d %d %d;\n", i, trackingData->accCalibrationData->rawSamples[i][0], trackingData->accCalibrationData->rawSamples[i][1], trackingData->accCalibrationData->rawSamples[i][2]);
     }
     
     
@@ -742,12 +747,12 @@ void headtracker_compute_data(headtrackerData *trackingData) {
     
     // record raw data for the magnetometer if calibration is running
     if(trackingData->magCalibratingFlag) {
-        trackingData->magCalDataRawSamples[trackingData->magCalNumberOfRawSamples][0] = trackingData->magRawData[0];
-        trackingData->magCalDataRawSamples[trackingData->magCalNumberOfRawSamples][1] = trackingData->magRawData[1];
-        trackingData->magCalDataRawSamples[trackingData->magCalNumberOfRawSamples][2] = trackingData->magRawData[2];
+        trackingData->magCalibrationData->rawSamples[trackingData->magCalibrationData->numberOfSamples][0] = trackingData->magRawData[0];
+        trackingData->magCalibrationData->rawSamples[trackingData->magCalibrationData->numberOfSamples][1] = trackingData->magRawData[1];
+        trackingData->magCalibrationData->rawSamples[trackingData->magCalibrationData->numberOfSamples][2] = trackingData->magRawData[2];
         
-        trackingData->magCalNumberOfRawSamples++;
-        if(trackingData->magCalNumberOfRawSamples>=MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION) {
+        trackingData->magCalibrationData->numberOfSamples++;
+        if(trackingData->magCalibrationData->numberOfSamples>=MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION) {
             setMagCalibratingFlag(trackingData, 0);
         }
     }
@@ -769,12 +774,12 @@ void headtracker_compute_data(headtrackerData *trackingData) {
                 pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_ACC_CALIBRATION_RESUMED);
             }
             
-            trackingData->accCalDataRawSamples[trackingData->accCalNumberOfRawSamples][0] = trackingData->accRawData[0];
-            trackingData->accCalDataRawSamples[trackingData->accCalNumberOfRawSamples][1] = trackingData->accRawData[1];
-            trackingData->accCalDataRawSamples[trackingData->accCalNumberOfRawSamples][2] = trackingData->accRawData[2];
+            trackingData->accCalibrationData->rawSamples[trackingData->accCalibrationData->numberOfSamples][0] = trackingData->accRawData[0];
+            trackingData->accCalibrationData->rawSamples[trackingData->accCalibrationData->numberOfSamples][1] = trackingData->accRawData[1];
+            trackingData->accCalibrationData->rawSamples[trackingData->accCalibrationData->numberOfSamples][2] = trackingData->accRawData[2];
             
-            trackingData->accCalNumberOfRawSamples++;
-            if(trackingData->accCalNumberOfRawSamples>=MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION) {
+            trackingData->accCalibrationData->numberOfSamples++;
+            if(trackingData->accCalibrationData->numberOfSamples>=MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION) {
                 setAccCalibratingFlag(trackingData, 0);
             }
         }
@@ -1467,33 +1472,34 @@ void setMagCalibratingFlag(headtrackerData *trackingData, char magCalibratingFla
     trackingData->magCalibratingFlag = magCalibratingFlag;
     
     if(trackingData->magCalibratingFlag) {
-        trackingData->magCalNumberOfRawSamples = 0;
+        trackingData->magCalibrationData->numberOfSamples = 0;
         pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_MAG_CALIBRATION_STARTED);
         if(trackingData->verbose) printf("magnetometer calibration started\r\n");
     }
     else {
-        if (!ellipsoidFit(trackingData->magCalDataRawSamples, trackingData->magCalNumberOfRawSamples, trackingData->magOffset, trackingData->magScaling)) {
+        if (!ellipsoidFit(trackingData->magCalibrationData, trackingData->magOffset, trackingData->magScaling)) {
             for(i=0;i<3;i++) {
                 trackingData->magScalingFactor[i] = 1/trackingData->magScaling[i];
             }
             
             // cook extra data (for displaying/debugging purposes)
-            for(i=0;i<trackingData->magCalNumberOfRawSamples;i++) {
+            for(i=0;i<trackingData->magCalibrationData->numberOfSamples;i++) {
                 // calibrated samples
-                trackingData->magCalDataCalSamples[i][0] = (trackingData->magCalDataRawSamples[i][0]-trackingData->magOffset[0]) * trackingData->magScalingFactor[0];
-                trackingData->magCalDataCalSamples[i][1] = (trackingData->magCalDataRawSamples[i][1]-trackingData->magOffset[1]) * trackingData->magScalingFactor[1];
-                trackingData->magCalDataCalSamples[i][2] = (trackingData->magCalDataRawSamples[i][2]-trackingData->magOffset[2]) * trackingData->magScalingFactor[2];
+                trackingData->magCalibrationData->calSamples[i][0] = (trackingData->magCalibrationData->rawSamples[i][0]-trackingData->magOffset[0]) * trackingData->magScalingFactor[0];
+                trackingData->magCalibrationData->calSamples[i][1] = (trackingData->magCalibrationData->rawSamples[i][1]-trackingData->magOffset[1]) * trackingData->magScalingFactor[1];
+                trackingData->magCalibrationData->calSamples[i][2] = (trackingData->magCalibrationData->rawSamples[i][2]-trackingData->magOffset[2]) * trackingData->magScalingFactor[2];
                 
                 // error
-                trackingData->magCalDataNorm[i] = sqrt(trackingData->magCalDataCalSamples[i][0]*trackingData->magCalDataCalSamples[i][0]
-                                                        + trackingData->magCalDataCalSamples[i][1]*trackingData->magCalDataCalSamples[i][1]
-                                                        + trackingData->magCalDataCalSamples[i][2]*trackingData->magCalDataCalSamples[i][2]);
+                trackingData->magCalibrationData->dataNorm[i] = sqrt(trackingData->magCalibrationData->calSamples[i][0]*trackingData->magCalibrationData->calSamples[i][0]
+                                                        + trackingData->magCalibrationData->calSamples[i][1]*trackingData->magCalibrationData->calSamples[i][1]
+                                                        + trackingData->magCalibrationData->calSamples[i][2]*trackingData->magCalibrationData->calSamples[i][2]);
             }
             
             pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_MAG_CALIBRATION_SUCCEEDED);
             if(trackingData->verbose) printf("magnetometer calibration succeeded\r\n");
             if(trackingData->verbose) printf("magnetometer calibration radii: %f %f %f\r\n", trackingData->magScaling[0], trackingData->magScaling[1], trackingData->magScaling[2]);
             if(trackingData->verbose) printf("magnetometer calibration offsets: %f %f %f\r\n", trackingData->magOffset[0], trackingData->magOffset[1], trackingData->magOffset[2]);
+            if(trackingData->verbose) printf("condition number for ellipsoid fit: %f\r\n", trackingData->magCalibrationData->conditionNumber);
 
         } else {
             pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_MAG_CALIBRATION_FAILED);
@@ -1511,34 +1517,35 @@ void setAccCalibratingFlag(headtrackerData *trackingData, char accCalibratingFla
     trackingData->accCalibratingFlag = accCalibratingFlag;
     
     if(trackingData->accCalibratingFlag) {
-        trackingData->accCalNumberOfRawSamples = 0;
+        trackingData->accCalibrationData->numberOfSamples = 0;
         pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_ACC_CALIBRATION_STARTED);
         trackingData->accCalPauseStatus = 0;
         if(trackingData->verbose) printf("accelerometer calibration started\r\n");
     }
     else {
-        if (!ellipsoidFit(trackingData->accCalDataRawSamples, trackingData->accCalNumberOfRawSamples, trackingData->accOffset, trackingData->accScaling)) {
+        if (!ellipsoidFit(trackingData->accCalibrationData, trackingData->accOffset, trackingData->accScaling)) {
             for(i=0;i<3;i++) {
                 trackingData->accScalingFactor[i] = 1/trackingData->accScaling[i];
             }
             
             // cook extra data (for displaying/debugging purposes)
-            for(i=0;i<trackingData->accCalNumberOfRawSamples;i++) {
+            for(i=0;i<trackingData->accCalibrationData->numberOfSamples;i++) {
                 // calibrated samples
-                trackingData->accCalDataCalSamples[i][0] = (trackingData->accCalDataRawSamples[i][0]-trackingData->accOffset[0]) * trackingData->accScalingFactor[0];
-                trackingData->accCalDataCalSamples[i][1] = (trackingData->accCalDataRawSamples[i][1]-trackingData->accOffset[1]) * trackingData->accScalingFactor[1];
-                trackingData->accCalDataCalSamples[i][2] = (trackingData->accCalDataRawSamples[i][2]-trackingData->accOffset[2]) * trackingData->accScalingFactor[2];
+                trackingData->accCalibrationData->calSamples[i][0] = (trackingData->accCalibrationData->rawSamples[i][0]-trackingData->accOffset[0]) * trackingData->accScalingFactor[0];
+                trackingData->accCalibrationData->calSamples[i][1] = (trackingData->accCalibrationData->rawSamples[i][1]-trackingData->accOffset[1]) * trackingData->accScalingFactor[1];
+                trackingData->accCalibrationData->calSamples[i][2] = (trackingData->accCalibrationData->rawSamples[i][2]-trackingData->accOffset[2]) * trackingData->accScalingFactor[2];
                 
                 // error
-                trackingData->accCalDataNorm[i] = sqrt(trackingData->accCalDataCalSamples[i][0]*trackingData->accCalDataCalSamples[i][0]
-                                                       + trackingData->accCalDataCalSamples[i][1]*trackingData->accCalDataCalSamples[i][1]
-                                                       + trackingData->accCalDataCalSamples[i][2]*trackingData->accCalDataCalSamples[i][2]);
+                trackingData->accCalibrationData->dataNorm[i] = sqrt(trackingData->accCalibrationData->calSamples[i][0]*trackingData->accCalibrationData->calSamples[i][0]
+                                                       + trackingData->accCalibrationData->calSamples[i][1]*trackingData->accCalibrationData->calSamples[i][1]
+                                                       + trackingData->accCalibrationData->calSamples[i][2]*trackingData->accCalibrationData->calSamples[i][2]);
             }
             
             pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_ACC_CALIBRATION_SUCCEEDED);
             if(trackingData->verbose) printf("accelerometer calibration succeeded\r\n");
             if(trackingData->verbose) printf("accelerometer calibration radii: %f %f %f\r\n", trackingData->accScaling[0], trackingData->accScaling[1], trackingData->accScaling[2]);
             if(trackingData->verbose) printf("accelerometer calibration offsets: %f %f %f\r\n", trackingData->accOffset[0], trackingData->accOffset[1], trackingData->accOffset[2]);
+            if(trackingData->verbose) printf("condition number for ellipsoid fit: %f\r\n", trackingData->accCalibrationData->conditionNumber);
             
         } else {
             pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_ACC_CALIBRATION_FAILED);

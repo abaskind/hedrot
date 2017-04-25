@@ -2,7 +2,7 @@
 	"name" : "hedrotReceiver",
 	"version" : 1,
 	"creationdate" : 3560933167,
-	"modificationdate" : 3575265481,
+	"modificationdate" : 3576004210,
 	"viewrect" : [ 25.0, 69.0, 300.0, 500.0 ],
 	"autoorganize" : 0,
 	"hideprojectwindow" : 0,
@@ -14,16 +14,6 @@
 				"kind" : "patcher",
 				"local" : 1,
 				"toplevel" : 1
-			}
-,
-			"hedrotReceiver_viewCalData.maxpat" : 			{
-				"kind" : "patcher",
-				"local" : 1,
-				"singleton" : 				{
-					"bootpath" : "/Volumes/Data/Developpement/hedrot-headtracker/hedrot/Max/patches",
-					"projectrelativepath" : "./patches"
-				}
-
 			}
 
 		}

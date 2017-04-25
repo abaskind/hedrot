@@ -86,10 +86,13 @@ typedef struct hedrot_receiver
     // output data
     t_atom          t_estimatedAngles[3];
     t_atom          t_estimatedQuaternion[4];
-    t_dictionary	*MagCalInfoDict;
-    t_symbol        *MagCalInfoDictName;
-    t_dictionary	*AccCalInfoDict;
-    t_symbol        *AccCalInfoDictName;
+    t_dictionary	*magCalInfoDict;
+    t_symbol        *magCalInfoDictName;
+    t_jit_object    *magCalDataCalSamples_Matrix;
+    t_buffer_obj    *magCalDataCalNorm_BufferObj;
+    t_symbol        *magCalDataCalNorm_BufferObjName;
+    t_dictionary	*accCalInfoDict;
+    t_symbol        *accCalInfoDictName;
     t_jit_object    *accCalDataCalSamples_Matrix;
     t_buffer_obj    *accCalDataCalNorm_BufferObj;
     t_symbol        *accCalDataCalNorm_BufferObjName;
@@ -141,6 +144,11 @@ void hedrot_receiver_opendestinationtextfile(t_hedrot_receiver *x, t_symbol *s);
 void hedrot_receiver_doopenforwrite(t_hedrot_receiver *x, t_symbol *s);
 void hedrot_receiver_startrec(t_hedrot_receiver *x);
 void hedrot_receiver_stoprec(t_hedrot_receiver *x);
+
+// generic methods for calibration
+char hedrot_receiver_createCalDataDictionary( float offset[], float scaling[], calibrationData *calData,
+                                             t_dictionary *calDict, t_jit_object *sampleMatrix,
+                                             t_buffer_obj *normBufferObj, t_symbol *normBufferObjName);
 
 // methods for mag calibration
 void hedrot_receiver_startMagCalibration(t_hedrot_receiver *x);

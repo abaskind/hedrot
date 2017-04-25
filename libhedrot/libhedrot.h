@@ -33,9 +33,6 @@
 #define PINGTIME                0.5  // time delay in seconds between two pings when the headtracker has been found
 #define AUTODISCOVER_MAX_TIME   0.1  // max time period in seconds between autodiscover ping and headtracker response
 
-// other constants
-#define MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION 100000
-
 // prototypes
 #if defined(_WIN32) || defined(_WIN64)
 # define strtok_r strtok_s // strtok_r does not exist on windows, use strtok_s instead
@@ -164,18 +161,12 @@ typedef struct _headtrackerData {
     
     float           magOffset[3];
     float           magScaling[3], magScalingFactor[3];
-    short           magCalDataRawSamples[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION][3];  // calibration internal data, raw samples
-    float           magCalDataCalSamples[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION][3];  // calibration internal data, calibrated samples
-    float           magCalDataNorm[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION];  // calibration internal data, error
-    long            magCalNumberOfRawSamples;
+    calibrationData *magCalibrationData;
     char            magCalibratingFlag;
     
     float           accOffset[3];
     float           accScaling[3], accScalingFactor[3];
-    short           accCalDataRawSamples[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION][3];  // calibration internal data, raw samples
-    float           accCalDataCalSamples[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION][3];  // calibration internal data, calibrated samples
-    float           accCalDataNorm[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION];  // calibration internal data, error
-    long            accCalNumberOfRawSamples;
+    calibrationData *accCalibrationData;
     char            accCalibratingFlag;
     float           accCalMaxGyroNorm; // maximum allowed norm for the gyroscope when calibrating accelerometer
     char            accCalPauseStatus; // 0 if acquiring samples, 1 if paused because norm for the gyroscope too high

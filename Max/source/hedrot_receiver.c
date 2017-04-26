@@ -5,6 +5,8 @@
 
 #include "hedrot_receiver.h"
 
+#include "libhedrot_utils.h"
+
 /* ------------------- main methods --------------------------- */
 
 void hedrot_receiver_tick(t_hedrot_receiver *x) {
@@ -582,6 +584,8 @@ char hedrot_receiver_createCalDataDictionary( float offset[], float scaling[], c
     dictionary_appendatoms(calDict, gensym("scaling"), 3, accScaling);
     
     dictionary_appendfloat(calDict, gensym("conditionNumber"), calData->conditionNumber);
+    
+    dictionary_appendfloat(calDict, gensym("maxNormError"), calData->maxNormError);
     
     // create the matrix that store the calibrated samples
     jit_matrix_info_default(&samplesMatrix_info);

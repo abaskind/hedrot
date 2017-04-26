@@ -6956,7 +6956,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u463001061"
+									"varname" : "u915001092"
 								}
 
 							}
@@ -12701,7 +12701,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u571001060"
+									"varname" : "u879001091"
 								}
 
 							}
@@ -19242,7 +19242,7 @@
 											"modernui" : 1
 										}
 ,
-										"rect" : [ 903.0, 320.0, 758.0, 342.0 ],
+										"rect" : [ 276.0, 46.0, 758.0, 342.0 ],
 										"bglocked" : 1,
 										"openinpresentation" : 1,
 										"default_fontsize" : 12.0,
@@ -19949,7 +19949,7 @@
 															"modernui" : 1
 														}
 ,
-														"rect" : [ 1061.0, 108.0, 367.0, 126.0 ],
+														"rect" : [ 469.0, 441.0, 367.0, 126.0 ],
 														"bglocked" : 0,
 														"openinpresentation" : 1,
 														"default_fontsize" : 12.0,
@@ -21125,7 +21125,7 @@
 																	"outlettype" : [ "" ],
 																	"patching_rect" : [ 300.5, 240.0, 127.0, 20.0 ],
 																	"style" : "",
-																	"text" : "460 303 1218 645"
+																	"text" : "276 46 1034 388"
 																}
 
 															}
@@ -40024,7 +40024,7 @@
 ,
 					"style" : "",
 					"text" : "autopattr @autorestore 0",
-					"varname" : "u952001062"
+					"varname" : "u527001093"
 				}
 
 			}

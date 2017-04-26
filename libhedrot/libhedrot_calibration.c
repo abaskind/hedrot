@@ -8,6 +8,8 @@
 
 #include "libhedrot_calibration.h"
 
+#include "libhedrot_utils.h"
+
 // include cblas and lapack for matrix operations
 #ifdef __MACH__  // if mach (mac os X)
 #include <Accelerate/Accelerate.h>
@@ -16,6 +18,99 @@
 #include "lapacke.h"
 #endif
 #endif
+
+//=====================================================================================================
+// function accMagCalibration
+//=====================================================================================================
+//
+// general function for calibrating accelerometers and magnetometers
+//
+//
+// returns 1 (error) if calibration failed
+
+int accMagCalibration(calibrationData* calData, float* estimatedOffset, float* estimatedScaling) {
+    calibrationData *TMPcalData1, *TMPcalData2;
+    float TMPestimatedOffset[3], TMPestimatedScaling[3];
+    int i;
+    char err = 0;
+    
+    // allocates memory for the temporary calibration data structures
+    TMPcalData1 = (calibrationData*) malloc(sizeof(calibrationData));
+    TMPcalData2 = (calibrationData*) malloc(sizeof(calibrationData));
+    
+    // copy raw data in the temporary calibration data structure
+    TMPcalData1->numberOfSamples = calData->numberOfSamples;
+    for (i=0;i<TMPcalData1->numberOfSamples; i++) {
+        TMPcalData1->rawSamples[i][0] = calData->rawSamples[i][0];
+        TMPcalData1->rawSamples[i][1] = calData->rawSamples[i][1];
+        TMPcalData1->rawSamples[i][2] = calData->rawSamples[i][2];
+    }
+    
+    // first pass: calls ellipsoidFit a first time
+    if( ellipsoidFit(TMPcalData1, TMPestimatedOffset, TMPestimatedScaling) ) {
+        // if error, quits
+        printf( "[libhedrot] (function accMagCalibration) first pass failed.\r\n" );
+        err =  1;
+        goto end;
+    }
+    
+    // no error, goes on
+    printf( "[libhedrot] (function accMagCalibration) first pass succeeded.\r\n" );
+    printf( "           radii: %f %f %f\r\n", TMPestimatedScaling[0], TMPestimatedScaling[1], TMPestimatedScaling[2]);
+    printf( "           offsets: %f %f %f\r\n", TMPestimatedOffset[0], TMPestimatedOffset[1], TMPestimatedOffset[2]);
+    printf( "           condition number for ellipsoid fit: %f\r\n", TMPcalData1->conditionNumber);
+    printf( "           maximum norm error: %f\r\n", TMPcalData1->maxNormError);
+    
+    // based on the norm error from the first pass, filter raw samples which are outside a certain range (1 +/- NORM_ERROR_TOLERANCE)
+    TMPcalData2->numberOfSamples = 0;
+    for (i=0; i<TMPcalData1->numberOfSamples; i++) {
+        if( fabsf(TMPcalData1->dataNorm[i]-1) <= NORM_ERROR_TOLERANCE) {
+            TMPcalData2->rawSamples[TMPcalData2->numberOfSamples][0] = TMPcalData1->rawSamples[i][0];
+            TMPcalData2->rawSamples[TMPcalData2->numberOfSamples][1] = TMPcalData1->rawSamples[i][1];
+            TMPcalData2->rawSamples[TMPcalData2->numberOfSamples][2] = TMPcalData1->rawSamples[i][2];
+            TMPcalData2->numberOfSamples++;
+        }
+    }
+    
+    // second pass: calls ellipsoidFit a second time
+    if( ellipsoidFit(TMPcalData2, TMPestimatedOffset, TMPestimatedScaling) ) {
+        // if error, quits
+        printf( "[libhedrot] (function accMagCalibration) second pass failed.\r\n" );
+        err =  1;
+        goto end;
+    }
+    
+    // no error, goes on
+    printf( "[libhedrot] (function accMagCalibration) second pass succeeded.\r\n" );
+    printf( "           radii: %f %f %f\r\n", TMPestimatedScaling[0], TMPestimatedScaling[1], TMPestimatedScaling[2]);
+    printf( "           offsets: %f %f %f\r\n", TMPestimatedOffset[0], TMPestimatedOffset[1], TMPestimatedOffset[2]);
+    printf( "           condition number for ellipsoid fit: %f\r\n", TMPcalData2->conditionNumber);
+    printf( "           maximum norm error: %f\r\n", TMPcalData2->maxNormError);
+    
+    // save the final estimation values
+    estimatedOffset[0] = TMPestimatedOffset[0];
+    estimatedOffset[1] = TMPestimatedOffset[1];
+    estimatedOffset[2] = TMPestimatedOffset[2];
+    estimatedScaling[0] = TMPestimatedScaling[0];
+    estimatedScaling[1] = TMPestimatedScaling[1];
+    estimatedScaling[2] = TMPestimatedScaling[2];
+    
+    // cook extra calibration data on initial (unfiltered) data set
+    cookCalibrationData(calData, estimatedOffset, estimatedScaling);
+    
+    // overwrite the max norm error that has been just computed by the previous one (which ignores the data that had been filtered out)
+    calData->maxNormError = TMPcalData2->maxNormError;
+    
+    // set as condition number the one from the second pass
+    calData->conditionNumber = TMPcalData2->conditionNumber;
+    
+end:
+    // free memory and returns
+    free(TMPcalData1);
+    free(TMPcalData2);
+    return err;
+}
+
 
 
 //=====================================================================================================
@@ -35,7 +130,7 @@
 // ... with gamma = 1 + ( d^2/a + e^2/b + f^2/c );
 //
 // returns 1 (error) if calibration failed
-int ellipsoidFit(calibrationData* calData, float* accOffset, float* accScaling) {
+int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estimatedScaling) {
     int i;
     
     // definitions
@@ -113,17 +208,20 @@ int ellipsoidFit(calibrationData* calData, float* accOffset, float* accScaling) 
     }
     
     // compute the radii and offsets from the results
-    accOffset[0] = (float) -matrixB[3]/matrixB[0];
-    accOffset[1] = (float) -matrixB[4]/matrixB[1];
-    accOffset[2] = (float) -matrixB[5]/matrixB[2];
+    estimatedOffset[0] = (float) -matrixB[3]/matrixB[0];
+    estimatedOffset[1] = (float) -matrixB[4]/matrixB[1];
+    estimatedOffset[2] = (float) -matrixB[5]/matrixB[2];
     
     gamma = 1 + ( matrixB[3]*matrixB[3] / matrixB[0] + matrixB[4]*matrixB[4] / matrixB[1] + matrixB[5]*matrixB[5] / matrixB[2] );
-    accScaling[0] = (float) sqrt(gamma/matrixB[0]);
-    accScaling[1] = (float) sqrt(gamma/matrixB[1]);
-    accScaling[2] = (float) sqrt(gamma/matrixB[2]);
+    estimatedScaling[0] = (float) sqrt(gamma/matrixB[0]);
+    estimatedScaling[1] = (float) sqrt(gamma/matrixB[1]);
+    estimatedScaling[2] = (float) sqrt(gamma/matrixB[2]);
     
     // compute the condition number
     calData->conditionNumber = vectorS[0]/vectorS[5];
+    
+    // cook extra data (for displaying/debugging purposes)
+    cookCalibrationData(calData, estimatedOffset, estimatedScaling);
     
     /* Free workspace */
 #ifdef __MACH__  // if mach (mac os X)
@@ -136,4 +234,28 @@ int ellipsoidFit(calibrationData* calData, float* accOffset, float* accScaling) 
 #endif
     
     return 0;
+}
+
+
+
+//=====================================================================================================
+// function ellipsoidFitCheck
+//=====================================================================================================
+//
+// cook extra data (calibrated recorded data, norm, maximum norm error) for visualisation/debugging based on raw data and estimated parameters
+void cookCalibrationData(calibrationData* calData, float* estimatedOffset, float* estimatedScaling) {
+    int i;
+    calData->maxNormError = 0;
+    for(i=0;i<calData->numberOfSamples;i++) {
+        // calibrated samples
+        calData->calSamples[i][0] = (calData->rawSamples[i][0]-estimatedOffset[0]) / estimatedScaling[0];
+        calData->calSamples[i][1] = (calData->rawSamples[i][1]-estimatedOffset[1]) / estimatedScaling[1];
+        calData->calSamples[i][2] = (calData->rawSamples[i][2]-estimatedOffset[2]) / estimatedScaling[2];
+        
+        // norm and max norm error update
+        calData->dataNorm[i] = sqrt(calData->calSamples[i][0]*calData->calSamples[i][0]
+                                    + calData->calSamples[i][1]*calData->calSamples[i][1]
+                                    + calData->calSamples[i][2]*calData->calSamples[i][2]);
+        calData->maxNormError = max( calData->maxNormError, fabsf(calData->dataNorm[i] - 1) );
+    }
 }

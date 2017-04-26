@@ -17,7 +17,6 @@
 
 #include "libhedrot_serialcomm.h"
 #include "libhedrot_calibration.h"
-#include "libhedrot_utils.h"
 
 
 // hedrot version

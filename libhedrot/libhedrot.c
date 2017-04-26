@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "libhedrot_utils.h"
+
 #if defined(_WIN32) || defined(_WIN64)
 #include <stdint.h>
 #endif
@@ -1477,22 +1479,9 @@ void setMagCalibratingFlag(headtrackerData *trackingData, char magCalibratingFla
         if(trackingData->verbose) printf("magnetometer calibration started\r\n");
     }
     else {
-        if (!ellipsoidFit(trackingData->magCalibrationData, trackingData->magOffset, trackingData->magScaling)) {
+        if (!accMagCalibration(trackingData->magCalibrationData, trackingData->magOffset, trackingData->magScaling)) {
             for(i=0;i<3;i++) {
                 trackingData->magScalingFactor[i] = 1/trackingData->magScaling[i];
-            }
-            
-            // cook extra data (for displaying/debugging purposes)
-            for(i=0;i<trackingData->magCalibrationData->numberOfSamples;i++) {
-                // calibrated samples
-                trackingData->magCalibrationData->calSamples[i][0] = (trackingData->magCalibrationData->rawSamples[i][0]-trackingData->magOffset[0]) * trackingData->magScalingFactor[0];
-                trackingData->magCalibrationData->calSamples[i][1] = (trackingData->magCalibrationData->rawSamples[i][1]-trackingData->magOffset[1]) * trackingData->magScalingFactor[1];
-                trackingData->magCalibrationData->calSamples[i][2] = (trackingData->magCalibrationData->rawSamples[i][2]-trackingData->magOffset[2]) * trackingData->magScalingFactor[2];
-                
-                // error
-                trackingData->magCalibrationData->dataNorm[i] = sqrt(trackingData->magCalibrationData->calSamples[i][0]*trackingData->magCalibrationData->calSamples[i][0]
-                                                        + trackingData->magCalibrationData->calSamples[i][1]*trackingData->magCalibrationData->calSamples[i][1]
-                                                        + trackingData->magCalibrationData->calSamples[i][2]*trackingData->magCalibrationData->calSamples[i][2]);
             }
             
             pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_MAG_CALIBRATION_SUCCEEDED);
@@ -1523,22 +1512,9 @@ void setAccCalibratingFlag(headtrackerData *trackingData, char accCalibratingFla
         if(trackingData->verbose) printf("accelerometer calibration started\r\n");
     }
     else {
-        if (!ellipsoidFit(trackingData->accCalibrationData, trackingData->accOffset, trackingData->accScaling)) {
+        if (!accMagCalibration(trackingData->accCalibrationData, trackingData->accOffset, trackingData->accScaling)) {
             for(i=0;i<3;i++) {
                 trackingData->accScalingFactor[i] = 1/trackingData->accScaling[i];
-            }
-            
-            // cook extra data (for displaying/debugging purposes)
-            for(i=0;i<trackingData->accCalibrationData->numberOfSamples;i++) {
-                // calibrated samples
-                trackingData->accCalibrationData->calSamples[i][0] = (trackingData->accCalibrationData->rawSamples[i][0]-trackingData->accOffset[0]) * trackingData->accScalingFactor[0];
-                trackingData->accCalibrationData->calSamples[i][1] = (trackingData->accCalibrationData->rawSamples[i][1]-trackingData->accOffset[1]) * trackingData->accScalingFactor[1];
-                trackingData->accCalibrationData->calSamples[i][2] = (trackingData->accCalibrationData->rawSamples[i][2]-trackingData->accOffset[2]) * trackingData->accScalingFactor[2];
-                
-                // error
-                trackingData->accCalibrationData->dataNorm[i] = sqrt(trackingData->accCalibrationData->calSamples[i][0]*trackingData->accCalibrationData->calSamples[i][0]
-                                                       + trackingData->accCalibrationData->calSamples[i][1]*trackingData->accCalibrationData->calSamples[i][1]
-                                                       + trackingData->accCalibrationData->calSamples[i][2]*trackingData->accCalibrationData->calSamples[i][2]);
             }
             
             pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_ACC_CALIBRATION_SUCCEEDED);

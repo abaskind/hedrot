@@ -13,7 +13,7 @@
 
 // constants
 #define MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION 100000
-#define MAX_CONDITION_NUMBER 1000
+#define MAX_CONDITION_NUMBER 5000
 #define NORM_ERROR_TOLERANCE .05 // during calibration, all samples which norm is outside (1 +/- NORM_ERROR_TOLERANCE) after first pass of calibration are filtered out for the second pass
 
 //=====================================================================================================

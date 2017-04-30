@@ -26,13 +26,20 @@ typedef struct _calibrationData {
     float           calSamples[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION][3];  // calibrated samples
     float           dataNorm[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION];       // vector norm after calibration
     float           conditionNumber;
-    float           maxNormError;                                          // maximum norm error (absolute value of norm minus 1)
+    float           normAverage;                                           // average norm to the center
+    float           normStdDev;                                            // standard deviation of the norm to the center
+    float           maxNormError;                                          // maximum norm error (absolute value of norm minus averageNorm)
 } calibrationData;
 
 
 int accMagCalibration(calibrationData* calData, float* estimatedOffset, float* estimatedScaling);
 
-int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estimatedScaling);
+int myCalibrationOffline(calibrationData* calData, float* estimatedOffset, float* estimatedScaling);
+
+int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estimatedScaling, double *quadricCoefficients);
+int quadricFit(calibrationData* calData, double *quadricCoefficients);
+
+int filterCalData(calibrationData *inCalData, calibrationData *outCalData, float center[3]);
 
 void cookCalibrationData(calibrationData* calData, float* estimatedOffset, float* estimatedScaling);
 

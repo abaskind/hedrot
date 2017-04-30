@@ -81,6 +81,7 @@ typedef struct hedrot_receiver
     char            rotationOrder;
     char            invertRotation;
     float           accCalMaxGyroNorm;
+    char            offlineCalibrationMethod; //0 = double ellipsoid fit, 1 = Aussal
     
     
     // output data
@@ -153,6 +154,7 @@ char hedrot_receiver_createCalDataDictionary( float offset[], float scaling[], c
 // methods for mag calibration
 void hedrot_receiver_startMagCalibration(t_hedrot_receiver *x);
 void hedrot_receiver_stopMagCalibration(t_hedrot_receiver *x);
+void hedrot_receiver_redoMagCalibration(t_hedrot_receiver *x);
 void hedrot_receiver_saveMagCalibration(t_hedrot_receiver *x);
 void hedrot_receiver_dumpMagCalInfo(t_hedrot_receiver *x);
 void hedrot_receiver_exportMagRawCalData(t_hedrot_receiver *x, t_symbol *s);
@@ -161,6 +163,7 @@ void hedrot_receiver_defered_exportMagRawCalData(t_hedrot_receiver *x, t_symbol 
 // methods for acc calibration
 void hedrot_receiver_startAccCalibration(t_hedrot_receiver *x);
 void hedrot_receiver_stopAccCalibration(t_hedrot_receiver *x);
+void hedrot_receiver_redoAccCalibration(t_hedrot_receiver *x);
 void hedrot_receiver_saveAccCalibration(t_hedrot_receiver *x);
 void hedrot_receiver_dumpAccCalInfo(t_hedrot_receiver *x);
 void hedrot_receiver_exportAccRawCalData(t_hedrot_receiver *x, t_symbol *s);
@@ -226,5 +229,7 @@ t_max_err hedrot_receiver_axesReference_set(t_hedrot_receiver *x, t_object *attr
 t_max_err hedrot_receiver_rotationOrder_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_invertRotation_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_accCalMaxGyroNorm_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
+t_max_err hedrot_receiver_offlineCalibrationMethod_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
+
 
 #endif

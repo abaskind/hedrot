@@ -8,6 +8,7 @@
 
 #include "libhedrot_utils.h"
 
+
 //=====================================================================================================
 // utils
 //=====================================================================================================
@@ -131,3 +132,72 @@ int stringToChars(char* valueBuffer, char* data, int nvalues) {
         return 1; //ok
     }
 }
+
+
+//=====================================================================================================
+// function getMean3
+//=====================================================================================================
+//
+// get average point in a set of data (short format) over 3 dimensions
+// careful: memory for double* rawMean has to be allocated first!!
+void getMean3(short *samples, long numberOfSamples, float* mean) {
+    int n;
+    
+    // initialization
+    mean[0] = 0;
+    mean[1] = 0;
+    mean[2] = 0;
+    n = 3*numberOfSamples;
+    
+    while(n--) {
+        mean[0] += *samples++;
+        mean[1] += *samples++;
+        mean[2] += *samples++;
+    }
+    
+    // normalization
+    mean[0] /= numberOfSamples;
+    mean[1] /= numberOfSamples;
+    mean[2] /= numberOfSamples;
+}
+
+
+//=====================================================================================================
+// function getMean1f
+//=====================================================================================================
+//
+// get average point in a set of data (float format), 1 dimension
+// careful: memory for double* rawMean has to be allocated first!!
+float getMean1f(float *samples, long numberOfSamples) {
+    int n;
+    float mean = 0;
+
+    n = numberOfSamples;
+    while(n--)
+        mean += *samples++;
+    
+    // normalization
+    return (mean / numberOfSamples);
+}
+
+
+//=====================================================================================================
+// function getStdDev1f
+//=====================================================================================================
+//
+// get variance (centered moment 2nd order, square of the std deviation) per axis in a set of data (double version)
+float getStdDev1f(float *samples, long numberOfSamples, float mean) {
+    int n;
+    double TMPval;
+    float var = 0;
+
+    n = numberOfSamples;
+    while(n--) {
+        TMPval = *samples++ - mean;
+        var += TMPval*TMPval;
+    }
+
+    // normalization and square root
+    return sqrt(var/numberOfSamples);
+}
+

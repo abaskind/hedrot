@@ -136,6 +136,8 @@ headtrackerData* headtracker_new() {
     trackingData->gyroOffsetCalibratedState = 0;
     resetGyroOffsetCalibration(trackingData);
     
+    trackingData->offlineCalibrationMethod = 0;
+    
     trackingData->magCalibrationData->numberOfSamples = 0;
     trackingData->magCalibratingFlag = 0;
 
@@ -435,6 +437,79 @@ int export_accCalDataRawSamples(headtrackerData *trackingData, char* filename) {
     return 1;
 }
 
+
+//=====================================================================================================
+// function calibrateAcc
+//=====================================================================================================
+//
+// function to call the actual accelerometer calibration routine
+int calibrateAcc(headtrackerData *trackingData) {
+    int i;
+    char err;
+    
+    switch(trackingData->offlineCalibrationMethod) {
+        case 0: // double ellipsoid fit
+            err = accMagCalibration(trackingData->accCalibrationData, trackingData->accOffset, trackingData->accScaling);
+            break;
+        case 1: // Matthieu Aussal's method "mycalibration"
+            err = myCalibrationOffline(trackingData->accCalibrationData, trackingData->accOffset, trackingData->accScaling);
+            break;
+    }
+    
+    if (!err) {
+        for(i=0;i<3;i++) {
+            trackingData->accScalingFactor[i] = 1/trackingData->accScaling[i];
+        }
+        
+        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_ACC_CALIBRATION_SUCCEEDED);
+        if(trackingData->verbose) printf("accelerometer calibration succeeded\r\n");
+        if(trackingData->verbose) printf("accelerometer calibration radii: %f %f %f\r\n", trackingData->accScaling[0], trackingData->accScaling[1], trackingData->accScaling[2]);
+        if(trackingData->verbose) printf("accelerometer calibration offsets: %f %f %f\r\n", trackingData->accOffset[0], trackingData->accOffset[1], trackingData->accOffset[2]);
+        if(trackingData->verbose) printf("condition number for ellipsoid fit: %f\r\n", trackingData->accCalibrationData->conditionNumber);
+        return 0;
+    } else {
+        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_ACC_CALIBRATION_FAILED);
+        if(trackingData->verbose) printf("accelerometer calibration failed\r\n");
+        return 1;
+    }
+}
+
+//=====================================================================================================
+// function calibrateMag
+//=====================================================================================================
+//
+// function to call the actual magnetometer calibration routine
+int calibrateMag(headtrackerData *trackingData) {
+    int i;
+    char err;
+    
+    switch(trackingData->offlineCalibrationMethod) {
+        case 0: // double ellipsoid fit
+            err = accMagCalibration(trackingData->magCalibrationData, trackingData->magOffset, trackingData->magScaling);
+            break;
+        case 1: // Matthieu Aussal's method "mycalibration"
+            err = myCalibrationOffline(trackingData->magCalibrationData, trackingData->magOffset, trackingData->magScaling);
+            break;
+    }
+    
+    
+    if (!err) {
+        for(i=0;i<3;i++) {
+            trackingData->magScalingFactor[i] = 1/trackingData->magScaling[i];
+        }
+        
+        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_MAG_CALIBRATION_SUCCEEDED);
+        if(trackingData->verbose) printf("magnetometer calibration succeeded\r\n");
+        if(trackingData->verbose) printf("magnetometer calibration radii: %f %f %f\r\n", trackingData->magScaling[0], trackingData->magScaling[1], trackingData->magScaling[2]);
+        if(trackingData->verbose) printf("magnetometer calibration offsets: %f %f %f\r\n", trackingData->magOffset[0], trackingData->magOffset[1], trackingData->magOffset[2]);
+        if(trackingData->verbose) printf("condition number for ellipsoid fit: %f\r\n", trackingData->magCalibrationData->conditionNumber);
+        return 0;
+    } else {
+        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_MAG_CALIBRATION_FAILED);
+        if(trackingData->verbose) printf("magnetometer calibration failed\r\n");
+        return 1;
+    }
+}
 
 //=====================================================================================================
 // function headtracker_tick
@@ -1465,12 +1540,19 @@ void setAccCalMaxGyroNorm(headtrackerData *trackingData, float accCalMaxGyroNorm
 }
 
 
+//=====================================================================================================
+// public setter to change offline calibration method
+//=====================================================================================================
+void setOfflineCalibrationMethod(headtrackerData *trackingData, char offlineCalibrationMethod) {
+    trackingData->offlineCalibrationMethod = offlineCalibrationMethod;
+}
+
+
 
 //=====================================================================================================
 // public setter to start/stop recording of raw data for mag calibration
 //=====================================================================================================
 void setMagCalibratingFlag(headtrackerData *trackingData, char magCalibratingFlag) {
-    int i;
     trackingData->magCalibratingFlag = magCalibratingFlag;
     
     if(trackingData->magCalibratingFlag) {
@@ -1478,22 +1560,8 @@ void setMagCalibratingFlag(headtrackerData *trackingData, char magCalibratingFla
         pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_MAG_CALIBRATION_STARTED);
         if(trackingData->verbose) printf("magnetometer calibration started\r\n");
     }
-    else {
-        if (!accMagCalibration(trackingData->magCalibrationData, trackingData->magOffset, trackingData->magScaling)) {
-            for(i=0;i<3;i++) {
-                trackingData->magScalingFactor[i] = 1/trackingData->magScaling[i];
-            }
-            
-            pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_MAG_CALIBRATION_SUCCEEDED);
-            if(trackingData->verbose) printf("magnetometer calibration succeeded\r\n");
-            if(trackingData->verbose) printf("magnetometer calibration radii: %f %f %f\r\n", trackingData->magScaling[0], trackingData->magScaling[1], trackingData->magScaling[2]);
-            if(trackingData->verbose) printf("magnetometer calibration offsets: %f %f %f\r\n", trackingData->magOffset[0], trackingData->magOffset[1], trackingData->magOffset[2]);
-            if(trackingData->verbose) printf("condition number for ellipsoid fit: %f\r\n", trackingData->magCalibrationData->conditionNumber);
-
-        } else {
-            pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_MAG_CALIBRATION_FAILED);
-            if(trackingData->verbose) printf("magnetometer calibration failed\r\n");
-        }
+    else { // recording of raw samples stopped
+        calibrateMag(trackingData);
     }
 }
 
@@ -1502,7 +1570,6 @@ void setMagCalibratingFlag(headtrackerData *trackingData, char magCalibratingFla
 // public setter to start/stop recording of raw data for acc calibration
 //=====================================================================================================
 void setAccCalibratingFlag(headtrackerData *trackingData, char accCalibratingFlag) {
-    int i;
     trackingData->accCalibratingFlag = accCalibratingFlag;
     
     if(trackingData->accCalibratingFlag) {
@@ -1511,22 +1578,8 @@ void setAccCalibratingFlag(headtrackerData *trackingData, char accCalibratingFla
         trackingData->accCalPauseStatus = 0;
         if(trackingData->verbose) printf("accelerometer calibration started\r\n");
     }
-    else {
-        if (!accMagCalibration(trackingData->accCalibrationData, trackingData->accOffset, trackingData->accScaling)) {
-            for(i=0;i<3;i++) {
-                trackingData->accScalingFactor[i] = 1/trackingData->accScaling[i];
-            }
-            
-            pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_ACC_CALIBRATION_SUCCEEDED);
-            if(trackingData->verbose) printf("accelerometer calibration succeeded\r\n");
-            if(trackingData->verbose) printf("accelerometer calibration radii: %f %f %f\r\n", trackingData->accScaling[0], trackingData->accScaling[1], trackingData->accScaling[2]);
-            if(trackingData->verbose) printf("accelerometer calibration offsets: %f %f %f\r\n", trackingData->accOffset[0], trackingData->accOffset[1], trackingData->accOffset[2]);
-            if(trackingData->verbose) printf("condition number for ellipsoid fit: %f\r\n", trackingData->accCalibrationData->conditionNumber);
-            
-        } else {
-            pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_ACC_CALIBRATION_FAILED);
-            if(trackingData->verbose) printf("accelerometer calibration failed\r\n");
-        }
+    else { // recording of raw samples stopped
+        calibrateAcc(trackingData);
     }
 }
 

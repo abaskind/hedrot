@@ -126,6 +126,9 @@ typedef struct _headtrackerData {
     long            samplerate;
     float           samplePeriod; // internal
     
+    // calibration settings
+    char            offlineCalibrationMethod; //0 = double ellipsoid fit, 1 = Aussal
+    
     // gyroscope settings
     unsigned char   gyroDataRate;
     unsigned char   gyroClockSource;
@@ -237,6 +240,8 @@ int import_headtracker_settings(headtrackerData *trackingData, char* filename);
 int export_magCalDataRawSamples(headtrackerData *trackingData, char* filename);
 int export_accCalDataRawSamples(headtrackerData *trackingData, char* filename);
 
+int calibrateAcc(headtrackerData *trackingData);
+int calibrateMag(headtrackerData *trackingData);
 
 //=====================================================================================================
 // "public" setters for receiver parameters
@@ -256,6 +261,7 @@ void setInvertRotation(headtrackerData *trackingData, char invertRotation);
 void setMagCalibratingFlag(headtrackerData *trackingData, char magCalibratingFlag);
 void setAccCalibratingFlag(headtrackerData *trackingData, char accCalibratingFlag);
 void setAccCalMaxGyroNorm(headtrackerData *trackingData, float accCalMaxGyroNorm);
+void setOfflineCalibrationMethod(headtrackerData *trackingData, char offlineCalibrationMethod);
 
 
 

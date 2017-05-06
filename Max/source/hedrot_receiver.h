@@ -82,21 +82,30 @@ typedef struct hedrot_receiver
     char            invertRotation;
     float           accCalMaxGyroNorm;
     char            offlineCalibrationMethod; //0 = double ellipsoid fit, 1 = Aussal
+    char            RTmagCalOn;
     
     
     // output data
     t_atom          t_estimatedAngles[3];
     t_atom          t_estimatedQuaternion[4];
+    
     t_dictionary	*magCalInfoDict;
     t_symbol        *magCalInfoDictName;
     t_jit_object    *magCalDataCalSamples_Matrix;
     t_buffer_obj    *magCalDataCalNorm_BufferObj;
     t_symbol        *magCalDataCalNorm_BufferObjName;
+    
     t_dictionary	*accCalInfoDict;
     t_symbol        *accCalInfoDictName;
     t_jit_object    *accCalDataCalSamples_Matrix;
     t_buffer_obj    *accCalDataCalNorm_BufferObj;
     t_symbol        *accCalDataCalNorm_BufferObjName;
+    
+    t_dictionary	*RTmagCalInfoDict;
+    t_symbol        *RTmagCalInfoDictName;
+    t_jit_object    *RTmagCalDataCalSamples_Matrix;
+    t_buffer_obj    *RTmagCalDataCalNorm_BufferObj;
+    t_symbol        *RTmagCalDataCalNorm_BufferObjName;
     
     
     // (control) output data rate
@@ -169,6 +178,8 @@ void hedrot_receiver_dumpAccCalInfo(t_hedrot_receiver *x);
 void hedrot_receiver_exportAccRawCalData(t_hedrot_receiver *x, t_symbol *s);
 void hedrot_receiver_defered_exportAccRawCalData(t_hedrot_receiver *x, t_symbol *s);
 
+// methods for mag RT calibration
+void hedrot_receiver_dumpRTmagCalInfo(t_hedrot_receiver *x);
 
 void hedrot_receiver_output_data(t_hedrot_receiver *x);
 
@@ -230,6 +241,7 @@ t_max_err hedrot_receiver_rotationOrder_set(t_hedrot_receiver *x, t_object *attr
 t_max_err hedrot_receiver_invertRotation_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_accCalMaxGyroNorm_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_offlineCalibrationMethod_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
+t_max_err hedrot_receiver_RTmagCalOn_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 
 
 #endif

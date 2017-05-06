@@ -70,6 +70,11 @@ headtrackerData* headtracker_new() {
     // allocate memory for the calibrationData structures
     trackingData->magCalibrationData = (calibrationData*) malloc(sizeof(calibrationData));
     trackingData->accCalibrationData = (calibrationData*) malloc(sizeof(calibrationData));
+    
+    trackingData->RTmagCalibrationData = newRTmagCalData();
+    trackingData->RTmagCalOn = 0;
+    trackingData->RTmagMaxDistanceError = .05;
+    trackingData->RTMagCalibrationRateFactor = 100; // RT calibration every 100 new samples
 
     
     headtracker_init(trackingData);
@@ -150,6 +155,19 @@ headtrackerData* headtracker_new() {
     return trackingData;
 }
 
+//=====================================================================================================
+// function headtracker_free
+//=====================================================================================================
+//
+// free a new headtracker structure
+//
+void headtracker_free(headtrackerData* trackingData) {
+    free(trackingData->serialcomm);
+    free(trackingData->magCalibrationData);
+    free(trackingData->accCalibrationData);
+    free(trackingData->serialcomm);
+    free(trackingData);
+}
 
 //=====================================================================================================
 // function headtracker_init
@@ -371,7 +389,9 @@ int export_magCalDataRawSamples(headtrackerData *trackingData, char* filename) {
     
     // dump all values in the text file
     for(i = 0; i<trackingData->magCalibrationData->numberOfSamples; i++) {
-        fprintf(fd, "%d, %d %d %d;\n", i, trackingData->magCalibrationData->rawSamples[i][0], trackingData->magCalibrationData->rawSamples[i][1], trackingData->magCalibrationData->rawSamples[i][2]);
+        fprintf(fd, "%d, %d %d %d;\n", i, (int) round(trackingData->magCalibrationData->rawSamples[i][0]),
+                                        (int) round(trackingData->magCalibrationData->rawSamples[i][1]),
+                                        (int) round(trackingData->magCalibrationData->rawSamples[i][2]));
     }
     
     
@@ -423,7 +443,9 @@ int export_accCalDataRawSamples(headtrackerData *trackingData, char* filename) {
     
     // dump all values in the text file
     for(i = 0; i<trackingData->accCalibrationData->numberOfSamples; i++) {
-        fprintf(fd, "%d, %d %d %d;\n", i, trackingData->accCalibrationData->rawSamples[i][0], trackingData->accCalibrationData->rawSamples[i][1], trackingData->accCalibrationData->rawSamples[i][2]);
+        fprintf(fd, "%d, %d %d %d;\n", i, (int) round(trackingData->accCalibrationData->rawSamples[i][0]),
+                (int) round(trackingData->accCalibrationData->rawSamples[i][1]),
+                (int) round(trackingData->accCalibrationData->rawSamples[i][2]));
     }
     
     
@@ -789,13 +811,34 @@ void gyroOffsetCalibration(headtrackerData *trackingData) {
 
 
 void headtracker_compute_data(headtrackerData *trackingData) {
+    char RTmagCalres;
+    
     convert_7bytes_to_3int16(trackingData->rawDataBuffer,0,trackingData->magRawData);
     convert_7bytes_to_3int16(trackingData->rawDataBuffer,7,trackingData->accRawData);
     convert_7bytes_to_3int16(trackingData->rawDataBuffer,14,trackingData->gyroRawData);
     
     // angle estimation
     if(trackingData->calibrationValid) {
-        MadgwickAHRSupdateModified(trackingData); //compute cooked data and angles only if calibration is valid
+        // if the real-time calibration of the magnetometer is on and if the counter reaches 0, update it
+        if(trackingData->RTmagCalOn) {
+            trackingData->RTMagCalAcquisitionRateCounter--;
+            if(!trackingData->RTMagCalAcquisitionRateCounter) {
+                trackingData->RTMagCalAcquisitionRateCounter = trackingData->RTMagCalAcquisitionRateFactor;
+                
+                RTmagCalres = RTmagCalibrationUpdate(trackingData->RTmagCalibrationData, trackingData->magRawData);
+                // returns result status:
+                //  0: point out of bounds, non added
+                //  1: point added, no calibration done
+                //  2: point added, calibration failed
+                //  3: point added, calibration succeeded
+                
+                if(RTmagCalres == 3)
+                    pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_MAG_RT_CALIBRATION_SUCCEEDED);
+            }
+        }
+        
+        //compute cooked data and angles only if calibration is valid
+        MadgwickAHRSupdateModified(trackingData);
     }
     
     // check if the gyro calibration is done
@@ -944,9 +987,15 @@ char MadgwickAHRSupdateModified(headtrackerData *trackingData) {
     trackingData->gyroCalData[2] = (trackingData->gyroRawData[2]-trackingData->gyroOffset[2]) * trackingData->gyroscopeCalibrationFactor;
     
     //scale mag data
-    trackingData->magCalData[0]=(trackingData->magRawData[0]-trackingData->magOffset[0]) * trackingData->magScalingFactor[0];
-    trackingData->magCalData[1]=(trackingData->magRawData[1]-trackingData->magOffset[1]) * trackingData->magScalingFactor[1];
-    trackingData->magCalData[2]=(trackingData->magRawData[2]-trackingData->magOffset[2]) * trackingData->magScalingFactor[2];
+    if(trackingData->RTmagCalOn) {
+        trackingData->magCalData[0]=(trackingData->magRawData[0]-trackingData->RTmagCalibrationData->estimatedOffset[0]) * trackingData->RTmagCalibrationData->estimatedScalingFactor[0];
+        trackingData->magCalData[1]=(trackingData->magRawData[1]-trackingData->RTmagCalibrationData->estimatedOffset[1]) * trackingData->RTmagCalibrationData->estimatedScalingFactor[1];
+        trackingData->magCalData[2]=(trackingData->magRawData[2]-trackingData->RTmagCalibrationData->estimatedOffset[2]) * trackingData->RTmagCalibrationData->estimatedScalingFactor[2];
+    } else {
+        trackingData->magCalData[0]=(trackingData->magRawData[0]-trackingData->magOffset[0]) * trackingData->magScalingFactor[0];
+        trackingData->magCalData[1]=(trackingData->magRawData[1]-trackingData->magOffset[1]) * trackingData->magScalingFactor[1];
+        trackingData->magCalData[2]=(trackingData->magRawData[2]-trackingData->magOffset[2]) * trackingData->magScalingFactor[2];
+    }
     
     //scale acc data
     trackingData->accCalData[0]=(trackingData->accRawData[0]-trackingData->accOffset[0]) * trackingData->accScalingFactor[0];
@@ -1229,6 +1278,8 @@ int  processKeyValueSettingPair(headtrackerData *trackingData, char *keyBuffer, 
     } else {
         if(trackingData->verbose) printf("unknown key <<%s>> !!!! Continuing anyway...\r\n", keyBuffer);
     }
+    
+    changeRTMagCalAcquisitionRateFactor(trackingData);
     
     return 1;
 }
@@ -1596,6 +1647,8 @@ void setSamplerate(headtrackerData *trackingData, long samplerate, char requestS
     // recalculate receiver parameters based on samplerate
     trackingData->accLPalpha = 1 - (float) exp(-trackingData->samplePeriod/trackingData->accLPtimeConstant);
     
+    changeRTMagCalAcquisitionRateFactor(trackingData);
+    
 	message[0] = R2H_TRANSMIT_SAMPLERATE;
 	message[1] = (unsigned char) (trackingData->samplerate%256); //least significant byte first, then most significant byte
 	message[2] = (unsigned char) (trackingData->samplerate/256);
@@ -1716,7 +1769,9 @@ void setMagSampleAveraging(headtrackerData *trackingData, unsigned char magSampl
 
 void setMagDataRate(headtrackerData *trackingData, unsigned char magDataRate, char requestSettingsFlag) {
     unsigned char message[2];
-	
+    
+    changeRTMagCalAcquisitionRateFactor(trackingData);
+    
 	trackingData->magDataRate = magDataRate;
 	message[0] = R2H_TRANSMIT_MAG_DATA_RATE;
 	message[1] = trackingData->magDataRate;
@@ -1740,6 +1795,8 @@ void setMagGain(headtrackerData *trackingData, unsigned char magGain, char reque
 
 void setMagMeasurementMode(headtrackerData *trackingData, unsigned char magMeasurementMode, char requestSettingsFlag) {
     unsigned char message[2];
+    
+    changeRTMagCalAcquisitionRateFactor(trackingData);
 	
 	trackingData->magMeasurementMode = magMeasurementMode;
 	message[0] = R2H_TRANSMIT_MAG_MEASUREMENT_MODE;
@@ -1805,6 +1862,19 @@ void setMagScaling(headtrackerData *trackingData, float* magScaling, char reques
     
     // schedule an information request
     if(requestSettingsFlag) headtracker_requestHeadtrackerSettings(trackingData);
+}
+
+//=====================================================================================================
+// public setters for mag real-time calibration
+//=====================================================================================================
+void setRTmagCalOn(headtrackerData *trackingData, char RTmagCalOn) {
+    trackingData->RTmagCalOn = RTmagCalOn;
+    
+    if(trackingData->RTmagCalOn)
+        initRTmagCalData( trackingData->RTmagCalibrationData, trackingData->magOffset, trackingData->magScaling, trackingData->RTmagMaxDistanceError, trackingData->RTMagCalibrationRateFactor);
+    
+    // initialize counter
+    trackingData->RTMagCalAcquisitionRateCounter = trackingData->RTMagCalAcquisitionRateFactor;
 }
 
 
@@ -1906,6 +1976,50 @@ void changeQuaternionReference(headtrackerData *trackingData) {
             break;
             // if 0 does nothing
     }
+    
+}
+
+void changeRTMagCalAcquisitionRateFactor(headtrackerData *trackingData) {
+    // change the subsampling factor for acquisition of the magnetometer data, depending on its settings
+    short magRate;
+    
+    // 1/ get the actual rate of the magnetometer
+    switch(trackingData->magMeasurementMode) {
+        case 0:
+            // continuous mode, constant rate of 160 Hz
+            magRate = 160;
+            break;
+        case 1:
+            // single mode, rate is defined by user
+            switch(trackingData->magDataRate) {
+                case 0:
+                    magRate = .75;
+                    break;
+                case 1:
+                    magRate = 1.5;
+                    break;
+                case 2:
+                    magRate = 3;
+                    break;
+                case 3:
+                    magRate = 7.5;
+                    break;
+                case 4:
+                    magRate = 15;
+                    break;
+                case 5:
+                    magRate = 30;
+                    break;
+                case 6:
+                    magRate = 75;
+                    break;
+            }
+            break;
+    }
+    
+    // 2/ compute the rate
+    trackingData->RTMagCalAcquisitionRateFactor = round(trackingData->samplerate / magRate);
+    
     
 }
 

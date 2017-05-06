@@ -237,45 +237,6 @@ end:
 // function ellipsoidFit
 //=====================================================================================================
 //
-// apply the ellipsoidFit algorithm (function ellipsoidFitCore) to a data set
-//
-// returns 1 (error) if calibration failed
-int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estimatedScaling, double *quadricCoefficients) {
-    int i;
-    char err = 0;
-    
-    // definitions
-    double *matrixA = (double*) malloc(calData->numberOfSamples*6*sizeof(double)); // internal input matrix A (in the problem A.X = B)
-    
-    
-    // Build the matrix D (rows = X^2, Y^2, Z^2, 2*X, 2*Y, 2*Z) and the matrix ONES (N*1)
-    for(i=0; i<calData->numberOfSamples; i++) {
-        matrixA[0*calData->numberOfSamples+i] = calData->rawSamples[i][0] * calData->rawSamples[i][0];
-        matrixA[1*calData->numberOfSamples+i] = calData->rawSamples[i][1] * calData->rawSamples[i][1];
-        matrixA[2*calData->numberOfSamples+i] = calData->rawSamples[i][2] * calData->rawSamples[i][2];
-        
-        matrixA[3*calData->numberOfSamples+i] = 2 * calData->rawSamples[i][0];
-        matrixA[4*calData->numberOfSamples+i] = 2 * calData->rawSamples[i][1];
-        matrixA[5*calData->numberOfSamples+i] = 2 * calData->rawSamples[i][2];
-    }
-    
-    err =  ellipsoidFitCore( matrixA, calData->numberOfSamples, estimatedOffset, estimatedScaling, &calData->conditionNumber, quadricCoefficients);
-    if(!err) {
-        // cook extra data (for displaying/debugging purposes)
-        cookCalibrationData(calData, estimatedOffset, estimatedScaling);
-    }
-    
-    /* Free workspace */
-    free(matrixA);
-    
-    return err;
-}
-
-
-//=====================================================================================================
-// function ellipsoidFitCore
-//=====================================================================================================
-//
 // find the center and raddii of a set of raw data (Nx3), assumed to be on a non rotated ellipsoid
 // The calculation is done in double precision, the result is converted to single.
 //
@@ -289,19 +250,18 @@ int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estima
 // ... with gamma = 1 + ( d^2/a + e^2/b + f^2/c );
 //
 // returns 1 (error) if calibration failed
-int ellipsoidFitCore(double *matrixA, long numberOfSamples, float* estimatedOffset, float* estimatedScaling, float *conditionNumber, double *quadricCoefficients) {
+int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estimatedScaling, double *quadricCoefficients) {
     int i;
     char err = 0;
     double gamma;
     
     // definitions
+    double *matrixA = (double*) malloc(calData->numberOfSamples*6*sizeof(double)); // internal input matrix A (corresponding to the problem to solve A.X = B)
+    double *matrixB = (double*) malloc(calData->numberOfSamples*sizeof(double)); // internal input matrix B (column mit ones), output = solution
+    double vectorS[6]; //output = singular values
     
     // constants
     double rcond = 1/MAX_CONDITION_NUMBER; // reverse maximum condition number
-    
-    // variables and solutions
-    double *matrixB = (double*) malloc(numberOfSamples*sizeof(double)); // internal input matrix B (column mit ones), output = solution
-    double vectorS[6]; //output = singular values
     
 #ifdef __MACH__  // if mach (mac os X)
     // constants
@@ -309,20 +269,29 @@ int ellipsoidFitCore(double *matrixA, long numberOfSamples, float* estimatedOffs
     __CLPK_integer rank; // effective rank of the matrix
     double wkopt;
     double *work;
-    __CLPK_integer n = numberOfSamples;
-    __CLPK_integer lda = numberOfSamples, ldb = numberOfSamples;
+    __CLPK_integer n = calData->numberOfSamples;
+    __CLPK_integer lda = calData->numberOfSamples, ldb = calData->numberOfSamples;
     __CLPK_integer lwork, info;
 #else
 #if defined(_WIN32) || defined(_WIN64)
     // constants
     lapack_int rank; // effective rank of the matrix
-    int n = numberOfSamples;
-    int lda = numberOfSamples, ldb = numberOfSamples;
+    int n = calData->numberOfSamples;
+    int lda = calData->numberOfSamples, ldb = calData->numberOfSamples;
 #endif
 #endif
     
-    // Build the matrix B (N*1)
-    for(i=0; i<numberOfSamples; i++) {
+    
+    // Build the matrix D (rows = X^2, Y^2, Z^2, 2*X, 2*Y, 2*Z) and the matrix ONES (N*1)
+    for(i=0; i<calData->numberOfSamples; i++) {
+        matrixA[0*calData->numberOfSamples+i] = calData->rawSamples[i][0] * calData->rawSamples[i][0];
+        matrixA[1*calData->numberOfSamples+i] = calData->rawSamples[i][1] * calData->rawSamples[i][1];
+        matrixA[2*calData->numberOfSamples+i] = calData->rawSamples[i][2] * calData->rawSamples[i][2];
+        
+        matrixA[3*calData->numberOfSamples+i] = 2 * calData->rawSamples[i][0];
+        matrixA[4*calData->numberOfSamples+i] = 2 * calData->rawSamples[i][1];
+        matrixA[5*calData->numberOfSamples+i] = 2 * calData->rawSamples[i][2];
+        
         matrixB[i] = 1;
     }
     
@@ -387,7 +356,10 @@ int ellipsoidFitCore(double *matrixA, long numberOfSamples, float* estimatedOffs
     estimatedScaling[2] = (float) sqrt(gamma/matrixB[2]);
     
     // compute the condition number
-    *conditionNumber = vectorS[0]/vectorS[5];
+    calData->conditionNumber = vectorS[0]/vectorS[5];
+    
+    // cook extra data (for displaying/debugging purposes)
+    cookCalibrationData(calData, estimatedOffset, estimatedScaling);
     
     // copy the coefficients of the direct solution in the output
     for( i=0; i<6; i++) quadricCoefficients[i] = matrixB[i];
@@ -397,7 +369,10 @@ end:
 #ifdef __MACH__  // if mach (mac os X)
     free( (void*)work );
 #else
+#if defined(_WIN32) || defined(_WIN64)
+    free(matrixA);
     free(matrixB);
+#endif
 #endif
     
     return err;

@@ -40,7 +40,7 @@ void quaternionComposition(float q01, float q02, float q03, float q04, float q11
 int stringToFloats(char* valueBuffer, float* data, int nvalues);
 int stringToChars(char* valueBuffer, char* data, int nvalues);
 
-void getMean3(short *samples, long numberOfSamples, float* mean);
+void getMean3(double *samples, long numberOfSamples, float* mean);
 float getMean1f(float *samples, long numberOfSamples);
 float getStdDev1f(float *samples, long numberOfSamples, float mean);
 

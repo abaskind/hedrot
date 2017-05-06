@@ -13,7 +13,7 @@
 // utils
 //=====================================================================================================
 
-// floating point modulo
+// double floating point modulo
 double mod(double a, double N) {return a - N*floor(a/N);} //return in range [0, N]
 
 
@@ -140,7 +140,7 @@ int stringToChars(char* valueBuffer, char* data, int nvalues) {
 //
 // get average point in a set of data (short format) over 3 dimensions
 // careful: memory for double* rawMean has to be allocated first!!
-void getMean3(short *samples, long numberOfSamples, float* mean) {
+void getMean3(double *samples, long numberOfSamples, float* mean) {
     int n;
     
     // initialization

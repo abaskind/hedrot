@@ -92,9 +92,6 @@ void hedrot_receiver_tick(t_hedrot_receiver *x) {
             case NOTIFICATION_MESSAGE_GYRO_CALIBRATION_FINISHED:
                 hedrot_receiver_outputGyroCalibrationFinishedNotice(x);
                 break;
-            case NOTIFICATION_MESSAGE_BOARD_OVERLOAD:
-                if(x->verbose) post("[hedrot_receiver] : board too slow, reduce samplerate");
-                break;
             case NOTIFICATION_MESSAGE_MAG_CALIBRATION_STARTED:
                 hedrot_receiver_outputMagCalibrationStartedNotice(x);
                 break;
@@ -122,9 +119,15 @@ void hedrot_receiver_tick(t_hedrot_receiver *x) {
             case NOTIFICATION_MESSAGE_ACC_CALIBRATION_RESUMED:
                 hedrot_receiver_outputAccCalibrationResumedNotice(x);
                 break;
-                
             case NOTIFICATION_MESSAGE_EXPORT_ACCCALDATARAWSAMPLES_FAILED:
                 if(x->verbose) post("[hedrot_receiver] : could not save acc raw calibration data");
+                break;
+            case NOTIFICATION_MESSAGE_MAG_RT_CALIBRATION_SUCCEEDED:
+                if(x->verbose) post("[hedrot_receiver] : magnetometer new calibrated");
+                hedrot_receiver_dumpRTmagCalInfo(x);
+                break;
+            case NOTIFICATION_MESSAGE_BOARD_OVERLOAD:
+                if(x->verbose) post("[hedrot_receiver] : board too slow, reduce samplerate");
                 break;
             default:
                 post("[hedrot_receiver] : unknown message %ld from libhedrot", messageNumber);
@@ -279,7 +282,22 @@ void *hedrot_receiver_new(t_symbol *s, short ac, t_atom *av)
         object_error( (t_object *)x, "problem while changing buffer size");
     }
     
-    
+    x->RTmagCalInfoDict = dictionary_new();
+    x->RTmagCalInfoDictName = symbol_unique();
+    x->RTmagCalInfoDict = dictobj_register(x->RTmagCalInfoDict, &x->RTmagCalInfoDictName);
+    // creates the embedded buffer (for norm of the RT mag cal data)
+    x->RTmagCalDataCalNorm_BufferObjName = symbol_unique();
+    atom_setsym(temp_atom, x->RTmagCalDataCalNorm_BufferObjName);
+    x->RTmagCalDataCalNorm_BufferObj = (t_buffer_obj*) object_new_typed(CLASS_BOX, gensym("buffer~"), 1, temp_atom);
+    if(x->RTmagCalDataCalNorm_BufferObj) {
+        // resize the buffer
+        atom_setlong(temp_atom, MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION);
+        if(!object_method_typed (x->RTmagCalDataCalNorm_BufferObj, gensym("sizeinsamps"), 1L, temp_atom, temp_atom + 1) == MAX_ERR_NONE) {
+            error("[hedrot_receiver] (method hedrot_receiver_new): problem while changing buffer size");
+        }
+    } else {
+        object_error( (t_object *)x, "problem while changing buffer size");
+    }
     hedrot_receiver_init(x);
     
     
@@ -295,7 +313,7 @@ void hedrot_receiver_free_clock(t_hedrot_receiver *x) {
 
 void hedrot_receiver_free(t_hedrot_receiver *x)
 {
-    if(x->verbose) post("[hedrot_receiver] free serial...");
+    if(x->verbose) post("[hedrot_receiver] free memory...");
     
     hedrot_receiver_close(x);
     hedrot_receiver_free_clock(x);
@@ -567,8 +585,8 @@ char hedrot_receiver_createCalDataDictionary( float offset[], float scaling[], c
                                              t_dictionary *calDict, t_jit_object *sampleMatrix,
                                              t_buffer_obj *normBufferObj, t_symbol *normBufferObjName) {
     int i;
-    t_atom accOffset[3];
-    t_atom accScaling[3];
+    t_atom offsetData[3];
+    t_atom ScalingData[3];
     t_float *tab; // buffer values
     
     t_jit_matrix_info samplesMatrix_info;
@@ -581,15 +599,15 @@ char hedrot_receiver_createCalDataDictionary( float offset[], float scaling[], c
     
     dictionary_appendlong(calDict, gensym("numberOfSamples"), calData->numberOfSamples);
     
-    atom_setfloat(accOffset, offset[0]);
-    atom_setfloat(accOffset+1, offset[1]);
-    atom_setfloat(accOffset+2, offset[2]);
-    dictionary_appendatoms(calDict, gensym("offset"), 3, accOffset);
+    atom_setfloat(offsetData, offset[0]);
+    atom_setfloat(offsetData+1, offset[1]);
+    atom_setfloat(offsetData+2, offset[2]);
+    dictionary_appendatoms(calDict, gensym("offset"), 3, offsetData);
     
-    atom_setfloat(accScaling, scaling[0]);
-    atom_setfloat(accScaling+1, scaling[1]);
-    atom_setfloat(accScaling+2, scaling[2]);
-    dictionary_appendatoms(calDict, gensym("scaling"), 3, accScaling);
+    atom_setfloat(ScalingData, scaling[0]);
+    atom_setfloat(ScalingData+1, scaling[1]);
+    atom_setfloat(ScalingData+2, scaling[2]);
+    dictionary_appendatoms(calDict, gensym("scaling"), 3, ScalingData);
     
     dictionary_appendfloat(calDict, gensym("conditionNumber"), calData->conditionNumber);
     
@@ -636,7 +654,7 @@ char hedrot_receiver_createCalDataDictionary( float offset[], float scaling[], c
             // at the end of the loop, add the reference to the matrix to the dictionary
             dictionary_appendsym( calDict, gensym("CalData"), calDataCalSamples_matrixName);
         } else {
-            error("[hedrot_receiver] (method dumpAccCalInfo): error creating output jitter matrices");
+            error("[hedrot_receiver] (method dumpAccCalInfo): error creating output jitter matrix");
             return 1; // error
         }
         // restore matrix lock state to previous value
@@ -672,6 +690,26 @@ char hedrot_receiver_createCalDataDictionary( float offset[], float scaling[], c
     } else {
         error("[hedrot_receiver] (method hedrot_receiver_createCalDataDictionary): error creating output jitter matrix");
         return 1; // error
+    }
+}
+
+// methods for mag RT calibration
+
+
+void hedrot_receiver_dumpRTmagCalInfo(t_hedrot_receiver *x) {
+    // dump extended real-time calibration info for the magnetometer as a dictionary
+    t_atom output[3];
+    
+    if( !hedrot_receiver_createCalDataDictionary( x->trackingData->RTmagCalibrationData->estimatedOffset,
+                                                 x->trackingData->RTmagCalibrationData->estimatedScaling,
+                                                 x->trackingData->RTmagCalibrationData->calData,
+                                                 x->RTmagCalInfoDict, x->RTmagCalDataCalSamples_Matrix,
+                                                 x->RTmagCalDataCalNorm_BufferObj, x->RTmagCalDataCalNorm_BufferObjName) ) {
+        // output the dictionary
+        atom_setsym(output, gensym("calData"));
+        atom_setsym(output+1, _sym_dictionary);
+        atom_setsym(output+2, x->RTmagCalInfoDictName);
+        outlet_anything( x->x_status_outlet, gensym("RTmag_calibration"), 3, output);
     }
 }
 
@@ -1508,6 +1546,14 @@ t_max_err hedrot_receiver_offlineCalibrationMethod_set(t_hedrot_receiver *x, t_o
 }
 
 
+t_max_err hedrot_receiver_RTmagCalOn_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
+    if (argc && argv) {
+        x->RTmagCalOn = (char) max(min(atom_getlong(argv),1),0);
+        setRTmagCalOn(x->trackingData, x->RTmagCalOn);
+    }
+    return MAX_ERR_NONE;
+}
+
 
 
 /* ---------------- SETUP OBJECT ------------------ */
@@ -1612,6 +1658,8 @@ int C74_EXPORT main()
     CLASS_ATTR_ACCESSORS(c, "magSampleAveraging", NULL, hedrot_receiver_magSampleAveraging_set);
     
     CLASS_ATTR_CHAR(c,    "magDataRate",    0,  t_hedrot_receiver,  magDataRate);
+    CLASS_ATTR_ENUMINDEX(c, "magDataRate", 0, "\"0.75 Hz\" \"1.5 Hz\" \"3 Hz\" \"7.5 Hz\" \"15 Hz\" \"30 Hz\" \"75 Hz\"");
+    CLASS_ATTR_STYLE(c, "magDataRate", 0, "enumindex");
     CLASS_ATTR_ACCESSORS(c, "magDataRate", NULL, hedrot_receiver_magDataRate_set);
     
     CLASS_ATTR_CHAR(c,    "magGain",    0,  t_hedrot_receiver,  magGain);
@@ -1685,6 +1733,11 @@ int C74_EXPORT main()
     CLASS_ATTR_ENUMINDEX(c, "offlineCalibrationMethod", 0, "\"double ellipsoid fit\" \"Aussal\"");
     CLASS_ATTR_ACCESSORS(c, "offlineCalibrationMethod", NULL, hedrot_receiver_offlineCalibrationMethod_set);
     CLASS_ATTR_SAVE(c,    "offlineCalibrationMethod",   0);
+    
+    CLASS_ATTR_CHAR(c,    "RTmagCalOn",    0,  t_hedrot_receiver,  RTmagCalOn);
+    CLASS_ATTR_STYLE_LABEL(c, "RTmagCalOn", 0, "onoff", "RTmagCalOn");
+    CLASS_ATTR_ACCESSORS(c, "RTmagCalOn", NULL, hedrot_receiver_RTmagCalOn_set);
+    CLASS_ATTR_SAVE(c,    "RTmagCalOn",   0);
     
     // output settings
     CLASS_ATTR_LONG(c,    "outputDataPeriod",    0,  t_hedrot_receiver,  outputDataPeriod);

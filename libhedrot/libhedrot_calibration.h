@@ -22,8 +22,8 @@
 
 typedef struct _calibrationData {
     long            numberOfSamples;
-    short           rawSamples[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION][3];  // raw samples
-    float           calSamples[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION][3];  // calibrated samples
+    double          rawSamples[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION][3];  // raw samples
+    double          calSamples[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION][3];  // calibrated samples
     float           dataNorm[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION];       // vector norm after calibration
     float           conditionNumber;
     float           normAverage;                                           // average norm to the center
@@ -37,7 +37,6 @@ int accMagCalibration(calibrationData* calData, float* estimatedOffset, float* e
 int myCalibrationOffline(calibrationData* calData, float* estimatedOffset, float* estimatedScaling);
 
 int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estimatedScaling, double *quadricCoefficients);
-int ellipsoidFitCore(double *matrixD, long numberOfSamples, float* estimatedOffset, float* estimatedScaling, float *conditionNumber, double *quadricCoefficients);
 int quadricFit(calibrationData* calData, double *quadricCoefficients);
 
 int filterCalData(calibrationData *inCalData, calibrationData *outCalData, float center[3]);

@@ -17,6 +17,7 @@
 
 #include "libhedrot_serialcomm.h"
 #include "libhedrot_calibration.h"
+#include "libhedrot_RTmagCalibration.h"
 
 
 // hedrot version
@@ -77,7 +78,8 @@
 #define NOTIFICATION_MESSAGE_ACC_CALIBRATION_PAUSED     34
 #define NOTIFICATION_MESSAGE_ACC_CALIBRATION_RESUMED     35
 #define NOTIFICATION_MESSAGE_EXPORT_ACCCALDATARAWSAMPLES_FAILED 36
-#define NOTIFICATION_MESSAGE_BOARD_OVERLOAD             40
+#define NOTIFICATION_MESSAGE_MAG_RT_CALIBRATION_SUCCEEDED 40
+#define NOTIFICATION_MESSAGE_BOARD_OVERLOAD             50
 
 
 //=====================================================================================================
@@ -163,16 +165,22 @@ typedef struct _headtrackerData {
     
     float           magOffset[3];
     float           magScaling[3], magScalingFactor[3];
-    calibrationData *magCalibrationData;
+    calibrationData* magCalibrationData;
     char            magCalibratingFlag;
     
     float           accOffset[3];
     float           accScaling[3], accScalingFactor[3];
-    calibrationData *accCalibrationData;
+    calibrationData* accCalibrationData;
     char            accCalibratingFlag;
     float           accCalMaxGyroNorm; // maximum allowed norm for the gyroscope when calibrating accelerometer
     char            accCalPauseStatus; // 0 if acquiring samples, 1 if paused because norm for the gyroscope too high
-
+    
+    RTmagCalData*   RTmagCalibrationData;
+    short           RTMagCalAcquisitionRateFactor;
+    short           RTMagCalAcquisitionRateCounter;
+    char            RTmagCalOn;
+    float           RTmagMaxDistanceError;
+    short           RTMagCalibrationRateFactor;
     
     //--------------- OUTPUTS AND STATUS FROM THE HEAD TRACKER -------------------
     
@@ -228,6 +236,7 @@ typedef struct _headtrackerData {
 // "public" functions declarations
 //=====================================================================================================
 headtrackerData* headtracker_new();
+void headtracker_free(headtrackerData* trackingData);
 void headtracker_init(headtrackerData *trackingData);
 void headtracker_tick(headtrackerData *trackingData);
 void center_angles(headtrackerData *trackingData);
@@ -291,6 +300,12 @@ void setAccScaling(headtrackerData *trackingData, float* accScaling, char reques
 void setMagOffset(headtrackerData *trackingData, float* magOffset, char requestSettingsFlag);
 void setMagScaling(headtrackerData *trackingData, float* magScaling, char requestSettingsFlag);
 
+
+//=====================================================================================================
+// public setters for mag real-time calibration
+//=====================================================================================================
+void setRTmagCalOn(headtrackerData *trackingData, char RTmagCalOn);
+
 //=====================================================================================================
 // "private" setters
 //=====================================================================================================
@@ -313,6 +328,7 @@ void headtracker_sendSignedCharArray2Headtracker(headtrackerData *trackingData, 
 void resetGyroOffsetCalibration(headtrackerData *trackingData);
 int  processKeyValueSettingPair(headtrackerData *trackingData, char *key, char *value, char UpdateHeadtrackerFlag);
 void changeQuaternionReference(headtrackerData *trackingData);
+void changeRTMagCalAcquisitionRateFactor(headtrackerData *trackingData);
 
 
 #endif

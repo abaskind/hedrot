@@ -126,6 +126,9 @@ void hedrot_receiver_tick(t_hedrot_receiver *x) {
                 if(x->verbose) post("[hedrot_receiver] : magnetometer new calibrated");
                 hedrot_receiver_dumpRTmagCalInfo(x);
                 break;
+            case NOTIFICATION_MESSAGE_EXPORT_RTMAGCALDATARAWSAMPLES_FAILED:
+                if(x->verbose) post("[hedrot_receiver] : could not save raw real-time mag calibration data");
+                break;
             case NOTIFICATION_MESSAGE_BOARD_OVERLOAD:
                 if(x->verbose) post("[hedrot_receiver] : board too slow, reduce samplerate");
                 break;
@@ -713,6 +716,35 @@ void hedrot_receiver_dumpRTmagCalInfo(t_hedrot_receiver *x) {
     }
 }
 
+void hedrot_receiver_exportRTmagRawCalData(t_hedrot_receiver *x, t_symbol *s) {
+    defer((t_object *)x, (method)hedrot_receiver_defered_exportRTmagRawCalData, s, 0, NULL);
+}
+
+
+void hedrot_receiver_defered_exportRTmagRawCalData(t_hedrot_receiver *x, t_symbol *s) {
+    t_fourcc filetype = FOUR_CHAR_CODE('TEXT'), outtype;
+    char filename[MAX_PATH_CHARS], fullfilename[MAX_PATH_CHARS];
+    short path=0;
+    
+    if (s == gensym("")) {      // if no argument supplied, ask for file
+        sprintf(filename, "headtrackerRawRTmagCalibrationData.txt");
+        
+        saveas_promptset("Save raw real-time magnetometer calibration data as...");
+        if (saveasdialog_extended(filename, &path, &outtype, &filetype, 1))
+            // non-zero: user cancelled
+            return;
+    } else {
+        strcpy(filename, s->s_name);
+    }
+    
+    path_toabsolutesystempath( path, filename, fullfilename);
+    
+    post("[hedrot_receiver]: try to open file %s for storing raw real-time magnetometer calibration data", fullfilename);
+    
+    if(!export_RTmagCalDataRawSamples(x->trackingData, fullfilename))
+        error("[hedrot_receiver] Error while exporting raw real-time magnetometer calibration data");
+    
+}
 
 
 void hedrot_receiver_outputPortList(t_hedrot_receiver *x) {
@@ -1600,6 +1632,10 @@ int C74_EXPORT main()
     class_addmethod(c, (method)hedrot_receiver_saveAccCalibration,   "saveAccCalibration", 0);
     class_addmethod(c, (method)hedrot_receiver_dumpAccCalInfo,       "dumpAccCalData", 0);
     class_addmethod(c, (method)hedrot_receiver_exportAccRawCalData,  "exportAccRawCalData", A_DEFSYM, 0);
+    
+    
+    // methods for real-time mag calibration
+    class_addmethod(c, (method)hedrot_receiver_exportRTmagRawCalData,  "exportRTmagRawCalData", A_DEFSYM, 0);
     
     
     

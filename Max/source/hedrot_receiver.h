@@ -180,6 +180,8 @@ void hedrot_receiver_defered_exportAccRawCalData(t_hedrot_receiver *x, t_symbol 
 
 // methods for mag RT calibration
 void hedrot_receiver_dumpRTmagCalInfo(t_hedrot_receiver *x);
+void hedrot_receiver_exportRTmagRawCalData(t_hedrot_receiver *x, t_symbol *s);
+void hedrot_receiver_defered_exportRTmagRawCalData(t_hedrot_receiver *x, t_symbol *s);
 
 void hedrot_receiver_output_data(t_hedrot_receiver *x);
 

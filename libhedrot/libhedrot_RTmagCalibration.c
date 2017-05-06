@@ -86,12 +86,12 @@ void computeFibonnaciMapping( RTmagCalData* data) {
     double theta, sinPhi;
     
     for( i=0; i<RT_CAL_NUMBER_OF_ZONES; i++) {
-        theta   = 2*M_PI*mod(M_INV_GOLDEN_RATIO*i,1);
-        sinPhi  = 1 - (2*i+1)/RT_CAL_NUMBER_OF_ZONES;
+        theta   = 2.0*M_PI*mod(M_INV_GOLDEN_RATIO*i,1);
+        sinPhi  = 1.0 - (2*i+1.0)/RT_CAL_NUMBER_OF_ZONES;
         
         data->Fibonacci_Points[i][0] = cos(theta)*sinPhi;      // x
         data->Fibonacci_Points[i][1] = sin(theta)*sinPhi;      // y
-        data->Fibonacci_Points[i][1] = sqrt(1-sinPhi*sinPhi);  // z
+        data->Fibonacci_Points[i][2] = sqrt(1-sinPhi*sinPhi);  // z
     }
 }
 
@@ -120,6 +120,12 @@ short getClosestFibonacciPoint( RTmagCalData* data, float calPoint[3]) {
             minDistance2 = dist2;
             zoneNumber = i;
         }
+        
+        /*printf("point %i, XYZ= %f %f %f, calpoint_XYZ %f %f %f, distance2 = %f\r\n",i,
+               data->Fibonacci_Points[i][0], data->Fibonacci_Points[i][1], data->Fibonacci_Points[i][2],
+               calPoint[0], calPoint[1], calPoint[2],
+               dist2);
+        dist2 = 0;*/
     }
     
     return zoneNumber;
@@ -135,8 +141,9 @@ void addPoint2FibonnaciZone( RTmagCalData* data, short zoneNumber, short rawPoin
     short i;
 
     // if the zone was previously empty, add 1 to data->numberOfFilledZones
-    if(!data->zoneData[zoneNumber].numberOfPoints)
+    if(!data->zoneData[zoneNumber].numberOfPoints) {
         data->numberOfFilledZones++;
+    }
     
     // adds the point in the corresponding zone
     //ring buffer: does not accept more than RT_CAL_NUMBER_OF_POINTS_PER_ZONE points
@@ -163,10 +170,10 @@ void addPoint2FibonnaciZone( RTmagCalData* data, short zoneNumber, short rawPoin
     data->zoneData[zoneNumber].averagePoint[1] /= data->zoneData[zoneNumber].numberOfPoints;
     data->zoneData[zoneNumber].averagePoint[2] /= data->zoneData[zoneNumber].numberOfPoints;
     
-    printf("adding a point to zone number %d, number of points %d, new average %f %f %f\r\n", zoneNumber, data->zoneData[zoneNumber].numberOfPoints,
+    /*printf("adding a point to zone number %d, number of points %d, new average %f %f %f\r\n", zoneNumber, data->zoneData[zoneNumber].numberOfPoints,
            data->zoneData[zoneNumber].averagePoint[0],
            data->zoneData[zoneNumber].averagePoint[1],
-           data->zoneData[zoneNumber].averagePoint[2]); // for debugging
+           data->zoneData[zoneNumber].averagePoint[2]); // for debugging*/
 }
 
 

@@ -4,7 +4,7 @@
 % 
 % Copyright 2017 Alexis Baskind
 
-function rawMagCalData = readTextMagCalData(filename)
+function offlineCalrawData = readTextOfflineCalrawData(filename)
 
   fileID = fopen(filename,'r');
 

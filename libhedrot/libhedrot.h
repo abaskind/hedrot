@@ -79,6 +79,7 @@
 #define NOTIFICATION_MESSAGE_ACC_CALIBRATION_RESUMED     35
 #define NOTIFICATION_MESSAGE_EXPORT_ACCCALDATARAWSAMPLES_FAILED 36
 #define NOTIFICATION_MESSAGE_MAG_RT_CALIBRATION_SUCCEEDED 40
+#define NOTIFICATION_MESSAGE_EXPORT_RTMAGCALDATARAWSAMPLES_FAILED 41
 #define NOTIFICATION_MESSAGE_BOARD_OVERLOAD             50
 
 
@@ -248,6 +249,7 @@ int export_headtracker_settings(headtrackerData *trackingData, char* filename);
 int import_headtracker_settings(headtrackerData *trackingData, char* filename);
 int export_magCalDataRawSamples(headtrackerData *trackingData, char* filename);
 int export_accCalDataRawSamples(headtrackerData *trackingData, char* filename);
+int export_RTmagCalDataRawSamples(headtrackerData *trackingData, char* filename);
 
 int calibrateAcc(headtrackerData *trackingData);
 int calibrateMag(headtrackerData *trackingData);

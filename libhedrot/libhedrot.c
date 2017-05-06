@@ -73,7 +73,7 @@ headtrackerData* headtracker_new() {
     
     trackingData->RTmagCalibrationData = newRTmagCalData();
     trackingData->RTmagCalOn = 0;
-    trackingData->RTmagMaxDistanceError = .05;
+    trackingData->RTmagMaxDistanceError = 1; // test, should be lower
     trackingData->RTMagCalibrationRateFactor = 100; // RT calibration every 100 new samples
 
     
@@ -461,6 +461,75 @@ int export_accCalDataRawSamples(headtrackerData *trackingData, char* filename) {
 
 
 //=====================================================================================================
+// function export_magCalDataRawSamples
+//=====================================================================================================
+//
+// export magnetometer real-time calibration data if available
+//
+// the format for each line is:
+//      sample_number, X Y Z;
+//
+// returns 1 if no error
+// returns 0 if error
+//
+int export_RTmagCalDataRawSamples(headtrackerData *trackingData, char* filename) {
+    FILE *fd;
+    int i;
+    
+    if(!trackingData->RTmagCalibrationData->calData->numberOfSamples) {
+        printf("Error: no samples to save");
+        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_EXPORT_RTMAGCALDATARAWSAMPLES_FAILED);
+        return 0;
+    }
+    
+    // open file for writing, returns 0 if it fails
+#if defined(_WIN32) || defined(_WIN64)
+    fopen_s( &fd, filename, "w");
+#else /* #if defined(_WIN32) || defined(_WIN64) */
+    fd = fopen( filename, "w");
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
+    
+    if( fd == NULL) {
+        printf("Error: file %s could not be opened for writing", filename);
+        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_EXPORT_RTMAGCALDATARAWSAMPLES_FAILED);
+        return 0;
+    }
+    
+    // write the header
+    fprintf(fd, "<header>\n");
+    
+    fprintf(fd, "estimatedOffset, %f %f %f;\n",
+            trackingData->RTmagCalibrationData->estimatedOffset[0],
+            trackingData->RTmagCalibrationData->estimatedOffset[1],
+            trackingData->RTmagCalibrationData->estimatedOffset[2]);
+    
+    fprintf(fd, "estimatedScaling, %f %f %f;\n",
+            trackingData->RTmagCalibrationData->estimatedScaling[0],
+            trackingData->RTmagCalibrationData->estimatedScaling[1],
+            trackingData->RTmagCalibrationData->estimatedScaling[2]);
+    
+    fprintf(fd, "</header>\n");
+    
+    // dump all values in the text file
+    for(i = 0; i<trackingData->RTmagCalibrationData->calData->numberOfSamples; i++) {
+        fprintf(fd, "%d, %f %f %f;\n", i, trackingData->RTmagCalibrationData->calData->rawSamples[i][0],
+                trackingData->RTmagCalibrationData->calData->rawSamples[i][1],
+                trackingData->RTmagCalibrationData->calData->rawSamples[i][2]);
+    }
+    
+    
+    // close (save) the file, returns 0 if it fails
+    if(fclose(fd)) {
+        printf("Error: file %s could not be closed properly", filename);
+        pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_EXPORT_RTMAGCALDATARAWSAMPLES_FAILED);
+        return 0;
+    }
+    
+    return 1;
+}
+
+
+//=====================================================================================================
 // function calibrateAcc
 //=====================================================================================================
 //
@@ -832,7 +901,7 @@ void headtracker_compute_data(headtrackerData *trackingData) {
                 //  2: point added, calibration failed
                 //  3: point added, calibration succeeded
                 
-                if(RTmagCalres == 3)
+                if(RTmagCalres >= 3)
                     pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_MAG_RT_CALIBRATION_SUCCEEDED);
             }
         }

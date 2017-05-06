@@ -37,6 +37,7 @@ int accMagCalibration(calibrationData* calData, float* estimatedOffset, float* e
 int myCalibrationOffline(calibrationData* calData, float* estimatedOffset, float* estimatedScaling);
 
 int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estimatedScaling, double *quadricCoefficients);
+int ellipsoidFitCore(double *matrixD, long numberOfSamples, float* estimatedOffset, float* estimatedScaling, float *conditionNumber, double *quadricCoefficients);
 int quadricFit(calibrationData* calData, double *quadricCoefficients);
 
 int filterCalData(calibrationData *inCalData, calibrationData *outCalData, float center[3]);

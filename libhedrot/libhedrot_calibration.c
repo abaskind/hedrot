@@ -237,6 +237,45 @@ end:
 // function ellipsoidFit
 //=====================================================================================================
 //
+// apply the ellipsoidFit algorithm (function ellipsoidFitCore) to a data set
+//
+// returns 1 (error) if calibration failed
+int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estimatedScaling, double *quadricCoefficients) {
+    int i;
+    char err = 0;
+    
+    // definitions
+    double *matrixA = (double*) malloc(calData->numberOfSamples*6*sizeof(double)); // internal input matrix A (in the problem A.X = B)
+    
+    
+    // Build the matrix D (rows = X^2, Y^2, Z^2, 2*X, 2*Y, 2*Z) and the matrix ONES (N*1)
+    for(i=0; i<calData->numberOfSamples; i++) {
+        matrixA[0*calData->numberOfSamples+i] = calData->rawSamples[i][0] * calData->rawSamples[i][0];
+        matrixA[1*calData->numberOfSamples+i] = calData->rawSamples[i][1] * calData->rawSamples[i][1];
+        matrixA[2*calData->numberOfSamples+i] = calData->rawSamples[i][2] * calData->rawSamples[i][2];
+        
+        matrixA[3*calData->numberOfSamples+i] = 2 * calData->rawSamples[i][0];
+        matrixA[4*calData->numberOfSamples+i] = 2 * calData->rawSamples[i][1];
+        matrixA[5*calData->numberOfSamples+i] = 2 * calData->rawSamples[i][2];
+    }
+    
+    err =  ellipsoidFitCore( matrixA, calData->numberOfSamples, estimatedOffset, estimatedScaling, &calData->conditionNumber, quadricCoefficients);
+    if(!err) {
+        // cook extra data (for displaying/debugging purposes)
+        cookCalibrationData(calData, estimatedOffset, estimatedScaling);
+    }
+    
+    /* Free workspace */
+    free(matrixA);
+    
+    return err;
+}
+
+
+//=====================================================================================================
+// function ellipsoidFitCore
+//=====================================================================================================
+//
 // find the center and raddii of a set of raw data (Nx3), assumed to be on a non rotated ellipsoid
 // The calculation is done in double precision, the result is converted to single.
 //
@@ -250,7 +289,7 @@ end:
 // ... with gamma = 1 + ( d^2/a + e^2/b + f^2/c );
 //
 // returns 1 (error) if calibration failed
-int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estimatedScaling, double *quadricCoefficients) {
+int ellipsoidFitCore(double *matrixA, long numberOfSamples, float* estimatedOffset, float* estimatedScaling, float *conditionNumber, double *quadricCoefficients) {
     int i;
     char err = 0;
     double gamma;
@@ -259,42 +298,31 @@ int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estima
     
     // constants
     double rcond = 1/MAX_CONDITION_NUMBER; // reverse maximum condition number
-
+    
+    // variables and solutions
+    double *matrixB = (double*) malloc(numberOfSamples*sizeof(double)); // internal input matrix B (column mit ones), output = solution
+    double vectorS[6]; //output = singular values
+    
 #ifdef __MACH__  // if mach (mac os X)
     // constants
     __CLPK_integer one = 1, six=6;
-    double matrixD[calData->numberOfSamples*6]; // internal input matrix A
-    double matrixB[calData->numberOfSamples]; // internal input matrix B (column mit ones), output = solution
-    double vectorS[6]; //output = singular values
     __CLPK_integer rank; // effective rank of the matrix
     double wkopt;
     double *work;
-    __CLPK_integer n = calData->numberOfSamples;
-    __CLPK_integer lda = calData->numberOfSamples, ldb = calData->numberOfSamples;
+    __CLPK_integer n = numberOfSamples;
+    __CLPK_integer lda = numberOfSamples, ldb = numberOfSamples;
     __CLPK_integer lwork, info;
 #else
 #if defined(_WIN32) || defined(_WIN64)
     // constants
-    double *matrixD = (double*) malloc(calData->numberOfSamples*6*sizeof(double)); // internal input matrix A
-    double *matrixB = (double*) malloc(calData->numberOfSamples*sizeof(double)); // internal input matrix B (column mit ones), output = solution
-    double vectorS[6]; //output = singular values
     lapack_int rank; // effective rank of the matrix
-    int n = calData->numberOfSamples;
-    int lda = calData->numberOfSamples, ldb = calData->numberOfSamples;
+    int n = numberOfSamples;
+    int lda = numberOfSamples, ldb = numberOfSamples;
 #endif
 #endif
     
-    
-    // Build the matrix D (rows = X^2, Y^2, Z^2, 2*X, 2*Y, 2*Z) and the matrix ONES (N*1)
-    for(i=0; i<calData->numberOfSamples; i++) {
-        matrixD[0*calData->numberOfSamples+i] = calData->rawSamples[i][0] * calData->rawSamples[i][0];
-        matrixD[1*calData->numberOfSamples+i] = calData->rawSamples[i][1] * calData->rawSamples[i][1];
-        matrixD[2*calData->numberOfSamples+i] = calData->rawSamples[i][2] * calData->rawSamples[i][2];
-        
-        matrixD[3*calData->numberOfSamples+i] = 2 * calData->rawSamples[i][0];
-        matrixD[4*calData->numberOfSamples+i] = 2 * calData->rawSamples[i][1];
-        matrixD[5*calData->numberOfSamples+i] = 2 * calData->rawSamples[i][2];
-        
+    // Build the matrix B (N*1)
+    for(i=0; i<numberOfSamples; i++) {
         matrixB[i] = 1;
     }
     
@@ -302,22 +330,22 @@ int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estima
 #ifdef __MACH__  // if mach (mac os X)
     /* Query and allocate the optimal workspace */
     lwork = -1;
-    dgelss_(&n, &six, &one, matrixD, &lda, matrixB, &ldb, vectorS, &rcond, &rank, &wkopt, &lwork, &info);
+    dgelss_(&n, &six, &one, matrixA, &lda, matrixB, &ldb, vectorS, &rcond, &rank, &wkopt, &lwork, &info);
     lwork = (int)wkopt;
     work = (double*) malloc( lwork*sizeof(double) );
     /* Solve the equations A*X = B */
-    dgelss_(&n, &six, &one, matrixD, &lda, matrixB, &ldb, vectorS, &rcond, &rank, work, &lwork, &info);
+    dgelss_(&n, &six, &one, matrixA, &lda, matrixB, &ldb, vectorS, &rcond, &rank, work, &lwork, &info);
     
     /* Check for the full rank */
     /*if( info > 0 ) {
-        printf( "The diagonal element %i of the triangular factor ", (int) info );
-        printf( "of A is zero, so that A does not have full rank;\r\n" );
-        printf( "the least squares solution could not be computed.\r\n" );
-        return 1;
-    }*/
+     printf( "The diagonal element %i of the triangular factor ", (int) info );
+     printf( "of A is zero, so that A does not have full rank;\r\n" );
+     printf( "the least squares solution could not be computed.\r\n" );
+     return 1;
+     }*/
 #else
 #if defined(_WIN32) || defined(_WIN64)
-    LAPACKE_dgelss( LAPACK_COL_MAJOR, n, 6, 1, matrixD, lda, matrixB, ldb, vectorS, rcond, &rank );
+    LAPACKE_dgelss( LAPACK_COL_MAJOR, n, 6, 1, matrixA, lda, matrixB, ldb, vectorS, rcond, &rank );
 #endif
 #endif
     
@@ -359,10 +387,7 @@ int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estima
     estimatedScaling[2] = (float) sqrt(gamma/matrixB[2]);
     
     // compute the condition number
-    calData->conditionNumber = vectorS[0]/vectorS[5];
-    
-    // cook extra data (for displaying/debugging purposes)
-    cookCalibrationData(calData, estimatedOffset, estimatedScaling);
+    *conditionNumber = vectorS[0]/vectorS[5];
     
     // copy the coefficients of the direct solution in the output
     for( i=0; i<6; i++) quadricCoefficients[i] = matrixB[i];
@@ -372,10 +397,7 @@ end:
 #ifdef __MACH__  // if mach (mac os X)
     free( (void*)work );
 #else
-#if defined(_WIN32) || defined(_WIN64)
-    free(matrixD);
     free(matrixB);
-#endif
 #endif
     
     return err;
@@ -409,7 +431,7 @@ int quadricFit(calibrationData* calData, double *quadricCoefficients) {
     __CLPK_integer one = 1, nine=9;
     double rcond = 1/MAX_CONDITION_NUMBER; // reverse maximum condition number
     
-    double matrixD[calData->numberOfSamples*9]; // internal input matrix A
+    double matrixA[calData->numberOfSamples*9]; // internal input matrix A
     double matrixB[calData->numberOfSamples]; // internal input matrix B (column mit ones), output = solution
     double vectorS[9]; //output = singular values
     __CLPK_integer rank; // effective rank of the matrix
@@ -423,7 +445,7 @@ int quadricFit(calibrationData* calData, double *quadricCoefficients) {
     // constants
     double rcond = 1/MAX_CONDITION_NUMBER; // reverse maximum condition number
     
-    double *matrixD = (double*) malloc(calData->numberOfSamples*9*sizeof(double)); // internal input matrix A
+    double *matrixA = (double*) malloc(calData->numberOfSamples*9*sizeof(double)); // internal input matrix A
     double *matrixB = (double*) malloc(calData->numberOfSamples*sizeof(double)); // internal input matrix B (column mit ones), output = solution
     double vectorS[9]; //output = singular values
     lapack_int rank; // effective rank of the matrix
@@ -435,17 +457,17 @@ int quadricFit(calibrationData* calData, double *quadricCoefficients) {
     
     // Build the matrix D (rows = X^2, Y^2, Z^2, X*Y, X*Z, Y*Z, 2*X, 2*Y, 2*Z) and the matrix ONES (N*1)
     for(i=0; i<calData->numberOfSamples; i++) {
-        matrixD[0*calData->numberOfSamples+i] = calData->rawSamples[i][0] * calData->rawSamples[i][0];
-        matrixD[1*calData->numberOfSamples+i] = calData->rawSamples[i][1] * calData->rawSamples[i][1];
-        matrixD[2*calData->numberOfSamples+i] = calData->rawSamples[i][2] * calData->rawSamples[i][2];
+        matrixA[0*calData->numberOfSamples+i] = calData->rawSamples[i][0] * calData->rawSamples[i][0];
+        matrixA[1*calData->numberOfSamples+i] = calData->rawSamples[i][1] * calData->rawSamples[i][1];
+        matrixA[2*calData->numberOfSamples+i] = calData->rawSamples[i][2] * calData->rawSamples[i][2];
         
-        matrixD[3*calData->numberOfSamples+i] = calData->rawSamples[i][0] * calData->rawSamples[i][1];
-        matrixD[4*calData->numberOfSamples+i] = calData->rawSamples[i][0] * calData->rawSamples[i][2];
-        matrixD[5*calData->numberOfSamples+i] = calData->rawSamples[i][1] * calData->rawSamples[i][2];
+        matrixA[3*calData->numberOfSamples+i] = calData->rawSamples[i][0] * calData->rawSamples[i][1];
+        matrixA[4*calData->numberOfSamples+i] = calData->rawSamples[i][0] * calData->rawSamples[i][2];
+        matrixA[5*calData->numberOfSamples+i] = calData->rawSamples[i][1] * calData->rawSamples[i][2];
         
-        matrixD[6*calData->numberOfSamples+i] = 2 * calData->rawSamples[i][0];
-        matrixD[7*calData->numberOfSamples+i] = 2 * calData->rawSamples[i][1];
-        matrixD[8*calData->numberOfSamples+i] = 2 * calData->rawSamples[i][2];
+        matrixA[6*calData->numberOfSamples+i] = 2 * calData->rawSamples[i][0];
+        matrixA[7*calData->numberOfSamples+i] = 2 * calData->rawSamples[i][1];
+        matrixA[8*calData->numberOfSamples+i] = 2 * calData->rawSamples[i][2];
         
         matrixB[i] = 1;
     }
@@ -454,11 +476,11 @@ int quadricFit(calibrationData* calData, double *quadricCoefficients) {
 #ifdef __MACH__  // if mach (mac os X)
     /* Query and allocate the optimal workspace */
     lwork = -1;
-    dgelss_(&n, &nine, &one, matrixD, &lda, matrixB, &ldb, vectorS, &rcond, &rank, &wkopt, &lwork, &info);
+    dgelss_(&n, &nine, &one, matrixA, &lda, matrixB, &ldb, vectorS, &rcond, &rank, &wkopt, &lwork, &info);
     lwork = (int)wkopt;
     work = (double*) malloc( lwork*sizeof(double) );
     /* Solve the equations A*X = B */
-    dgelss_(&n, &nine, &one, matrixD, &lda, matrixB, &ldb, vectorS, &rcond, &rank, work, &lwork, &info);
+    dgelss_(&n, &nine, &one, matrixA, &lda, matrixB, &ldb, vectorS, &rcond, &rank, work, &lwork, &info);
     
     /* Check for the full rank */
     /*if( info > 0 ) {
@@ -469,7 +491,7 @@ int quadricFit(calibrationData* calData, double *quadricCoefficients) {
      }*/
 #else
 #if defined(_WIN32) || defined(_WIN64)
-    LAPACKE_dgelss( LAPACK_COL_MAJOR, n, 6, 1, matrixD, lda, matrixB, ldb, vectorS, rcond, &rank );
+    LAPACKE_dgelss( LAPACK_COL_MAJOR, n, 6, 1, matrixA, lda, matrixB, ldb, vectorS, rcond, &rank );
 #endif
 #endif
     
@@ -510,7 +532,7 @@ end:
     free( (void*)work );
 #else
 #if defined(_WIN32) || defined(_WIN64)
-    free(matrixD);
+    free(matrixA);
     free(matrixB);
 #endif
 #endif

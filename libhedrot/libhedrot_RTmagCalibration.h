@@ -18,16 +18,20 @@
 
 #define RT_CAL_NUMBER_OF_ZONES 100 // number of zones in the unit sphere (defined by Fibonaci mapping)
 #define RT_CAL_NUMBER_OF_POINTS_PER_ZONE 100 // number of points per zone
-#define RT_CAL_MIN_NUMBER_OF_ZONES 10 // minimum number of zones with points to start the calibration
+
+#define MAX_CONDITION_NUMBER_REALTIME 1000000 // much larger tolerance as for the offline method
+
+#define TIME_CONSTANT_INDICATOR_OF_REJECTED_POINTS 1600 // in samples
+#define MAX_ALLOWED_PROPORTION_OF_REJECTED_POINTS .5
 
 //=====================================================================================================
 // structure definition: RTmagZoneData (structure that stores information per zone)
 //=====================================================================================================
 typedef struct _RTmagZoneData {
-    short points[RT_CAL_NUMBER_OF_POINTS_PER_ZONE][3];
-    double averagePoint[3];
-    short numberOfPoints;
-    short indexOfCurrentPoint;
+    short               points[RT_CAL_NUMBER_OF_POINTS_PER_ZONE][3];
+    double              averagePoint[3];
+    short               numberOfPoints;
+    short               indexOfCurrentPoint;
 } RTmagZoneData;
 
 //=====================================================================================================
@@ -35,22 +39,32 @@ typedef struct _RTmagZoneData {
 //=====================================================================================================
 typedef struct _RTmagCalData {
     // parameters
-    float RTmagMinDistance2; //minimum squared distance error to accept or not a new point
-    float RTmagMaxDistance2; //minimum squared distance error to accept or not a new point
-    short calibrationRateFactor; // calibration rate
+    short               calibrationRateFactor; // calibration rate
+    char                calibrationValid;       // 0 => step 1 ("brute force" method), 1=> step 2 (with Fibonacci mapping)
+    float               RTmagMaxDistanceError;
     
-    float Fibonacci_Points[RT_CAL_NUMBER_OF_ZONES][3];
-    float estimatedOffset[3];
-    float estimatedScaling[3], estimatedScalingFactor[3];
-    RTmagZoneData *zoneData;
+    // for step 1 (with raw samples)
+    long                maxNumberOfSamplesStep1;
+    long                sampleIndexStep1; // internal
     
-    char calibrationValid;
-    short numberOfFilledZones;
+    // for step 2 (with Fibonacci mapping)
+    float               Fibonacci_Points[RT_CAL_NUMBER_OF_ZONES][3];
+    RTmagZoneData       *zoneData;
+    float               RTmagMinDistance2; //minimum squared distance error to accept or not a new point
+    float               RTmagMaxDistance2; //maximum squared distance error to accept or not a new point
+    short               numberOfFilledZones;
     
-    calibrationData* calData;
+    // estimated values
+    float               estimatedOffset[3];
+    float               estimatedScaling[3], estimatedScalingFactor[3];
+    
+    // countainer for calibrating with ellipsoid fit and displaying purposes
+    calibrationData*    calData;
     
     // internal data
-    short calibrationRateCounter;
+    short               calibrationRateCounter;
+    float               proportionOfRejectedPoints_State;
+    float               proportionOfRejectedPoints_LPcoeff; // coefficient alpha of the low pass filter estimating the proportion of rejected points
 } RTmagCalData;
 
 //=====================================================================================================
@@ -58,13 +72,16 @@ typedef struct _RTmagCalData {
 //=====================================================================================================
 RTmagCalData* newRTmagCalData();
 void freeRTmagCalData(RTmagCalData* data);
-void initRTmagCalData(RTmagCalData* data, float* initalEstimatedOffset, float* initalEstimatedScaling, float RTmagMaxDistanceError, short calibrationRateFactor);
+void initRTmagCalData(RTmagCalData* data, float* initalEstimatedOffset, float* initalEstimatedScaling, float RTmagMaxDistanceError, short calibrationRateFactor, long maxNumberOfSamplesStep1);
 
-void setRTmagMaxDistanceError(RTmagCalData* data, float RTmagMaxDistanceError);
-void setCalibrationRateFactor(RTmagCalData* data, short calibrationRateFactor);
+void RTmagCalibration_setCalibrationRateFactor(RTmagCalData* data, short calibrationRateFactor);
+
+void RTmagCalibration_setMaxNumberOfSamplesStep1(RTmagCalData* data, long maxNumberOfSamplesStep1);
+
+void RTmagCalibration_setRTmagMaxDistanceError(RTmagCalData* data, float RTmagMaxDistanceError);
 
 void computeFibonnaciMapping( RTmagCalData* data);
-short getClosestFibonacciPoint( RTmagCalData* data, float calPoint[3]);
+short getClosestFibonacciPoint( RTmagCalData* data, double calPoint[3]);
 void addPoint2FibonnaciZone( RTmagCalData* data, short zoneNumber, short point[3]);
 
 short RTmagCalibrationUpdate( RTmagCalData* data, short rawPoint[3]);

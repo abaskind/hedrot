@@ -131,6 +131,12 @@ typedef struct _headtrackerData {
     
     // calibration settings
     char            offlineCalibrationMethod; //0 = double ellipsoid fit, 1 = Aussal
+    char            RTmagCalOn; // for real-time calibration
+    float           RTmagMaxMemoryDurationStep1; // RT mag calibration step 1: maximum duration of the memory used for calibration, in seconds
+    long            RTmaxNumberOfSamplesStep1; // same thing in samples
+    float           RTmagMaxDistanceError; // for RT mag calibration step 2, tolerance on the radius for new points
+    float           RTMagCalibrationPeriod; // RT mag calibration period in seconds
+
     
     // gyroscope settings
     unsigned char   gyroDataRate;
@@ -151,7 +157,7 @@ typedef struct _headtrackerData {
     unsigned char   magGain;
     unsigned char   magMeasurementMode;
     
-    // calibration values und settings
+    //---------------  calibration internal values und settings -------------------
     float           gyroOffset[3];
     float           gyroOffsetAutocalTime; // in ms
     long            gyroOffsetAutocalThreshold; //in LSB units
@@ -176,11 +182,10 @@ typedef struct _headtrackerData {
     float           accCalMaxGyroNorm; // maximum allowed norm for the gyroscope when calibrating accelerometer
     char            accCalPauseStatus; // 0 if acquiring samples, 1 if paused because norm for the gyroscope too high
     
+    // for realtime mag calibration
     RTmagCalData*   RTmagCalibrationData;
     short           RTMagCalAcquisitionRateFactor;
     short           RTMagCalAcquisitionRateCounter;
-    char            RTmagCalOn;
-    float           RTmagMaxDistanceError;
     short           RTMagCalibrationRateFactor;
     
     //--------------- OUTPUTS AND STATUS FROM THE HEAD TRACKER -------------------
@@ -307,6 +312,9 @@ void setMagScaling(headtrackerData *trackingData, float* magScaling, char reques
 // public setters for mag real-time calibration
 //=====================================================================================================
 void setRTmagCalOn(headtrackerData *trackingData, char RTmagCalOn);
+void setRTmagMaxMemoryDurationStep1(headtrackerData *trackingData, float setRTmagMaxMemoryDurationStep1);
+void setRTMagCalibrationPeriod(headtrackerData *trackingData, float RTMagCalibrationPeriod);
+void setRTmagMaxDistanceError(headtrackerData *trackingData, float RTmagMaxDistanceError);
 
 //=====================================================================================================
 // "private" setters
@@ -330,7 +338,7 @@ void headtracker_sendSignedCharArray2Headtracker(headtrackerData *trackingData, 
 void resetGyroOffsetCalibration(headtrackerData *trackingData);
 int  processKeyValueSettingPair(headtrackerData *trackingData, char *key, char *value, char UpdateHeadtrackerFlag);
 void changeQuaternionReference(headtrackerData *trackingData);
-void changeRTMagCalAcquisitionRateFactor(headtrackerData *trackingData);
+void changeRTMagCalTimeSettings(headtrackerData *trackingData);
 
 
 #endif

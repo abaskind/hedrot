@@ -25,7 +25,7 @@
 #endif
 
 #ifndef sign
-#define sign(a) ((a)>=0)
+#define sign(a) (((a)>=0.0)*2-1)
 #endif
 
 

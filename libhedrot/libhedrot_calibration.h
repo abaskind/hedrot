@@ -13,7 +13,7 @@
 
 // constants
 #define MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION 100000
-#define MAX_CONDITION_NUMBER 5000
+#define MAX_CONDITION_NUMBER_OFFLINE 100000
 #define NORM_ERROR_TOLERANCE .05 // during calibration, all samples which norm is outside (1 +/- NORM_ERROR_TOLERANCE) after first pass of calibration are filtered out for the second pass
 
 //=====================================================================================================
@@ -34,10 +34,10 @@ typedef struct _calibrationData {
 
 int accMagCalibration(calibrationData* calData, float* estimatedOffset, float* estimatedScaling);
 
-int myCalibrationOffline(calibrationData* calData, float* estimatedOffset, float* estimatedScaling);
+int myCalibration1(calibrationData* calData, float* estimatedOffset, float* estimatedScaling);
 
-int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estimatedScaling, double *quadricCoefficients);
-int quadricFit(calibrationData* calData, double *quadricCoefficients);
+int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estimatedScaling, double *quadricCoefficients, double maxConditionNumber);
+int quadricFit(calibrationData* calData, double *quadricCoefficients, double maxConditionNumber);
 
 int filterCalData(calibrationData *inCalData, calibrationData *outCalData, float center[3]);
 

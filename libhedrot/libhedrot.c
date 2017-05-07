@@ -73,8 +73,9 @@ headtrackerData* headtracker_new() {
     
     trackingData->RTmagCalibrationData = newRTmagCalData();
     trackingData->RTmagCalOn = 0;
-    trackingData->RTmagMaxDistanceError = 1; // test, should be lower
-    trackingData->RTMagCalibrationRateFactor = 100; // RT calibration every 100 new samples
+    trackingData->RTmagMaxDistanceError = .1; // 10% distance error compared to the previously calibrated set is allowed
+    trackingData->RTMagCalibrationPeriod = 1; // RT calibration in seconds
+    trackingData->RTmagMaxMemoryDurationStep1 = 6; // maximum duration of the memory used for calibration step 1, in seconds
 
     
     headtracker_init(trackingData);
@@ -543,7 +544,7 @@ int calibrateAcc(headtrackerData *trackingData) {
             err = accMagCalibration(trackingData->accCalibrationData, trackingData->accOffset, trackingData->accScaling);
             break;
         case 1: // Matthieu Aussal's method "mycalibration"
-            err = myCalibrationOffline(trackingData->accCalibrationData, trackingData->accOffset, trackingData->accScaling);
+            err = myCalibration1(trackingData->accCalibrationData, trackingData->accOffset, trackingData->accScaling);
             break;
     }
     
@@ -579,7 +580,7 @@ int calibrateMag(headtrackerData *trackingData) {
             err = accMagCalibration(trackingData->magCalibrationData, trackingData->magOffset, trackingData->magScaling);
             break;
         case 1: // Matthieu Aussal's method "mycalibration"
-            err = myCalibrationOffline(trackingData->magCalibrationData, trackingData->magOffset, trackingData->magScaling);
+            err = myCalibration1(trackingData->magCalibrationData, trackingData->magOffset, trackingData->magScaling);
             break;
     }
     
@@ -1348,7 +1349,7 @@ int  processKeyValueSettingPair(headtrackerData *trackingData, char *keyBuffer, 
         if(trackingData->verbose) printf("unknown key <<%s>> !!!! Continuing anyway...\r\n", keyBuffer);
     }
     
-    changeRTMagCalAcquisitionRateFactor(trackingData);
+    changeRTMagCalTimeSettings(trackingData);
     
     return 1;
 }
@@ -1716,7 +1717,7 @@ void setSamplerate(headtrackerData *trackingData, long samplerate, char requestS
     // recalculate receiver parameters based on samplerate
     trackingData->accLPalpha = 1 - (float) exp(-trackingData->samplePeriod/trackingData->accLPtimeConstant);
     
-    changeRTMagCalAcquisitionRateFactor(trackingData);
+    changeRTMagCalTimeSettings(trackingData);
     
 	message[0] = R2H_TRANSMIT_SAMPLERATE;
 	message[1] = (unsigned char) (trackingData->samplerate%256); //least significant byte first, then most significant byte
@@ -1839,7 +1840,7 @@ void setMagSampleAveraging(headtrackerData *trackingData, unsigned char magSampl
 void setMagDataRate(headtrackerData *trackingData, unsigned char magDataRate, char requestSettingsFlag) {
     unsigned char message[2];
     
-    changeRTMagCalAcquisitionRateFactor(trackingData);
+    changeRTMagCalTimeSettings(trackingData);
     
 	trackingData->magDataRate = magDataRate;
 	message[0] = R2H_TRANSMIT_MAG_DATA_RATE;
@@ -1865,7 +1866,7 @@ void setMagGain(headtrackerData *trackingData, unsigned char magGain, char reque
 void setMagMeasurementMode(headtrackerData *trackingData, unsigned char magMeasurementMode, char requestSettingsFlag) {
     unsigned char message[2];
     
-    changeRTMagCalAcquisitionRateFactor(trackingData);
+    changeRTMagCalTimeSettings(trackingData);
 	
 	trackingData->magMeasurementMode = magMeasurementMode;
 	message[0] = R2H_TRANSMIT_MAG_MEASUREMENT_MODE;
@@ -1940,12 +1941,30 @@ void setRTmagCalOn(headtrackerData *trackingData, char RTmagCalOn) {
     trackingData->RTmagCalOn = RTmagCalOn;
     
     if(trackingData->RTmagCalOn)
-        initRTmagCalData( trackingData->RTmagCalibrationData, trackingData->magOffset, trackingData->magScaling, trackingData->RTmagMaxDistanceError, trackingData->RTMagCalibrationRateFactor);
+        initRTmagCalData( trackingData->RTmagCalibrationData, trackingData->magOffset, trackingData->magScaling, trackingData->RTmagMaxDistanceError, trackingData->RTMagCalibrationRateFactor, trackingData->RTmaxNumberOfSamplesStep1);
     
     // initialize counter
     trackingData->RTMagCalAcquisitionRateCounter = trackingData->RTMagCalAcquisitionRateFactor;
 }
 
+void setRTmagMaxMemoryDurationStep1(headtrackerData *trackingData, float RTmagMaxMemoryDurationStep1) {
+    trackingData->RTmagMaxMemoryDurationStep1 = RTmagMaxMemoryDurationStep1;
+    
+    changeRTMagCalTimeSettings(trackingData);
+}
+
+void setRTMagCalibrationPeriod(headtrackerData *trackingData, float RTMagCalibrationPeriod) {
+    trackingData->RTMagCalibrationPeriod = RTMagCalibrationPeriod;
+    
+    changeRTMagCalTimeSettings(trackingData);
+}
+
+
+void setRTmagMaxDistanceError(headtrackerData *trackingData, float RTmagMaxDistanceError){
+    trackingData->RTmagMaxDistanceError = RTmagMaxDistanceError;
+    
+    RTmagCalibration_setRTmagMaxDistanceError(trackingData->RTmagCalibrationData, trackingData->RTmagMaxDistanceError);
+}
 
 //=====================================================================================================
 // "private" setters
@@ -2048,7 +2067,9 @@ void changeQuaternionReference(headtrackerData *trackingData) {
     
 }
 
-void changeRTMagCalAcquisitionRateFactor(headtrackerData *trackingData) {
+void changeRTMagCalTimeSettings(headtrackerData *trackingData) {
+    // update all timing constants in samples based on their values in seconds
+    
     // change the subsampling factor for acquisition of the magnetometer data, depending on its settings
     short magRate;
     
@@ -2086,10 +2107,17 @@ void changeRTMagCalAcquisitionRateFactor(headtrackerData *trackingData) {
             break;
     }
     
-    // 2/ compute the rate
+    // 2/ compute the acquisition rate
     trackingData->RTMagCalAcquisitionRateFactor = round(trackingData->samplerate / magRate);
     
+    // 3/ compute the calibration rate
+    trackingData->RTMagCalibrationRateFactor = round(trackingData->RTMagCalibrationPeriod * magRate);
+    RTmagCalibration_setCalibrationRateFactor(trackingData->RTmagCalibrationData, trackingData->RTMagCalibrationRateFactor);
     
+    // 4/ update the max number of samples for step1
+    // update maxNumberOfSamplesStep1 according to RTmagMaxMemoryDurationStep1 and the sampling rate of the magnetometer
+    trackingData->RTmaxNumberOfSamplesStep1 = round(trackingData->RTmagMaxMemoryDurationStep1 * trackingData->samplerate / trackingData->RTMagCalAcquisitionRateFactor);
+    RTmagCalibration_setMaxNumberOfSamplesStep1(trackingData->RTmagCalibrationData, trackingData->RTmaxNumberOfSamplesStep1);
 }
 
 

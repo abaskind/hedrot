@@ -1053,6 +1053,18 @@ void hedrot_receiver_mirrorHeadtrackerInfo(t_hedrot_receiver *x) {
     
     x->offlineCalibrationMethod = x->trackingData->offlineCalibrationMethod;
     object_attr_touch( (t_object *)x, gensym("offlineCalibrationMethod"));
+
+    x->RTmagCalOn = x->trackingData->RTmagCalOn;
+    object_attr_touch( (t_object *)x, gensym("RTmagCalOn"));
+    
+    x->RTmagMaxMemoryDurationStep1 = x->trackingData->RTmagMaxMemoryDurationStep1;
+    object_attr_touch( (t_object *)x, gensym("RTmagMaxMemoryDurationStep1"));
+    
+    x->RTmagMaxDistanceError = x->trackingData->RTmagMaxDistanceError;
+    object_attr_touch( (t_object *)x, gensym("RTmagMaxDistanceError"));
+    
+    x->RTMagCalibrationPeriod = x->trackingData->RTMagCalibrationPeriod;
+    object_attr_touch( (t_object *)x, gensym("RTMagCalibrationPeriod"));
 }
 
 void hedrot_receiver_outputCalibrationNotValidNotice(t_hedrot_receiver *x) {
@@ -1587,6 +1599,33 @@ t_max_err hedrot_receiver_RTmagCalOn_set(t_hedrot_receiver *x, t_object *attr, l
 }
 
 
+t_max_err hedrot_receiver_RTmagMaxMemoryDurationStep1_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv){
+    if (argc && argv) {
+        x->RTmagMaxMemoryDurationStep1 = (float) max(atom_getfloat(argv),0);
+        setRTmagMaxMemoryDurationStep1(x->trackingData, x->RTmagMaxMemoryDurationStep1);
+    }
+    return MAX_ERR_NONE;
+}
+
+
+t_max_err hedrot_receiver_RTmagMaxDistanceError_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv){
+    if (argc && argv) {
+        x->RTmagMaxDistanceError = (float) max(atom_getfloat(argv),0);
+        setRTmagMaxDistanceError(x->trackingData, x->RTmagMaxDistanceError);
+    }
+    return MAX_ERR_NONE;
+}
+
+
+t_max_err hedrot_receiver_RTMagCalibrationPeriod_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv){
+    if (argc && argv) {
+        x->RTMagCalibrationPeriod = (float) max(atom_getfloat(argv),0);
+        setRTMagCalibrationPeriod(x->trackingData, x->RTMagCalibrationPeriod);
+    }
+    return MAX_ERR_NONE;
+}
+
+
 
 /* ---------------- SETUP OBJECT ------------------ */
 int C74_EXPORT main()
@@ -1733,6 +1772,25 @@ int C74_EXPORT main()
     CLASS_ATTR_ACCESSORS(c, "magScaling", NULL, hedrot_receiver_magScaling_set);
     
     
+    // real-time magnetometer calibration settings
+    CLASS_ATTR_CHAR(c,    "RTmagCalOn",    0,  t_hedrot_receiver,  RTmagCalOn);
+    CLASS_ATTR_STYLE_LABEL(c, "RTmagCalOn", 0, "onoff", "RTmagCalOn");
+    CLASS_ATTR_ACCESSORS(c, "RTmagCalOn", NULL, hedrot_receiver_RTmagCalOn_set);
+    CLASS_ATTR_SAVE(c,    "RTmagCalOn",   0);
+    
+    CLASS_ATTR_FLOAT(c,    "RTmagMaxMemoryDurationStep1",    0,  t_hedrot_receiver,  RTmagMaxMemoryDurationStep1);
+    CLASS_ATTR_ACCESSORS(c, "RTmagMaxMemoryDurationStep1", NULL, hedrot_receiver_RTmagMaxMemoryDurationStep1_set);
+    CLASS_ATTR_SAVE(c,    "RTmagMaxMemoryDurationStep1",   0);
+    
+    CLASS_ATTR_FLOAT(c,    "RTmagMaxDistanceError",    0,  t_hedrot_receiver,  RTmagMaxDistanceError);
+    CLASS_ATTR_ACCESSORS(c, "RTmagMaxDistanceError", NULL, hedrot_receiver_RTmagMaxDistanceError_set);
+    CLASS_ATTR_SAVE(c,    "RTmagMaxDistanceError",   0);
+    
+    CLASS_ATTR_FLOAT(c,    "RTMagCalibrationPeriod",    0,  t_hedrot_receiver,  RTMagCalibrationPeriod);
+    CLASS_ATTR_ACCESSORS(c, "RTMagCalibrationPeriod", NULL, hedrot_receiver_RTMagCalibrationPeriod_set);
+    CLASS_ATTR_SAVE(c,    "RTMagCalibrationPeriod",   0);
+    
+    
     // angle estimation
     CLASS_ATTR_FLOAT(c,    "MadgwickBetaGain",    0,  t_hedrot_receiver,  MadgwickBetaGain);
     CLASS_ATTR_ACCESSORS(c, "MadgwickBetaGain", NULL, hedrot_receiver_MadgwickBetaGain_set);
@@ -1769,11 +1827,6 @@ int C74_EXPORT main()
     CLASS_ATTR_ENUMINDEX(c, "offlineCalibrationMethod", 0, "\"double ellipsoid fit\" \"Aussal\"");
     CLASS_ATTR_ACCESSORS(c, "offlineCalibrationMethod", NULL, hedrot_receiver_offlineCalibrationMethod_set);
     CLASS_ATTR_SAVE(c,    "offlineCalibrationMethod",   0);
-    
-    CLASS_ATTR_CHAR(c,    "RTmagCalOn",    0,  t_hedrot_receiver,  RTmagCalOn);
-    CLASS_ATTR_STYLE_LABEL(c, "RTmagCalOn", 0, "onoff", "RTmagCalOn");
-    CLASS_ATTR_ACCESSORS(c, "RTmagCalOn", NULL, hedrot_receiver_RTmagCalOn_set);
-    CLASS_ATTR_SAVE(c,    "RTmagCalOn",   0);
     
     // output settings
     CLASS_ATTR_LONG(c,    "outputDataPeriod",    0,  t_hedrot_receiver,  outputDataPeriod);

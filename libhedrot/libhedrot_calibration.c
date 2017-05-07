@@ -36,7 +36,7 @@ int accMagCalibration(calibrationData* calData, float* estimatedOffset, float* e
     double quadricCoefficients6[6]; // not used here, needed however to call ellipsoidFit
     
     // first pass: calls ellipsoidFit a first time
-    if( ellipsoidFit(calData, TMPestimatedOffset, TMPestimatedScaling, quadricCoefficients6) ) {
+    if( ellipsoidFit(calData, TMPestimatedOffset, TMPestimatedScaling, quadricCoefficients6, MAX_CONDITION_NUMBER_OFFLINE) ) {
         // if error, quits
         printf( "[libhedrot] (function accMagCalibration) first pass failed.\r\n" );
         err =  1;
@@ -55,7 +55,7 @@ int accMagCalibration(calibrationData* calData, float* estimatedOffset, float* e
     filterCalData(calData, &TMPcalData1, TMPestimatedOffset);
     
     // second pass: calls ellipsoidFit a second time
-    if( ellipsoidFit(&TMPcalData1, TMPestimatedOffset, TMPestimatedScaling, quadricCoefficients6) ) {
+    if( ellipsoidFit(&TMPcalData1, TMPestimatedOffset, TMPestimatedScaling, quadricCoefficients6, MAX_CONDITION_NUMBER_OFFLINE) ) {
         // if error, quits
         printf( "[libhedrot] (function accMagCalibration) second pass failed.\r\n" );
         err =  1;
@@ -95,16 +95,16 @@ end:
 
 
 //=====================================================================================================
-// function myCalibrationOffline
+// function myCalibration1
 //=====================================================================================================
 //
 // general function for calibrating accelerometers and magnetometers
-// adapted from Matlab code "MyCalibration.m" by Matthieu Aussal, first part (offline)
+// adapted from Matlab code "MyCalibration.m" by Matthieu Aussal, step 1
 //
 //
 // returns 1 (error) if calibration failed
 
-int myCalibrationOffline(calibrationData* calData, float* estimatedOffset, float* estimatedScaling) {
+int myCalibration1(calibrationData* calData, float* estimatedOffset, float* estimatedScaling) {
     calibrationData TMPcalData1;
     float TMPestimatedOffset[3], TMPestimatedScaling[3];
     int i;
@@ -123,29 +123,29 @@ int myCalibrationOffline(calibrationData* calData, float* estimatedOffset, float
     filterCalData(calData, &TMPcalData1, X0);
     
     // first pass: calls quadricFit (rotated ellipsoid)
-    if( quadricFit(&TMPcalData1, quadricCoefficients9) ) {
+    if( quadricFit(&TMPcalData1, quadricCoefficients9, MAX_CONDITION_NUMBER_OFFLINE) ) {
         // if error, quits
-        printf( "[libhedrot] (function myCalibrationOffline) first pass failed.\r\n" );
+        printf( "[libhedrot] (function myCalibration1) first pass failed.\r\n" );
         err =  1;
         goto end;
     }
     
     // no error, goes on
-    printf( "[libhedrot] (function myCalibrationOffline) first pass succeeded.\r\n" );
+    printf( "[libhedrot] (function myCalibration1) first pass succeeded.\r\n" );
     printf( "debug output: %f, %f, %f, %f, %f, %f, %f, %f, %f\r\n", quadricCoefficients9[0], quadricCoefficients9[1], quadricCoefficients9[2],
            quadricCoefficients9[3], quadricCoefficients9[4], quadricCoefficients9[5],
            quadricCoefficients9[6], quadricCoefficients9[7], quadricCoefficients9[8] );
 
     // second pass: calls ellipsoidFit a first time (forcing non-rotated ellipsoid)
-    if( ellipsoidFit(&TMPcalData1, TMPestimatedOffset, TMPestimatedScaling, quadricCoefficients6) ) {
+    if( ellipsoidFit(&TMPcalData1, TMPestimatedOffset, TMPestimatedScaling, quadricCoefficients6, MAX_CONDITION_NUMBER_OFFLINE) ) {
         // if error, quits
-        printf( "[libhedrot] (function myCalibrationOffline) second pass failed.\r\n" );
+        printf( "[libhedrot] (function myCalibration1) second pass failed.\r\n" );
         err =  1;
         goto end;
     }
     
     
-    printf( "[libhedrot] (function myCalibrationOffline) second pass succeeded.\r\n" );
+    printf( "[libhedrot] (function myCalibration1) second pass succeeded.\r\n" );
     printf( "debug output: %f, %f, %f, %f, %f, %f\r\n", quadricCoefficients6[0], quadricCoefficients6[1], quadricCoefficients6[2],
            quadricCoefficients6[3], quadricCoefficients6[4], quadricCoefficients6[5] );
     
@@ -167,12 +167,12 @@ int myCalibrationOffline(calibrationData* calData, float* estimatedOffset, float
     
     if( tmpMax1 >= .1*tmpMax2 ) { //10% error allowed
         // if error, quits
-        printf( "[libhedrot] (function myCalibrationOffline) first check of non rotated ellipsoid failed.\r\n" );
+        printf( "[libhedrot] (function myCalibration1) first check of non rotated ellipsoid failed.\r\n" );
         printf( "debug output: %f, %f\r\n", tmpMax1, tmpMax2 );
         err =  1;
         goto end;
     } else {
-        printf( "[libhedrot] (function myCalibrationOffline) first check of non rotated ellipsoid succeeded.\r\n" );
+        printf( "[libhedrot] (function myCalibration1) first check of non rotated ellipsoid succeeded.\r\n" );
     }
     
     // 2° check if the coefficients 1-3,7-9 of the estimated quadrics with and without cross products (i.e. with and without rotation)
@@ -193,12 +193,12 @@ int myCalibrationOffline(calibrationData* calData, float* estimatedOffset, float
     
     if( tmpMax1 >= .1*tmpMax2 ) { //10% error allowed
         // if error, quits
-        printf( "[libhedrot] (function myCalibrationOffline) second check of non rotated ellipsoid failed.\r\n" );
+        printf( "[libhedrot] (function myCalibration1) second check of non rotated ellipsoid failed.\r\n" );
         printf( "debug output: %f, %f\r\n", tmpMax1, tmpMax2 );
         err =  1;
         goto end;
     } else {
-        printf( "[libhedrot] (function myCalibrationOffline) second check of non rotated ellipsoid succeeded.\r\n" );
+        printf( "[libhedrot] (function myCalibration1) second check of non rotated ellipsoid succeeded.\r\n" );
     }
     
     // no error, goes on
@@ -250,7 +250,7 @@ end:
 // ... with gamma = 1 + ( d^2/a + e^2/b + f^2/c );
 //
 // returns 1 (error) if calibration failed
-int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estimatedScaling, double *quadricCoefficients) {
+int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estimatedScaling, double *quadricCoefficients, double maxConditionNumber) {
     int i;
     char err = 0;
     double gamma;
@@ -261,14 +261,14 @@ int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estima
     double vectorS[6]; //output = singular values
     
     // constants
-    double rcond = 1/MAX_CONDITION_NUMBER; // reverse maximum condition number
+    double rcond = 1/maxConditionNumber; // reverse maximum condition number
     
 #ifdef __MACH__  // if mach (mac os X)
     // constants
     __CLPK_integer one = 1, six=6;
     __CLPK_integer rank; // effective rank of the matrix
     double wkopt;
-    double *work;
+    double *work = NULL;
     __CLPK_integer n = calData->numberOfSamples;
     __CLPK_integer lda = calData->numberOfSamples, ldb = calData->numberOfSamples;
     __CLPK_integer lwork, info;
@@ -280,6 +280,13 @@ int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estima
     int lda = calData->numberOfSamples, ldb = calData->numberOfSamples;
 #endif
 #endif
+    
+    // check if there are enough points (at least 6 are needed to define an ellipsoid). If not, error
+    if( calData->numberOfSamples < 6 ){
+        printf( "Not enough points to define an ellipsoid\r\n ");
+        err =  1;
+        goto end;
+    }
     
     
     // Build the matrix D (rows = X^2, Y^2, Z^2, 2*X, 2*Y, 2*Z) and the matrix ONES (N*1)
@@ -321,15 +328,15 @@ int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estima
     // check if the rank is different than 6
     if( rank != 6 ) {
         printf( "The matrix is not of full rank\r\n ");
-        printf( "The least squares solution could not be computed.\r\n" );
+        printf( "The least squares solution could not be computed.\r\n" ); 
         err =  1;
         goto end;
     }
     
     
     // check if the condition number is bigger than the allowed maximum
-    if( vectorS[0]/vectorS[5] >= MAX_CONDITION_NUMBER ) {
-        printf( "The condition number (%f) is bigger than the allowed maximum (%d)\r\n ", vectorS[0]/vectorS[5], MAX_CONDITION_NUMBER );
+    if( vectorS[0]/vectorS[5] >= maxConditionNumber ) {
+        printf( "The condition number (%f) is bigger than the allowed maximum (%f)\r\n ", vectorS[0]/vectorS[5], maxConditionNumber );
         err =  1;
         goto end;
     }
@@ -396,7 +403,7 @@ end:
 //
 //
 // returns 1 (error) if calibration failed
-int quadricFit(calibrationData* calData, double *quadricCoefficients) {
+int quadricFit(calibrationData* calData, double *quadricCoefficients, double maxConditionNumber) {
     int i;
     char err = 0;
     
@@ -404,7 +411,7 @@ int quadricFit(calibrationData* calData, double *quadricCoefficients) {
 #ifdef __MACH__  // if mach (mac os X)
     // constants
     __CLPK_integer one = 1, nine=9;
-    double rcond = 1/MAX_CONDITION_NUMBER; // reverse maximum condition number
+    double rcond = 1/maxConditionNumber; // reverse maximum condition number
     
     double matrixA[calData->numberOfSamples*9]; // internal input matrix A
     double matrixB[calData->numberOfSamples]; // internal input matrix B (column mit ones), output = solution
@@ -466,7 +473,7 @@ int quadricFit(calibrationData* calData, double *quadricCoefficients) {
      }*/
 #else
 #if defined(_WIN32) || defined(_WIN64)
-    LAPACKE_dgelss( LAPACK_COL_MAJOR, n, 6, 1, matrixA, lda, matrixB, ldb, vectorS, rcond, &rank );
+    LAPACKE_dgelss( LAPACK_COL_MAJOR, n, 9, 1, matrixA, lda, matrixB, ldb, vectorS, rcond, &rank );
 #endif
 #endif
     
@@ -480,8 +487,8 @@ int quadricFit(calibrationData* calData, double *quadricCoefficients) {
     
     
     // check if the condition number is bigger than the allowed maximum
-    if( vectorS[0]/vectorS[5] >= MAX_CONDITION_NUMBER ) {
-        printf( "The condition number (%f) is bigger than the allowed maximum (%d)\r\n ", vectorS[0]/vectorS[5], MAX_CONDITION_NUMBER );
+    if( vectorS[0]/vectorS[5] >= maxConditionNumber ) {
+        printf( "The condition number (%f) is bigger than the allowed maximum (%f)\r\n ", vectorS[0]/vectorS[5], maxConditionNumber );
         err =  1;
         goto end;
     }
@@ -504,7 +511,8 @@ int quadricFit(calibrationData* calData, double *quadricCoefficients) {
 end:
     /* Free workspace */
 #ifdef __MACH__  // if mach (mac os X)
-    free( (void*)work );
+    if(work)
+        free( (void*)work );
 #else
 #if defined(_WIN32) || defined(_WIN64)
     free(matrixA);

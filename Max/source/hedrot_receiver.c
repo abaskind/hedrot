@@ -1054,6 +1054,9 @@ void hedrot_receiver_mirrorHeadtrackerInfo(t_hedrot_receiver *x) {
     x->offlineCalibrationMethod = x->trackingData->offlineCalibrationMethod;
     object_attr_touch( (t_object *)x, gensym("offlineCalibrationMethod"));
 
+    x->RTmagCalibrationMethod = x->trackingData->RTmagCalibrationMethod;
+    object_attr_touch( (t_object *)x, gensym("RTmagCalibrationMethod"));
+
     x->RTmagCalOn = x->trackingData->RTmagCalOn;
     object_attr_touch( (t_object *)x, gensym("RTmagCalOn"));
     
@@ -1065,6 +1068,7 @@ void hedrot_receiver_mirrorHeadtrackerInfo(t_hedrot_receiver *x) {
     
     x->RTMagCalibrationPeriod = x->trackingData->RTMagCalibrationPeriod;
     object_attr_touch( (t_object *)x, gensym("RTMagCalibrationPeriod"));
+
 }
 
 void hedrot_receiver_outputCalibrationNotValidNotice(t_hedrot_receiver *x) {
@@ -1212,6 +1216,26 @@ void hedrot_receiver_doopenforwrite(t_hedrot_receiver *x, t_symbol *s) {
     sysfile_write(x->fh_write, &len, str);
     
     sprintf(str, "offlineCalibrationMethod, %hhi;\n", x->trackingData->offlineCalibrationMethod);
+    len = strlen(str);
+    sysfile_write(x->fh_write, &len, str);
+    
+    sprintf(str, "RTmagCalibrationMethod, %hhi;\n", x->trackingData->RTmagCalibrationMethod);
+    len = strlen(str);
+    sysfile_write(x->fh_write, &len, str);
+    
+    sprintf(str, "RTmagCalOn, %hhi;\n", x->trackingData->RTmagCalOn);
+    len = strlen(str);
+    sysfile_write(x->fh_write, &len, str);
+    
+    sprintf(str, "RTmagMaxMemoryDurationStep1, %f;\n", x->trackingData->RTmagMaxMemoryDurationStep1);
+    len = strlen(str);
+    sysfile_write(x->fh_write, &len, str);
+    
+    sprintf(str, "RTmagMaxDistanceError, %f;\n", x->trackingData->RTmagMaxDistanceError);
+    len = strlen(str);
+    sysfile_write(x->fh_write, &len, str);
+    
+    sprintf(str, "RTMagCalibrationPeriod, %f;\n", x->trackingData->RTMagCalibrationPeriod);
     len = strlen(str);
     sysfile_write(x->fh_write, &len, str);
     
@@ -1590,6 +1614,15 @@ t_max_err hedrot_receiver_offlineCalibrationMethod_set(t_hedrot_receiver *x, t_o
 }
 
 
+t_max_err hedrot_receiver_RTmagCalibrationMethod_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
+    if (argc && argv) {
+        x->RTmagCalibrationMethod = (char) max(min(atom_getlong(argv),1),0);
+        setRTmagCalibrationMethod(x->trackingData, x->RTmagCalibrationMethod);
+    }
+    return MAX_ERR_NONE;
+}
+
+
 t_max_err hedrot_receiver_RTmagCalOn_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
         x->RTmagCalOn = (char) max(min(atom_getlong(argv),1),0);
@@ -1771,8 +1804,19 @@ int C74_EXPORT main()
     CLASS_ATTR_FLOAT_ARRAY(c,    "magScaling",    0,  t_hedrot_receiver,  magScaling,  3);
     CLASS_ATTR_ACCESSORS(c, "magScaling", NULL, hedrot_receiver_magScaling_set);
     
+    CLASS_ATTR_CHAR(c,    "offlineCalibrationMethod",    0,  t_hedrot_receiver,  offlineCalibrationMethod);
+    CLASS_ATTR_ENUMINDEX(c, "offlineCalibrationMethod", 0, "\"double ellipsoid fit\" \"Aussal\"");
+    CLASS_ATTR_ACCESSORS(c, "offlineCalibrationMethod", NULL, hedrot_receiver_offlineCalibrationMethod_set);
+    CLASS_ATTR_SAVE(c,    "offlineCalibrationMethod",   0);
+    
     
     // real-time magnetometer calibration settings
+    CLASS_ATTR_CHAR(c,    "RTmagCalibrationMethod",    0,  t_hedrot_receiver,  RTmagCalibrationMethod);
+    CLASS_ATTR_ENUMINDEX(c, "RTmagCalibrationMethod", 0, "\"direct\" \"iterative\"");
+    CLASS_ATTR_ACCESSORS(c, "RTmagCalibrationMethod", NULL, hedrot_receiver_RTmagCalibrationMethod_set);
+    CLASS_ATTR_SAVE(c,    "RTmagCalibrationMethod",   0);
+    
+    
     CLASS_ATTR_CHAR(c,    "RTmagCalOn",    0,  t_hedrot_receiver,  RTmagCalOn);
     CLASS_ATTR_STYLE_LABEL(c, "RTmagCalOn", 0, "onoff", "RTmagCalOn");
     CLASS_ATTR_ACCESSORS(c, "RTmagCalOn", NULL, hedrot_receiver_RTmagCalOn_set);
@@ -1822,11 +1866,6 @@ int C74_EXPORT main()
     CLASS_ATTR_FLOAT(c,    "accCalMaxGyroNorm",    0,  t_hedrot_receiver,  accCalMaxGyroNorm);
     CLASS_ATTR_ACCESSORS(c, "accCalMaxGyroNorm", NULL, hedrot_receiver_accCalMaxGyroNorm_set);
     CLASS_ATTR_SAVE(c,    "accCalMaxGyroNorm",   0);
-    
-    CLASS_ATTR_CHAR(c,    "offlineCalibrationMethod",    0,  t_hedrot_receiver,  offlineCalibrationMethod);
-    CLASS_ATTR_ENUMINDEX(c, "offlineCalibrationMethod", 0, "\"double ellipsoid fit\" \"Aussal\"");
-    CLASS_ATTR_ACCESSORS(c, "offlineCalibrationMethod", NULL, hedrot_receiver_offlineCalibrationMethod_set);
-    CLASS_ATTR_SAVE(c,    "offlineCalibrationMethod",   0);
     
     // output settings
     CLASS_ATTR_LONG(c,    "outputDataPeriod",    0,  t_hedrot_receiver,  outputDataPeriod);

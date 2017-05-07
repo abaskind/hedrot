@@ -131,6 +131,7 @@ typedef struct _headtrackerData {
     
     // calibration settings
     char            offlineCalibrationMethod; //0 = double ellipsoid fit, 1 = Aussal
+    char            RTmagCalibrationMethod; //0 = direct, 1 = iterative
     char            RTmagCalOn; // for real-time calibration
     float           RTmagMaxMemoryDurationStep1; // RT mag calibration step 1: maximum duration of the memory used for calibration, in seconds
     long            RTmaxNumberOfSamplesStep1; // same thing in samples
@@ -278,6 +279,7 @@ void setMagCalibratingFlag(headtrackerData *trackingData, char magCalibratingFla
 void setAccCalibratingFlag(headtrackerData *trackingData, char accCalibratingFlag);
 void setAccCalMaxGyroNorm(headtrackerData *trackingData, float accCalMaxGyroNorm);
 void setOfflineCalibrationMethod(headtrackerData *trackingData, char offlineCalibrationMethod);
+void setRTmagCalibrationMethod(headtrackerData *trackingData, char RTmagCalibrationMethod);
 
 
 

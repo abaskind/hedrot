@@ -138,7 +138,100 @@
 						"tags" : "",
 						"style" : "",
 						"subpatcher_template" : "",
+						"visible" : 1,
 						"boxes" : [ 							{
+								"box" : 								{
+									"fontname" : "Arial",
+									"fontsize" : 12.0,
+									"id" : "obj-9",
+									"maxclass" : "newobj",
+									"numinlets" : 1,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 1140.0, 245.0, 194.0, 22.0 ],
+									"style" : "",
+									"text" : "prepend RTmagCalibrationMethod"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"fontname" : "Arial",
+									"fontsize" : 12.0,
+									"id" : "obj-14",
+									"maxclass" : "newobj",
+									"numinlets" : 1,
+									"numoutlets" : 0,
+									"patching_rect" : [ 1140.0, 268.0, 113.0, 22.0 ],
+									"style" : "",
+									"text" : "s >hedrot_receiver"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"fontname" : "Arial",
+									"fontsize" : 12.0,
+									"id" : "obj-32",
+									"maxclass" : "message",
+									"numinlets" : 2,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 1140.0, 199.0, 43.0, 22.0 ],
+									"style" : "",
+									"text" : "set $1"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-33",
+									"items" : [ "direct", ",", "iterative" ],
+									"maxclass" : "umenu",
+									"numinlets" : 1,
+									"numoutlets" : 3,
+									"outlettype" : [ "int", "", "" ],
+									"parameter_enable" : 0,
+									"patching_rect" : [ 1140.0, 222.0, 100.0, 22.0 ],
+									"presentation" : 1,
+									"presentation_rect" : [ 102.0, 193.226868, 100.0, 22.0 ],
+									"style" : "",
+									"varname" : "RTmagCalibrationMethod"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"fontname" : "Arial",
+									"fontsize" : 12.0,
+									"id" : "obj-34",
+									"maxclass" : "newobj",
+									"numinlets" : 0,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 1140.0, 172.0, 199.0, 22.0 ],
+									"style" : "",
+									"text" : "r >RTmagCalibrationMethodSetting"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"fontname" : "Arial Bold",
+									"fontsize" : 14.0,
+									"id" : "obj-35",
+									"maxclass" : "comment",
+									"numinlets" : 1,
+									"numoutlets" : 0,
+									"patching_rect" : [ 835.0, 176.0, 281.0, 22.0 ],
+									"presentation" : 1,
+									"presentation_rect" : [ 1.0, 193.226868, 153.0, 22.0 ],
+									"style" : "",
+									"text" : "Method"
+								}
+
+							}
+, 							{
 								"box" : 								{
 									"fontname" : "Arial",
 									"fontsize" : 12.0,
@@ -289,7 +382,7 @@
 									"parameter_enable" : 0,
 									"patching_rect" : [ 1140.0, 529.0, 50.0, 22.0 ],
 									"presentation" : 1,
-									"presentation_rect" : [ 152.0, 276.951874, 50.0, 22.0 ],
+									"presentation_rect" : [ 152.0, 288.951874, 50.0, 22.0 ],
 									"style" : "",
 									"varname" : "RTmagMaxMemoryDurationStep1"
 								}
@@ -322,7 +415,7 @@
 									"patching_rect" : [ 835.0, 483.0, 280.0, 38.0 ],
 									"presentation" : 1,
 									"presentation_linecount" : 3,
-									"presentation_rect" : [ 1.0, 264.951874, 160.143005, 53.0 ],
+									"presentation_rect" : [ 1.0, 276.951874, 160.143005, 53.0 ],
 									"style" : "",
 									"text" : "maximum sample memory for first part of the calibration (sec)"
 								}
@@ -384,7 +477,7 @@
 									"parameter_enable" : 0,
 									"patching_rect" : [ 1140.0, 389.0, 50.0, 22.0 ],
 									"presentation" : 1,
-									"presentation_rect" : [ 152.0, 209.5, 50.0, 22.0 ],
+									"presentation_rect" : [ 152.0, 236.5, 50.0, 22.0 ],
 									"style" : "",
 									"varname" : "RTMagCalibrationPeriod"
 								}
@@ -417,7 +510,7 @@
 									"patching_rect" : [ 835.0, 343.0, 265.0, 38.0 ],
 									"presentation" : 1,
 									"presentation_linecount" : 3,
-									"presentation_rect" : [ 1.0, 194.0, 153.0, 53.0 ],
+									"presentation_rect" : [ 1.0, 221.0, 153.0, 53.0 ],
 									"style" : "",
 									"text" : "magnetometer recalibration Period (in sec)"
 								}
@@ -453,7 +546,7 @@
 									"parameter_enable" : 0,
 									"patching_rect" : [ 198.0, 492.67688, 194.457458, 38.5 ],
 									"presentation" : 1,
-									"presentation_rect" : [ 14.751129, 94.67688, 175.033752, 75.54998 ],
+									"presentation_rect" : [ 14.751129, 94.67688, 175.033752, 68.54998 ],
 									"style" : "",
 									"text" : "",
 									"textcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
@@ -2434,6 +2527,33 @@
 							}
 , 							{
 								"patchline" : 								{
+									"destination" : [ "obj-33", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"source" : [ "obj-32", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-9", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"source" : [ "obj-33", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-32", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"source" : [ "obj-34", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
 									"destination" : [ "obj-6", 0 ],
 									"disabled" : 0,
 									"hidden" : 0,
@@ -2550,6 +2670,15 @@
 									"disabled" : 0,
 									"hidden" : 0,
 									"source" : [ "obj-84", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-14", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"source" : [ "obj-9", 0 ]
 								}
 
 							}
@@ -9516,8 +9645,8 @@
 									"patching_rect" : [ 357.0, 21.0, 144.0, 22.0 ],
 									"restore" : 									{
 										"MadgwickBetaGain" : [ 1.0 ],
-										"MadgwickBetaMax" : [ 2.5 ],
-										"accLPalpha" : [ 0.01 ],
+										"MadgwickBetaMax" : [ 10.0 ],
+										"accLPalpha" : [ 0.1 ],
 										"axesReference" : [ 0 ],
 										"invertRotation" : [ 0 ],
 										"outputDataPeriod" : [ 5 ],
@@ -9526,7 +9655,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u913001168"
+									"varname" : "u148001165"
 								}
 
 							}
@@ -9540,9 +9669,9 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 17.963989, 462.5, 322.0, 62.0 ],
+									"patching_rect" : [ 17.963989, 462.5, 322.0, 76.0 ],
 									"style" : "",
-									"text" : "bang;\r>hedrot_receiver outputDataPeriod 1, accLPtimeConstant 0.01, MadgwickBetaMax 2.5, MadgwickBetaGain 1, axesReference 0, rotationOrder 0, invertRotation 0;\r"
+									"text" : "bang;\r>hedrot_receiver outputDataPeriod 1, accLPtimeConstant 0.1, MadgwickBetaMax 10, MadgwickBetaGain 1, axesReference 0, rotationOrder 0, invertRotation 0;\r"
 								}
 
 							}
@@ -15271,7 +15400,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u611001167"
+									"varname" : "u281001164"
 								}
 
 							}
@@ -32539,7 +32668,7 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 81.463989, 806.0, 201.0, 20.0 ],
+									"patching_rect" : [ 81.463989, 832.0, 201.0, 20.0 ],
 									"style" : "",
 									"text" : "Real-time magnetometer calibration",
 									"textcolor" : [ 1.0, 1.0, 1.0, 1.0 ]
@@ -35497,13 +35626,14 @@
 									"patching_rect" : [ 923.333313, 470.5, 82.0, 19.0 ],
 									"saved_object_attributes" : 									{
 										"MadgwickBetaGain" : 1.0,
-										"MadgwickBetaMax" : 2.5,
+										"MadgwickBetaMax" : 10.0,
 										"RTMagCalibrationPeriod" : 1.0,
 										"RTmagCalOn" : 1,
-										"RTmagMaxDistanceError" : 0.1,
+										"RTmagCalibrationMethod" : 0,
+										"RTmagMaxDistanceError" : 0.05,
 										"RTmagMaxMemoryDurationStep1" : 6.0,
 										"accCalMaxGyroNorm" : 0.5,
-										"accLPtimeConstant" : 0.01,
+										"accLPtimeConstant" : 0.1,
 										"autoDiscover" : 1,
 										"axesReference" : 0,
 										"gyroOffsetAutocalOn" : 1,
@@ -35879,7 +36009,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 17.463989, 710.5, 249.0, 22.0 ],
+									"patching_rect" : [ 17.463989, 736.5, 249.0, 22.0 ],
 									"style" : "",
 									"text_width" : 202.536011
 								}
@@ -35893,7 +36023,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 17.463989, 744.75, 249.0, 22.0 ],
+									"patching_rect" : [ 17.463989, 770.75, 249.0, 22.0 ],
 									"style" : "",
 									"text_width" : 202.536011
 								}
@@ -35907,9 +36037,23 @@
 									"numinlets" : 1,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 17.463989, 777.0, 249.0, 22.0 ],
+									"patching_rect" : [ 17.463989, 803.0, 249.0, 22.0 ],
 									"style" : "",
 									"text_width" : 202.52
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"attr" : "RTmagCalibrationMethod",
+									"id" : "obj-105",
+									"maxclass" : "attrui",
+									"numinlets" : 1,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 19.463989, 712.5, 257.0, 22.0 ],
+									"style" : "",
+									"text_width" : 166.536011
 								}
 
 							}
@@ -35919,7 +36063,7 @@
 									"maxclass" : "panel",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 7.463989, 670.0, 362.0, 162.0 ],
+									"patching_rect" : [ 7.463989, 670.0, 368.0, 191.0 ],
 									"style" : ""
 								}
 
@@ -35958,6 +36102,15 @@
 									"disabled" : 0,
 									"hidden" : 1,
 									"source" : [ "obj-103", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-57", 0 ],
+									"disabled" : 0,
+									"hidden" : 0,
+									"source" : [ "obj-105", 0 ]
 								}
 
 							}
@@ -41572,7 +41725,7 @@
 ,
 					"style" : "",
 					"text" : "autopattr @autorestore 0",
-					"varname" : "u661001169"
+					"varname" : "u233001166"
 				}
 
 			}

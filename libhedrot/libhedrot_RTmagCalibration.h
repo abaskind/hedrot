@@ -19,10 +19,12 @@
 #define RT_CAL_NUMBER_OF_ZONES 100 // number of zones in the unit sphere (defined by Fibonaci mapping)
 #define RT_CAL_NUMBER_OF_POINTS_PER_ZONE 100 // number of points per zone
 
-#define MAX_CONDITION_NUMBER_REALTIME 1000000 // much larger tolerance as for the offline method
+#define MAX_CONDITION_NUMBER_REALTIME 100000
 
 #define TIME_CONSTANT_INDICATOR_OF_REJECTED_POINTS 1600 // in samples
 #define MAX_ALLOWED_PROPORTION_OF_REJECTED_POINTS .5
+
+#define MAX_ALLOWED_STANDARD_DEVIATION_ERROR .1
 
 //=====================================================================================================
 // structure definition: RTmagZoneData (structure that stores information per zone)
@@ -65,6 +67,8 @@ typedef struct _RTmagCalData {
     short               calibrationRateCounter;
     float               proportionOfRejectedPoints_State;
     float               proportionOfRejectedPoints_LPcoeff; // coefficient alpha of the low pass filter estimating the proportion of rejected points
+    float               previousEstimatedOffset[3], previousEstimatedScaling[3];
+    float               previousConditionNumber;
 } RTmagCalData;
 
 //=====================================================================================================
@@ -84,6 +88,7 @@ void computeFibonnaciMapping( RTmagCalData* data);
 short getClosestFibonacciPoint( RTmagCalData* data, double calPoint[3]);
 void addPoint2FibonnaciZone( RTmagCalData* data, short zoneNumber, short point[3]);
 
-short RTmagCalibrationUpdate( RTmagCalData* data, short rawPoint[3]);
+short RTmagCalibrationUpdateDirect( RTmagCalData* data, short rawPoint[3]);
+short RTmagCalibrationUpdateIterative( RTmagCalData* data, short rawPoint[3]);
 
 #endif /* defined(__hedrot_receiver__libhedrot_RTmagCalibration__) */

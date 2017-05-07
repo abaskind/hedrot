@@ -143,6 +143,7 @@ headtrackerData* headtracker_new() {
     resetGyroOffsetCalibration(trackingData);
     
     trackingData->offlineCalibrationMethod = 0;
+    trackingData->RTmagCalibrationMethod = 0; // direct
     
     trackingData->magCalibrationData->numberOfSamples = 0;
     trackingData->magCalibratingFlag = 0;
@@ -895,7 +896,10 @@ void headtracker_compute_data(headtrackerData *trackingData) {
             if(!trackingData->RTMagCalAcquisitionRateCounter) {
                 trackingData->RTMagCalAcquisitionRateCounter = trackingData->RTMagCalAcquisitionRateFactor;
                 
-                RTmagCalres = RTmagCalibrationUpdate(trackingData->RTmagCalibrationData, trackingData->magRawData);
+                if(trackingData->RTmagCalibrationMethod)
+                    RTmagCalres = RTmagCalibrationUpdateIterative(trackingData->RTmagCalibrationData, trackingData->magRawData);
+                else
+                    RTmagCalres = RTmagCalibrationUpdateDirect(trackingData->RTmagCalibrationData, trackingData->magRawData);
                 // returns result status:
                 //  0: point out of bounds, non added
                 //  1: point added, no calibration done
@@ -1669,6 +1673,15 @@ void setOfflineCalibrationMethod(headtrackerData *trackingData, char offlineCali
 }
 
 
+//=====================================================================================================
+// public setter to change real-time magnetometer calibration method
+//=====================================================================================================
+void setRTmagCalibrationMethod(headtrackerData *trackingData, char RTmagCalibrationMethod) {
+    trackingData->RTmagCalibrationMethod = RTmagCalibrationMethod;
+}
+
+
+
 
 //=====================================================================================================
 // public setter to start/stop recording of raw data for mag calibration
@@ -2116,7 +2129,7 @@ void changeRTMagCalTimeSettings(headtrackerData *trackingData) {
     
     // 4/ update the max number of samples for step1
     // update maxNumberOfSamplesStep1 according to RTmagMaxMemoryDurationStep1 and the sampling rate of the magnetometer
-    trackingData->RTmaxNumberOfSamplesStep1 = round(trackingData->RTmagMaxMemoryDurationStep1 * trackingData->samplerate / trackingData->RTMagCalAcquisitionRateFactor);
+    trackingData->RTmaxNumberOfSamplesStep1 = round(trackingData->RTmagMaxMemoryDurationStep1 * magRate);
     RTmagCalibration_setMaxNumberOfSamplesStep1(trackingData->RTmagCalibrationData, trackingData->RTmaxNumberOfSamplesStep1);
 }
 

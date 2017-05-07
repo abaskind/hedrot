@@ -255,6 +255,8 @@ int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estima
     char err = 0;
     double gamma;
     
+    float TMPestimatedOffset[3], TMPestimatedScaling[3];
+    
     // definitions
     double *matrixA = (double*) malloc(calData->numberOfSamples*6*sizeof(double)); // internal input matrix A (corresponding to the problem to solve A.X = B)
     double *matrixB = (double*) malloc(calData->numberOfSamples*sizeof(double)); // internal input matrix B (column mit ones), output = solution
@@ -353,14 +355,33 @@ int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estima
     }
     
     // compute the radii and offsets from the results
-    estimatedOffset[0] = (float) -matrixB[3]/matrixB[0];
-    estimatedOffset[1] = (float) -matrixB[4]/matrixB[1];
-    estimatedOffset[2] = (float) -matrixB[5]/matrixB[2];
+    TMPestimatedOffset[0] = (float) -matrixB[3]/matrixB[0];
+    TMPestimatedOffset[1] = (float) -matrixB[4]/matrixB[1];
+    TMPestimatedOffset[2] = (float) -matrixB[5]/matrixB[2];
     
     gamma = 1 + ( matrixB[3]*matrixB[3] / matrixB[0] + matrixB[4]*matrixB[4] / matrixB[1] + matrixB[5]*matrixB[5] / matrixB[2] );
-    estimatedScaling[0] = (float) sqrt(gamma/matrixB[0]);
-    estimatedScaling[1] = (float) sqrt(gamma/matrixB[1]);
-    estimatedScaling[2] = (float) sqrt(gamma/matrixB[2]);
+    TMPestimatedScaling[0] = (float) sqrt(gamma/matrixB[0]);
+    TMPestimatedScaling[1] = (float) sqrt(gamma/matrixB[1]);
+    TMPestimatedScaling[2] = (float) sqrt(gamma/matrixB[2]);
+    
+    // last check: are the estimated values absurd (i.e. outside of pre-defined bounds that depend on the magnetometer)?
+    if((abs(TMPestimatedOffset[0])>MAX_ALLOWED_OFFSET)
+        || (abs(TMPestimatedOffset[1])>MAX_ALLOWED_OFFSET)
+        || (abs(TMPestimatedOffset[2])>MAX_ALLOWED_OFFSET)
+        || (abs(TMPestimatedScaling[0])>MAX_ALLOWED_SCALING)
+        || (abs(TMPestimatedScaling[1])>MAX_ALLOWED_SCALING)
+        || (abs(TMPestimatedScaling[2])>MAX_ALLOWED_SCALING)) {
+            printf( "The estimated values are absurd\r\n");
+            err = 1;
+            goto end;
+        }
+    
+    estimatedOffset[0] = TMPestimatedOffset[0];
+    estimatedOffset[1] = TMPestimatedOffset[1];
+    estimatedOffset[2] = TMPestimatedOffset[2];
+    estimatedScaling[0] = TMPestimatedScaling[0];
+    estimatedScaling[1] = TMPestimatedScaling[1];
+    estimatedScaling[2] = TMPestimatedScaling[2];
     
     // compute the condition number
     calData->conditionNumber = vectorS[0]/vectorS[5];
@@ -597,3 +618,37 @@ void cookCalibrationData(calibrationData* calData, float* estimatedOffset, float
     calData->normAverage = getMean1f( calData->dataNorm, calData->numberOfSamples);
     calData->normStdDev = getStdDev1f( calData->dataNorm, calData->numberOfSamples, calData->normAverage);
 }
+
+//=====================================================================================================
+// function computeCalNormStatistics
+//=====================================================================================================
+//
+// variation of cookCalibrationData: compute standard deviation only, do not store anything (used to compare 2 calibrations)
+void computeCalNormStatistics(calibrationData* calData, float* estimatedOffset, float* estimatedScaling, float* normAverage, float* normStdDev) {
+    int i;
+    float invEstimatedScaling[3];
+    
+    double calSample[3];
+    float dataNorm[MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION];
+    
+    
+    invEstimatedScaling[0] = 1.0f / estimatedScaling[0];
+    invEstimatedScaling[1] = 1.0f / estimatedScaling[1];
+    invEstimatedScaling[2] = 1.0f / estimatedScaling[2];
+
+    for(i=0;i<calData->numberOfSamples;i++) {
+        // calibrated samples
+        calSample[0] = (calData->rawSamples[i][0]-estimatedOffset[0]) * invEstimatedScaling[0];
+        calSample[1] = (calData->rawSamples[i][1]-estimatedOffset[1]) * invEstimatedScaling[1];
+        calSample[2] = (calData->rawSamples[i][2]-estimatedOffset[2]) * invEstimatedScaling[2];
+        
+        // norm, norm average, norm standard deviation and max norm error update
+        dataNorm[i] = sqrt(calSample[0]*calSample[0]
+                            + calSample[1]*calSample[1]
+                            + calSample[2]*calSample[2]);
+    }
+    
+    *normAverage = getMean1f( dataNorm, calData->numberOfSamples);
+    *normStdDev = getStdDev1f( dataNorm, calData->numberOfSamples, *normAverage);
+}
+

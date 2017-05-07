@@ -61,6 +61,15 @@ void initRTmagCalData(RTmagCalData* data, float* initalEstimatedOffset, float* i
     data->calData->numberOfSamples = 0;
     data->maxNumberOfSamplesStep1 = maxNumberOfSamplesStep1;
     
+    data->calData->normStdDev = 100000; // very big number, to force update on the first pass
+    data->previousConditionNumber = MAX_CONDITION_NUMBER_REALTIME; // very big number, to force update on the first pass
+    data->previousEstimatedOffset[0] = initalEstimatedOffset[0];
+    data->previousEstimatedOffset[1] = initalEstimatedOffset[1];
+    data->previousEstimatedOffset[2] = initalEstimatedOffset[2];
+    data->previousEstimatedScaling[0] = initalEstimatedScaling[0];
+    data->previousEstimatedScaling[1] = initalEstimatedScaling[1];
+    data->previousEstimatedScaling[2] = initalEstimatedScaling[2];
+    
     data->numberOfFilledZones = 0;
     
     data->calibrationRateFactor = calibrationRateFactor;
@@ -84,8 +93,8 @@ void RTmagCalibration_setCalibrationRateFactor(RTmagCalData* data, short calibra
 
 void RTmagCalibration_setRTmagMaxDistanceError(RTmagCalData* data, float RTmagMaxDistanceError) {
     data->RTmagMaxDistanceError = RTmagMaxDistanceError;
-    data->RTmagMinDistance2 = (1-RTmagMaxDistanceError*RTmagMaxDistanceError)*(1-RTmagMaxDistanceError*RTmagMaxDistanceError);
-    data->RTmagMaxDistance2 = (1+RTmagMaxDistanceError*RTmagMaxDistanceError)*(1+RTmagMaxDistanceError*RTmagMaxDistanceError);
+    data->RTmagMinDistance2 = (1-RTmagMaxDistanceError)*(1-RTmagMaxDistanceError);
+    data->RTmagMaxDistance2 = (1+RTmagMaxDistanceError)*(1+RTmagMaxDistanceError);
 }
 
 
@@ -194,17 +203,162 @@ void addPoint2FibonnaciZone( RTmagCalData* data, short zoneNumber, short rawPoin
 
 
 //=====================================================================================================
-// function RTmagCalibrationUpdate
+// function RTmagCalibrationUpdateDirect
 //=====================================================================================================
 //
-// main function: updates the calibration corpus and computes the new offsets and scaling factors
+// main function (iterative method): updates the calibration corpus and computes the new offsets and scaling factors
 //
 // returns result status:
 //  0: too many points out of bounds, restart calibration
 //  1: point added, no calibration done
 //  2: point added, calibration failed
 //  3: point added, calibration succeeded
-short RTmagCalibrationUpdate( RTmagCalData* data, short rawPoint[3]) {
+short RTmagCalibrationUpdateDirect( RTmagCalData* data, short rawPoint[3]) {
+    double calPoint[3];
+    double normPoint2;
+    
+    short pointRejectedStatus;
+    double proportionOfRejectedPoints;
+    
+    float previousAverage, previousStandardDeviation;
+    float newEstimatedOffset[3], newEstimatedScaling[3];
+    
+    short err;
+    
+    double quadricCoefficients6[6]; // not used here, needed however to call ellipsoidFit
+    
+    
+    // store the new point anyway
+    data->calData->rawSamples[data->sampleIndexStep1][0] = rawPoint[0];
+    data->calData->rawSamples[data->sampleIndexStep1][1] = rawPoint[1];
+    data->calData->rawSamples[data->sampleIndexStep1][2] = rawPoint[2];
+    data->calData->numberOfSamples = min(data->calData->numberOfSamples++,data->maxNumberOfSamplesStep1);
+    data->sampleIndexStep1++;
+    if(data->sampleIndexStep1 == data->maxNumberOfSamplesStep1)
+        data->sampleIndexStep1 = 0; // maximum number of samples reached, erase the oldest ones
+    //printf("%ld, %d %d %d\r\n", data->sampleIndexStep1, rawPoint[0], rawPoint[1], rawPoint[2]); // for debugging
+    
+    if(data->calibrationValid) {
+        // check if calibration is still ok, otherwise restart it
+        
+        // scale the new point
+        calPoint[0] = (rawPoint[0]-data->estimatedOffset[0])*data->estimatedScalingFactor[0];
+        calPoint[1] = (rawPoint[1]-data->estimatedOffset[1])*data->estimatedScalingFactor[1];
+        calPoint[2] = (rawPoint[2]-data->estimatedOffset[2])*data->estimatedScalingFactor[2];
+        
+        // checks if the new point is close enough to the unit sphere, i.e. if abs(norm(Point)-1) <= RTmagMaxDistanceError
+        // this is equivalent to: (1-RTmagMaxDistanceError)^2 <= norm(Point)^2 <= (1+RTmagMaxDistanceError)^2
+        // i.e. RTmagMinDistance2 <= norm(Point)^2 <= RTmaxMinDistance2
+        // this is done only if a first successful calibration has been done
+        normPoint2 = calPoint[0]*calPoint[0]+calPoint[1]*calPoint[1]+calPoint[2]*calPoint[2];
+        //printf("normPoint2 = %f, RTmagMinDistance2 = %f, RTmagMaxDistance2 = %f\r\n", normPoint2, data->RTmagMinDistance2, data->RTmagMaxDistance2); // for debugging
+        if((normPoint2 >= data->RTmagMinDistance2) && (normPoint2 <= data->RTmagMaxDistance2)) {// point inside allowed bounds
+            pointRejectedStatus = 0;
+        } else {
+            pointRejectedStatus = 1;
+        }
+        
+        // update the indicator of the proportion of rejected points in the last time with moving average (duration defined by TIME_CONSTANT_INDICATOR_OF_REJECTED_POINTS)
+        proportionOfRejectedPoints = data->proportionOfRejectedPoints_LPcoeff * pointRejectedStatus + (1 - data->proportionOfRejectedPoints_LPcoeff) * data->proportionOfRejectedPoints_State;
+        if(proportionOfRejectedPoints > MAX_ALLOWED_PROPORTION_OF_REJECTED_POINTS) {
+            // too many rejected points in the last time, restart calibration
+            printf("Too many rejected points, restart calibration\r\n");
+            initRTmagCalData(data, data->estimatedOffset, data->estimatedScaling, data->RTmagMaxDistanceError, data->calibrationRateFactor, data->maxNumberOfSamplesStep1);
+            return 0;
+        } else {
+            data->proportionOfRejectedPoints_State = proportionOfRejectedPoints;
+            // go further
+        }
+    }
+    
+    // try to calibrate according to the "brute force" method (with all raw points)
+    
+    // if this is time for calibration, try to calibrate
+    data->calibrationRateCounter--;
+    
+    if(!data->calibrationRateCounter) {
+        data->calibrationRateCounter = data->calibrationRateFactor;
+        
+        // apply ellipsoid fit
+        err = ellipsoidFit(data->calData, data->estimatedOffset, data->estimatedScaling, quadricCoefficients6, MAX_CONDITION_NUMBER_REALTIME);
+        if(!err) {
+            if(data->calData->normStdDev <= MAX_ALLOWED_STANDARD_DEVIATION_ERROR) {
+                // calibration succeded, compare it with the previous one
+                newEstimatedOffset[0] = data->estimatedOffset[0];
+                newEstimatedOffset[1] = data->estimatedOffset[1];
+                newEstimatedOffset[2] = data->estimatedOffset[2];
+                newEstimatedScaling[0] = data->estimatedScaling[0];
+                newEstimatedScaling[1] = data->estimatedScaling[1];
+                newEstimatedScaling[2] = data->estimatedScaling[2];
+                
+                // recompute standard dev with previous estimated parameters
+                computeCalNormStatistics(data->calData, data->previousEstimatedOffset, data->previousEstimatedScaling, &previousAverage, &previousStandardDeviation);
+                
+                // compare new and old standard deviation and condition number
+                if((data->calData->normStdDev <= previousStandardDeviation) && (data->calData->conditionNumber <= data->previousConditionNumber)) {
+                    // the new estimation is better than the previous one, go for it
+                    data->calibrationValid = 1;
+                    
+                    // update scaling factor
+                    data->estimatedScalingFactor[0] = 1/data->estimatedScaling[0];
+                    data->estimatedScalingFactor[1] = 1/data->estimatedScaling[1];
+                    data->estimatedScalingFactor[2] = 1/data->estimatedScaling[2];
+                    
+                    // initialize indicator of proportion of rejected points
+                    data->proportionOfRejectedPoints_State = 0;
+                    
+                    
+                    // store condition number and estimated parameters to compare later
+                    data->previousConditionNumber = data->calData->conditionNumber;
+                    data->previousEstimatedOffset[0] = data->estimatedOffset[0];
+                    data->previousEstimatedOffset[1] = data->estimatedOffset[1];
+                    data->previousEstimatedOffset[2] = data->estimatedOffset[2];
+                    data->previousEstimatedScaling[0] = data->estimatedScaling[0];
+                    data->previousEstimatedScaling[1] = data->estimatedScaling[1];
+                    data->previousEstimatedScaling[2] = data->estimatedScaling[2];
+                    
+                    return 3;
+                } else {
+                    printf("previous calibration was better, calibration rejected\r\n");
+                    printf("previous condition number %f, new condition number %f\r\n", data->previousConditionNumber, data->calData->conditionNumber);
+                    printf("previous standard deviation %f, new standard deviation %f\r\n", previousStandardDeviation, data->calData->normStdDev);
+                    
+                    // the previous estimation was better, keep it
+                    data->estimatedOffset[0] = data->previousEstimatedOffset[0];
+                    data->estimatedOffset[1] = data->previousEstimatedOffset[1];
+                    data->estimatedOffset[2] = data->previousEstimatedOffset[2];
+                    data->estimatedScaling[0] = data->previousEstimatedScaling[0];
+                    data->estimatedScaling[1] = data->previousEstimatedScaling[1];
+                    data->estimatedScaling[2] = data->previousEstimatedScaling[2];
+                    
+                    return 2;
+                }
+
+            } else {
+                printf("standard deviation too high, calibration rejected\r\n");
+                return 2;
+            }
+        } else { // calibration failed
+            return 2;
+        }
+    } else {
+        return 1;
+    }
+}
+
+
+//=====================================================================================================
+// function RTmagCalibrationUpdateIterative
+//=====================================================================================================
+//
+// main function (iterative method): updates the calibration corpus and computes the new offsets and scaling factors
+//
+// returns result status:
+//  0: too many points out of bounds, restart calibration
+//  1: point added, no calibration done
+//  2: point added, calibration failed
+//  3: point added, calibration succeeded
+short RTmagCalibrationUpdateIterative( RTmagCalData* data, short rawPoint[3]) {
     double calPoint[3];
     short rawTMPpoint[3];
     double normPoint2;
@@ -238,30 +392,36 @@ short RTmagCalibrationUpdate( RTmagCalData* data, short rawPoint[3]) {
             // apply ellipsoid fit
             err = ellipsoidFit(data->calData, data->estimatedOffset, data->estimatedScaling, quadricCoefficients6, MAX_CONDITION_NUMBER_REALTIME);
             if(!err) {
-                // calibration succeded
-                data->calibrationValid = 1;
-                
-                // update scaling factor
-                data->estimatedScalingFactor[0] = 1/data->estimatedScaling[0];
-                data->estimatedScalingFactor[1] = 1/data->estimatedScaling[1];
-                data->estimatedScalingFactor[2] = 1/data->estimatedScaling[2];
-                
-                // cluster all samples on Fibonacci Mapping
-                for (i=0; i<data->calData->numberOfSamples; i++) {
-                    // get the zone number corresponding to the point
-                    zoneNumber = getClosestFibonacciPoint(data, data->calData->calSamples[i]);
+                if(data->calData->normStdDev <= MAX_ALLOWED_STANDARD_DEVIATION_ERROR) {
+                    // calibration succeded
+                    data->calibrationValid = 1;
                     
-                    // adds the point to the corresponding zone number
-                    rawTMPpoint[0] = data->calData->rawSamples[i][0];
-                    rawTMPpoint[1] = data->calData->rawSamples[i][1];
-                    rawTMPpoint[2] = data->calData->rawSamples[i][2];
-                    addPoint2FibonnaciZone( data, zoneNumber, rawTMPpoint);
+                    // update scaling factor
+                    data->estimatedScalingFactor[0] = 1/data->estimatedScaling[0];
+                    data->estimatedScalingFactor[1] = 1/data->estimatedScaling[1];
+                    data->estimatedScalingFactor[2] = 1/data->estimatedScaling[2];
+                    
+                    // cluster all samples on Fibonacci Mapping
+                    for (i=0; i<data->calData->numberOfSamples; i++) {
+                        // get the zone number corresponding to the point
+                        zoneNumber = getClosestFibonacciPoint(data, data->calData->calSamples[i]);
+                        
+                        // adds the point to the corresponding zone number
+                        rawTMPpoint[0] = data->calData->rawSamples[i][0];
+                        rawTMPpoint[1] = data->calData->rawSamples[i][1];
+                        rawTMPpoint[2] = data->calData->rawSamples[i][2];
+                        addPoint2FibonnaciZone( data, zoneNumber, rawTMPpoint);
+                    }
+                    
+                    // initialize indicator of proportion of rejected points
+                    data->proportionOfRejectedPoints_State = 0;
+                    
+                    return 3;
+                    
+                } else {
+                    printf("standard deviation too high, calibration rejected");
+                    return 2;
                 }
-                
-                // initialize indicator of proportion of rejected points
-                data->proportionOfRejectedPoints_State = 0;
-                
-                return 3;
             } else { // calibration failed
                 return 2;
             }
@@ -324,13 +484,18 @@ short RTmagCalibrationUpdate( RTmagCalData* data, short rawPoint[3]) {
             // apply ellipsoid fit
             err = ellipsoidFit(data->calData, data->estimatedOffset, data->estimatedScaling, quadricCoefficients6, MAX_CONDITION_NUMBER_REALTIME);
             if(!err) {
-                // calibration succeded
-                // update scaling factor
-                data->estimatedScalingFactor[0] = 1/data->estimatedScaling[0];
-                data->estimatedScalingFactor[1] = 1/data->estimatedScaling[1];
-                data->estimatedScalingFactor[2] = 1/data->estimatedScaling[2];
-                
-                return 3;
+                if(data->calData->normStdDev <= MAX_ALLOWED_STANDARD_DEVIATION_ERROR) {
+                    // calibration succeded
+                    // update scaling factor
+                    data->estimatedScalingFactor[0] = 1/data->estimatedScaling[0];
+                    data->estimatedScalingFactor[1] = 1/data->estimatedScaling[1];
+                    data->estimatedScalingFactor[2] = 1/data->estimatedScaling[2];
+                    
+                    return 3;
+                } else {
+                    printf("standard deviation too high, calibration rejected");
+                    return 2;
+                }
             } else { // calibration failed
                 return 2;
             }
@@ -339,4 +504,5 @@ short RTmagCalibrationUpdate( RTmagCalData* data, short rawPoint[3]) {
         }
     }
 }
+
 

@@ -82,6 +82,7 @@ typedef struct hedrot_receiver
     char            invertRotation;
     float           accCalMaxGyroNorm;
     char            offlineCalibrationMethod; //0 = double ellipsoid fit, 1 = Aussal
+    char            RTmagCalibrationMethod; //0 = direct, 1 = iterative
     char            RTmagCalOn;
     float           RTmagMaxMemoryDurationStep1; // RT mag calibration step 1: maximum duration of the memory used for calibration, in seconds
     float           RTmagMaxDistanceError; // for RT mag calibration step 2, tolerance on the radius for new points
@@ -246,6 +247,7 @@ t_max_err hedrot_receiver_rotationOrder_set(t_hedrot_receiver *x, t_object *attr
 t_max_err hedrot_receiver_invertRotation_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_accCalMaxGyroNorm_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_offlineCalibrationMethod_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
+t_max_err hedrot_receiver_RTmagCalibrationMethod_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_RTmagCalOn_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_RTmagMaxMemoryDurationStep1_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_RTmagMaxDistanceError_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);

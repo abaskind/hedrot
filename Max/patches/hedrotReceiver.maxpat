@@ -138,7 +138,6 @@
 						"tags" : "",
 						"style" : "",
 						"subpatcher_template" : "",
-						"visible" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
 									"fontname" : "Arial",
@@ -335,9 +334,9 @@
 									"numinlets" : 1,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 1140.0, 552.0, 240.0, 22.0 ],
+									"patching_rect" : [ 1140.0, 552.0, 208.0, 22.0 ],
 									"style" : "",
-									"text" : "prepend RTmagMaxMemoryDurationStep1"
+									"text" : "prepend RTmagMaxMemoryDuration"
 								}
 
 							}
@@ -384,7 +383,7 @@
 									"presentation" : 1,
 									"presentation_rect" : [ 152.0, 288.951874, 50.0, 22.0 ],
 									"style" : "",
-									"varname" : "RTmagMaxMemoryDurationStep1"
+									"varname" : "RTmagMaxMemoryDuration"
 								}
 
 							}
@@ -397,9 +396,9 @@
 									"numinlets" : 0,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 1140.0, 479.0, 244.0, 22.0 ],
+									"patching_rect" : [ 1140.0, 479.0, 213.0, 22.0 ],
 									"style" : "",
-									"text" : "r >RTmagMaxMemoryDurationStep1Setting"
+									"text" : "r >RTmagMaxMemoryDurationSetting"
 								}
 
 							}
@@ -408,16 +407,15 @@
 									"fontname" : "Arial Bold",
 									"fontsize" : 14.0,
 									"id" : "obj-25",
-									"linecount" : 2,
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 835.0, 483.0, 280.0, 38.0 ],
+									"patching_rect" : [ 835.0, 483.0, 280.0, 22.0 ],
 									"presentation" : 1,
-									"presentation_linecount" : 3,
-									"presentation_rect" : [ 1.0, 276.951874, 160.143005, 53.0 ],
+									"presentation_linecount" : 2,
+									"presentation_rect" : [ 1.0, 276.951874, 160.143005, 38.0 ],
 									"style" : "",
-									"text" : "maximum sample memory for first part of the calibration (sec)"
+									"text" : "maximum sample memory  (sec)"
 								}
 
 							}
@@ -8617,7 +8615,7 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 18.036011, 623.0, 134.0, 20.0 ],
 					"style" : "",
-					"text" : "Version 1.2.0beta1"
+					"text" : "Version 1.2.0beta2"
 				}
 
 			}
@@ -9655,7 +9653,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u148001165"
+									"varname" : "u829001977"
 								}
 
 							}
@@ -15400,7 +15398,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u281001164"
+									"varname" : "u135001976"
 								}
 
 							}
@@ -17019,7 +17017,7 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 26.0, 84.0, 512.67334, 29.0 ],
 					"style" : "",
-					"text" : "headtracker transmitting...",
+					"text" : "no headtracker connected",
 					"textcolor" : [ 0.0, 0.501961, 1.0, 1.0 ],
 					"textjustification" : 1
 				}
@@ -18162,7 +18160,6 @@
 								"box" : 								{
 									"fontname" : "Arial Bold",
 									"fontsize" : 14.0,
-									"hidden" : 1,
 									"id" : "obj-128",
 									"maxclass" : "comment",
 									"numinlets" : 1,
@@ -18223,7 +18220,6 @@
 , 							{
 								"box" : 								{
 									"allowdrag" : 0,
-									"hidden" : 1,
 									"id" : "obj-133",
 									"items" : [ 0.75, "Hz", ",", 1.5, "Hz", ",", 3, "Hz", ",", 7.5, "Hz", ",", 15, "Hz", ",", 30, "Hz", ",", 75, "Hz" ],
 									"maxclass" : "umenu",
@@ -22187,7 +22183,7 @@
 											"modernui" : 1
 										}
 ,
-										"rect" : [ 655.0, 108.0, 813.0, 623.0 ],
+										"rect" : [ 6.0, 99.0, 813.0, 623.0 ],
 										"bglocked" : 0,
 										"openinpresentation" : 1,
 										"default_fontsize" : 12.0,
@@ -32356,7 +32352,7 @@
 					"fontsize" : 18.0,
 					"id" : "obj-86",
 					"ignoreclick" : 1,
-					"items" : [ 0, "/dev/cu.Bluetooth-Incoming-Port", ",", 1, "/dev/cu.usbmodem2390101" ],
+					"items" : "<empty>",
 					"labelclick" : 1,
 					"maxclass" : "umenu",
 					"numinlets" : 1,
@@ -35627,11 +35623,11 @@
 									"saved_object_attributes" : 									{
 										"MadgwickBetaGain" : 1.0,
 										"MadgwickBetaMax" : 10.0,
-										"RTMagCalibrationPeriod" : 1.0,
-										"RTmagCalOn" : 1,
+										"RTMagCalibrationPeriod" : 0.1,
+										"RTmagCalOn" : 0,
 										"RTmagCalibrationMethod" : 0,
 										"RTmagMaxDistanceError" : 0.05,
-										"RTmagMaxMemoryDurationStep1" : 6.0,
+										"RTmagMaxMemoryDuration" : 6.0,
 										"accCalMaxGyroNorm" : 0.5,
 										"accLPtimeConstant" : 0.1,
 										"autoDiscover" : 1,
@@ -36031,7 +36027,7 @@
 							}
 , 							{
 								"box" : 								{
-									"attr" : "RTmagMaxMemoryDurationStep1",
+									"attr" : "RTmagMaxMemoryDuration",
 									"id" : "obj-101",
 									"maxclass" : "attrui",
 									"numinlets" : 1,
@@ -41719,13 +41715,13 @@
 					"restore" : 					{
 						"autodiscover" : [ 1 ],
 						"invertRotation" : [ 0 ],
-						"serialport" : [ "1 /dev/cu.usbmodem2390101" ],
+						"serialport" : [ "" ],
 						"values_to_transmit" : [ 1 ]
 					}
 ,
 					"style" : "",
 					"text" : "autopattr @autorestore 0",
-					"varname" : "u233001166"
+					"varname" : "u989001978"
 				}
 
 			}

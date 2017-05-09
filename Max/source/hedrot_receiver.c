@@ -1060,8 +1060,8 @@ void hedrot_receiver_mirrorHeadtrackerInfo(t_hedrot_receiver *x) {
     x->RTmagCalOn = x->trackingData->RTmagCalOn;
     object_attr_touch( (t_object *)x, gensym("RTmagCalOn"));
     
-    x->RTmagMaxMemoryDurationStep1 = x->trackingData->RTmagMaxMemoryDurationStep1;
-    object_attr_touch( (t_object *)x, gensym("RTmagMaxMemoryDurationStep1"));
+    x->RTmagMaxMemoryDuration = x->trackingData->RTmagMaxMemoryDuration;
+    object_attr_touch( (t_object *)x, gensym("RTmagMaxMemoryDuration"));
     
     x->RTmagMaxDistanceError = x->trackingData->RTmagMaxDistanceError;
     object_attr_touch( (t_object *)x, gensym("RTmagMaxDistanceError"));
@@ -1227,7 +1227,7 @@ void hedrot_receiver_doopenforwrite(t_hedrot_receiver *x, t_symbol *s) {
     len = strlen(str);
     sysfile_write(x->fh_write, &len, str);
     
-    sprintf(str, "RTmagMaxMemoryDurationStep1, %f;\n", x->trackingData->RTmagMaxMemoryDurationStep1);
+    sprintf(str, "RTmagMaxMemoryDuration, %f;\n", x->trackingData->RTmagMaxMemoryDuration);
     len = strlen(str);
     sysfile_write(x->fh_write, &len, str);
     
@@ -1632,10 +1632,10 @@ t_max_err hedrot_receiver_RTmagCalOn_set(t_hedrot_receiver *x, t_object *attr, l
 }
 
 
-t_max_err hedrot_receiver_RTmagMaxMemoryDurationStep1_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv){
+t_max_err hedrot_receiver_RTmagMaxMemoryDuration_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv){
     if (argc && argv) {
-        x->RTmagMaxMemoryDurationStep1 = (float) max(atom_getfloat(argv),0);
-        setRTmagMaxMemoryDurationStep1(x->trackingData, x->RTmagMaxMemoryDurationStep1);
+        x->RTmagMaxMemoryDuration = (float) max(atom_getfloat(argv),0);
+        setRTmagMaxMemoryDuration(x->trackingData, x->RTmagMaxMemoryDuration);
     }
     return MAX_ERR_NONE;
 }
@@ -1822,9 +1822,9 @@ int C74_EXPORT main()
     CLASS_ATTR_ACCESSORS(c, "RTmagCalOn", NULL, hedrot_receiver_RTmagCalOn_set);
     CLASS_ATTR_SAVE(c,    "RTmagCalOn",   0);
     
-    CLASS_ATTR_FLOAT(c,    "RTmagMaxMemoryDurationStep1",    0,  t_hedrot_receiver,  RTmagMaxMemoryDurationStep1);
-    CLASS_ATTR_ACCESSORS(c, "RTmagMaxMemoryDurationStep1", NULL, hedrot_receiver_RTmagMaxMemoryDurationStep1_set);
-    CLASS_ATTR_SAVE(c,    "RTmagMaxMemoryDurationStep1",   0);
+    CLASS_ATTR_FLOAT(c,    "RTmagMaxMemoryDuration",    0,  t_hedrot_receiver,  RTmagMaxMemoryDuration);
+    CLASS_ATTR_ACCESSORS(c, "RTmagMaxMemoryDuration", NULL, hedrot_receiver_RTmagMaxMemoryDuration_set);
+    CLASS_ATTR_SAVE(c,    "RTmagMaxMemoryDuration",   0);
     
     CLASS_ATTR_FLOAT(c,    "RTmagMaxDistanceError",    0,  t_hedrot_receiver,  RTmagMaxDistanceError);
     CLASS_ATTR_ACCESSORS(c, "RTmagMaxDistanceError", NULL, hedrot_receiver_RTmagMaxDistanceError_set);

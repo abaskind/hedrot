@@ -35,11 +35,11 @@ double get_monotonic_time() {
     mach_port_deallocate(mach_task_self(), cclock);
     return mts.tv_sec + mts.tv_nsec*1e-9;
 }
-#else 
+#else
 #if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>
 double get_monotonic_time() {
-	LARGE_INTEGER frequency;
+    LARGE_INTEGER frequency;
     LARGE_INTEGER time;
     QueryPerformanceFrequency(&frequency);
     QueryPerformanceCounter(&time);
@@ -74,9 +74,9 @@ headtrackerData* headtracker_new() {
     trackingData->RTmagCalibrationData = newRTmagCalData();
     trackingData->RTmagCalOn = 0;
     trackingData->RTmagMaxDistanceError = .1; // 10% distance error compared to the previously calibrated set is allowed
-    trackingData->RTMagCalibrationPeriod = 1; // RT calibration in seconds
-    trackingData->RTmagMaxMemoryDurationStep1 = 6; // maximum duration of the memory used for calibration step 1, in seconds
-
+    trackingData->RTMagCalibrationPeriod = .1; // RT calibration in seconds
+    trackingData->RTmagMaxMemoryDuration = 6; // maximum duration of the memory used for calibration step 1, in seconds
+    
     
     headtracker_init(trackingData);
     
@@ -147,11 +147,11 @@ headtrackerData* headtracker_new() {
     
     trackingData->magCalibrationData->numberOfSamples = 0;
     trackingData->magCalibratingFlag = 0;
-
+    
     trackingData->accCalibrationData->numberOfSamples = 0;
     trackingData->accCalibratingFlag = 0;
     trackingData->accCalMaxGyroNorm = .5;
-
+    
     headtracker_setReceptionStatus(trackingData, COMMUNICATION_STATE_NO_CONNECTED_HEADTRACKER);
     
     return trackingData;
@@ -231,12 +231,12 @@ void headtracker_list_comm_ports(headtrackerData *trackingData) {
 // returns 0 if error
 //
 int export_headtracker_settings(headtrackerData *trackingData, char* filename) {
-	FILE *fd;
+    FILE *fd;
     // open file for writing, returns 0 if it fails
 #if defined(_WIN32) || defined(_WIN64)
     fopen_s( &fd, filename, "w");
 #else /* #if defined(_WIN32) || defined(_WIN64) */
-	fd = fopen( filename, "w");
+    fd = fopen( filename, "w");
 #endif /* #if defined(_WIN32) || defined(_WIN64) */
     
     if( fd == NULL) {
@@ -300,14 +300,14 @@ int import_headtracker_settings(headtrackerData *trackingData, char* filename) {
     char   *keyBuffer =  NULL;
     char   *valueBuffer = NULL;
     char   *brkt;
-
-	FILE *fd;
+    
+    FILE *fd;
     
     // open file for reading, returns 0 if it fails
 #if defined(_WIN32) || defined(_WIN64)
     fopen_s( &fd, filename, "r");
 #else /* #if defined(_WIN32) || defined(_WIN64) */
-	fd = fopen( filename, "r");
+    fd = fopen( filename, "r");
 #endif /* #if defined(_WIN32) || defined(_WIN64) */
     
     if( fd == NULL) {
@@ -392,8 +392,8 @@ int export_magCalDataRawSamples(headtrackerData *trackingData, char* filename) {
     // dump all values in the text file
     for(i = 0; i<trackingData->magCalibrationData->numberOfSamples; i++) {
         fprintf(fd, "%d, %d %d %d;\n", i, (int) round(trackingData->magCalibrationData->rawSamples[i][0]),
-                                        (int) round(trackingData->magCalibrationData->rawSamples[i][1]),
-                                        (int) round(trackingData->magCalibrationData->rawSamples[i][2]));
+                (int) round(trackingData->magCalibrationData->rawSamples[i][1]),
+                (int) round(trackingData->magCalibrationData->rawSamples[i][2]));
     }
     
     
@@ -629,14 +629,14 @@ void headtracker_tick(headtrackerData *trackingData) {
         // get current time
         
         double current_time = get_monotonic_time();
-
-		unsigned int i;
         
-		unsigned char message; // for single bytes to be sent to the head tracker
-
+        unsigned int i;
+        
+        unsigned char message; // for single bytes to be sent to the head tracker
+        
         // check if a new scheduled ping is necessary
         if(current_time >= trackingData->scheduledNextPingTime) {
-			message = R2H_PING_CHAR;
+            message = R2H_PING_CHAR;
             if(write_serial(trackingData->serialcomm,&message, 1) == 1) {
                 //printf("ping sent, delay since last ping %f sec \r\n", current_time - trackingData->scheduledNextPingTime + PINGTIME);
                 
@@ -691,9 +691,9 @@ void headtracker_tick(headtrackerData *trackingData) {
                                 if(trackingData->serialcomm->readBuffer[i]==H2R_END_OF_RAWDATA_FRAME) {
                                     //check that the number of received bytes is correct
                                     if(trackingData->rawDataBufferIndex==NUMBER_OF_BYTES_IN_RAWDATA_FRAME) {
-                                            
+                                        
                                         headtracker_compute_data(trackingData);
-                                            
+                                        
                                         trackingData->trackingDataReady = 1;
                                     } else {
                                         if(trackingData->verbose) {
@@ -726,13 +726,13 @@ void headtracker_tick(headtrackerData *trackingData) {
 // request the settings from the head tracker (stored in EEPROM)
 //
 void headtracker_requestHeadtrackerSettings(headtrackerData *trackingData) {
-	unsigned char message; // for single byte to be sent to the head tracker
+    unsigned char message; // for single byte to be sent to the head tracker
     // if it's not the case, set the state to 1:
     if (trackingData->infoReceptionStatus!=COMMUNICATION_STATE_WAITING_FOR_INFO)
         headtracker_setReceptionStatus(trackingData,COMMUNICATION_STATE_WAITING_FOR_INFO);
     
     if(trackingData->verbose) printf("[hedrot] requesting info\r\n");
-	message = R2H_SEND_INFO_CHAR;
+    message = R2H_SEND_INFO_CHAR;
     write_serial(trackingData->serialcomm, &message, 1);
 }
 
@@ -751,17 +751,17 @@ int processInfoFromHeadtracker(headtrackerData *trackingData, int offset, int nu
     
     char   keyBuffer[RAWDATA_STRING_MAX_SIZE];
     char   valueBuffer[RAWDATA_STRING_MAX_SIZE];
-	int n,i;
+    int n,i;
     
     int keyBufferIndex = 0;
     int valueBufferIndex = 0;
     int isValueFlag = 0; //0 means "still aquiring the key name", 1 means "acquiring the value name"
     
-	for(n=0;n<RAWDATA_STRING_MAX_SIZE;n++) {
+    for(n=0;n<RAWDATA_STRING_MAX_SIZE;n++) {
         keyBuffer[n] = '\0';
         valueBuffer[n] = '\0';
     }
-
+    
     trackingData->calibrationValid = 1; //initialize the "calibration valid" flag
     
     if(trackingData->verbose) printf("headtracker info (%d bytes): \r\n", numberOfBytes);
@@ -786,7 +786,7 @@ int processInfoFromHeadtracker(headtrackerData *trackingData, int offset, int nu
                     pushNotificationMessage(trackingData, NOTIFICATION_MESSAGE_SETTINGS_DATA_TRANSMISSION_FAILED);
                     return 0;
                 }
-                    
+                
                 
                 isValueFlag = 0;
                 keyBufferIndex = 0;
@@ -939,15 +939,19 @@ void headtracker_compute_data(headtrackerData *trackingData) {
         }
     }
     
-    // record raw data for the magnetometer if calibration is running
+    // record raw data for the magnetometer if calibration is running (with subsampling since magnetometer data is oversampled by the headtracker)
     if(trackingData->magCalibratingFlag) {
-        trackingData->magCalibrationData->rawSamples[trackingData->magCalibrationData->numberOfSamples][0] = trackingData->magRawData[0];
-        trackingData->magCalibrationData->rawSamples[trackingData->magCalibrationData->numberOfSamples][1] = trackingData->magRawData[1];
-        trackingData->magCalibrationData->rawSamples[trackingData->magCalibrationData->numberOfSamples][2] = trackingData->magRawData[2];
-        
-        trackingData->magCalibrationData->numberOfSamples++;
-        if(trackingData->magCalibrationData->numberOfSamples>=MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION) {
-            setMagCalibratingFlag(trackingData, 0);
+        trackingData->RTMagCalAcquisitionRateCounter--;
+        if(!trackingData->RTMagCalAcquisitionRateCounter) {
+            trackingData->RTMagCalAcquisitionRateCounter = trackingData->RTMagCalAcquisitionRateFactor;
+            trackingData->magCalibrationData->rawSamples[trackingData->magCalibrationData->numberOfSamples][0] = trackingData->magRawData[0];
+            trackingData->magCalibrationData->rawSamples[trackingData->magCalibrationData->numberOfSamples][1] = trackingData->magRawData[1];
+            trackingData->magCalibrationData->rawSamples[trackingData->magCalibrationData->numberOfSamples][2] = trackingData->magRawData[2];
+            
+            trackingData->magCalibrationData->numberOfSamples++;
+            if(trackingData->magCalibrationData->numberOfSamples>=MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION) {
+                setMagCalibratingFlag(trackingData, 0);
+            }
         }
     }
     
@@ -955,8 +959,8 @@ void headtracker_compute_data(headtrackerData *trackingData) {
     if(trackingData->accCalibratingFlag) {
         // check if the norm of the gyroscope is too high (too much movement)
         if(trackingData->gyroCalData[0]*trackingData->gyroCalData[0]
-            + trackingData->gyroCalData[1]*trackingData->gyroCalData[1]
-            + trackingData->gyroCalData[2]*trackingData->gyroCalData[2]
+           + trackingData->gyroCalData[1]*trackingData->gyroCalData[1]
+           + trackingData->gyroCalData[2]*trackingData->gyroCalData[2]
            > trackingData->accCalMaxGyroNorm * trackingData->accCalMaxGyroNorm) {
             if(!trackingData->accCalPauseStatus) {
                 trackingData->accCalPauseStatus = 1;
@@ -1004,7 +1008,7 @@ void headtracker_compute_data(headtrackerData *trackingData) {
             quaternion2RollPitchYaw(trackingData->qcent1, trackingData->qcent2, trackingData->qcent3, trackingData->qcent4, &trackingData->yaw, &trackingData->pitch, &trackingData->roll);
             break;
     }
-
+    
 }
 
 
@@ -1406,15 +1410,15 @@ void headtracker_open(headtrackerData *trackingData, int portnum)
 //
 void headtracker_close(headtrackerData *trackingData)
 {
-	unsigned char message; // for single byte to be sent to the head tracker
-
+    unsigned char message; // for single byte to be sent to the head tracker
+    
     if(trackingData->verbose) printf("[hedrot] closing port...\r\n");
     
     if(trackingData->serialcomm->comhandle != INVALID_HANDLE_VALUE) {
-		message = R2H_STOP_TRANSMISSION_CHAR;
+        message = R2H_STOP_TRANSMISSION_CHAR;
         write_serial(trackingData->serialcomm,&message, 1); //stops sending raw data
-	}
-
+    }
+    
     close_serial(trackingData->serialcomm);
     
     headtracker_setReceptionStatus(trackingData,COMMUNICATION_STATE_NO_CONNECTED_HEADTRACKER);
@@ -1462,7 +1466,7 @@ void pushNotificationMessage(headtrackerData *trackingData, char messageNumber){
 // headtracker autodiscovering function
 //
 void headtracker_autodiscover(headtrackerData *trackingData) {
-	unsigned int i;
+    unsigned int i;
     
     if(trackingData->verbose) printf("[hedrot] : autodiscovering\r\n");
     
@@ -1516,9 +1520,9 @@ void headtracker_autodiscover(headtrackerData *trackingData) {
 // if during autodiscover, the previous port does not correspond to the headtracker, try the next one
 //
 void headtracker_autodiscover_tryNextPort(headtrackerData *trackingData) {
-	
-	unsigned char message; // for single byte to be sent to the head tracker
-
+    
+    unsigned char message; // for single byte to be sent to the head tracker
+    
     trackingData->serialcomm->portNumber++;
     if(trackingData->serialcomm->portNumber<trackingData->serialcomm->numberOfAvailablePorts) {
         // did we reach the last port? if not, try to open it
@@ -1534,7 +1538,7 @@ void headtracker_autodiscover_tryNextPort(headtrackerData *trackingData) {
             
             // test if it responds to a ping
             // send the ping data and wait for the next tick to see if the headtracker responds
-			message = R2H_AREYOUTHERE_CHAR;
+            message = R2H_AREYOUTHERE_CHAR;
             if(write_serial(trackingData->serialcomm, &message, 1)!=1) {
                 headtracker_setReceptionStatus(trackingData, COMMUNICATION_STATE_AUTODISCOVERING_STARTED);
                 
@@ -1678,6 +1682,7 @@ void setOfflineCalibrationMethod(headtrackerData *trackingData, char offlineCali
 //=====================================================================================================
 void setRTmagCalibrationMethod(headtrackerData *trackingData, char RTmagCalibrationMethod) {
     trackingData->RTmagCalibrationMethod = RTmagCalibrationMethod;
+    initRTmagCalData( trackingData->RTmagCalibrationData, trackingData->magOffset, trackingData->magScaling, trackingData->RTmagMaxDistanceError, trackingData->RTMagCalibrationRateFactor, trackingData->RTmaxNumberOfSamplesStep1);
 }
 
 
@@ -1722,8 +1727,8 @@ void setAccCalibratingFlag(headtrackerData *trackingData, char accCalibratingFla
 // public setters to send attributes to the headtracker
 //=====================================================================================================
 void setSamplerate(headtrackerData *trackingData, long samplerate, char requestSettingsFlag) {
-	unsigned char message[3];
-
+    unsigned char message[3];
+    
     trackingData->samplerate = max(min(samplerate,65535),2);
     trackingData->samplePeriod = 1.0f / trackingData->samplerate;
     
@@ -1732,10 +1737,10 @@ void setSamplerate(headtrackerData *trackingData, long samplerate, char requestS
     
     changeRTMagCalTimeSettings(trackingData);
     
-	message[0] = R2H_TRANSMIT_SAMPLERATE;
-	message[1] = (unsigned char) (trackingData->samplerate%256); //least significant byte first, then most significant byte
-	message[2] = (unsigned char) (trackingData->samplerate/256);
-
+    message[0] = R2H_TRANSMIT_SAMPLERATE;
+    message[1] = (unsigned char) (trackingData->samplerate%256); //least significant byte first, then most significant byte
+    message[2] = (unsigned char) (trackingData->samplerate/256);
+    
     write_serial(trackingData->serialcomm, message, 3);
     
     // request settings
@@ -1744,11 +1749,11 @@ void setSamplerate(headtrackerData *trackingData, long samplerate, char requestS
 
 void setgyroDataRate(headtrackerData *trackingData, unsigned char gyroDataRate, char requestSettingsFlag) {
     unsigned char message[2];
-
-	trackingData->gyroDataRate = gyroDataRate;
-	message[0] = R2H_TRANSMIT_GYRO_RATE;
-	message[1] = trackingData->gyroDataRate;
-	write_serial(trackingData->serialcomm, message, 2);
+    
+    trackingData->gyroDataRate = gyroDataRate;
+    message[0] = R2H_TRANSMIT_GYRO_RATE;
+    message[1] = trackingData->gyroDataRate;
+    write_serial(trackingData->serialcomm, message, 2);
     
     // request settings
     if(requestSettingsFlag) headtracker_requestHeadtrackerSettings(trackingData);
@@ -1756,11 +1761,11 @@ void setgyroDataRate(headtrackerData *trackingData, unsigned char gyroDataRate, 
 
 void setGyroClockSource(headtrackerData *trackingData, unsigned char gyroClockSource, char requestSettingsFlag) {
     unsigned char message[2];
-
-	trackingData->gyroClockSource = gyroClockSource;
-	message[0] = R2H_TRANSMIT_GYRO_CLOCK_SOURCE;
-	message[1] = trackingData->gyroClockSource;
-	write_serial(trackingData->serialcomm, message, 2);
+    
+    trackingData->gyroClockSource = gyroClockSource;
+    message[0] = R2H_TRANSMIT_GYRO_CLOCK_SOURCE;
+    message[1] = trackingData->gyroClockSource;
+    write_serial(trackingData->serialcomm, message, 2);
     
     // request settings
     if(requestSettingsFlag) headtracker_requestHeadtrackerSettings(trackingData);
@@ -1768,11 +1773,11 @@ void setGyroClockSource(headtrackerData *trackingData, unsigned char gyroClockSo
 
 void setGyroDLPFBandwidth(headtrackerData *trackingData, unsigned char gyroDLPFBandwidth, char requestSettingsFlag) {
     unsigned char message[2];
-
-	trackingData->gyroDLPFBandwidth = gyroDLPFBandwidth;
-	message[0] = R2H_TRANSMIT_GYRO_LPF_BANDWIDTH;
-	message[1] = trackingData->gyroDLPFBandwidth;
-	write_serial(trackingData->serialcomm, message, 2);
+    
+    trackingData->gyroDLPFBandwidth = gyroDLPFBandwidth;
+    message[0] = R2H_TRANSMIT_GYRO_LPF_BANDWIDTH;
+    message[1] = trackingData->gyroDLPFBandwidth;
+    write_serial(trackingData->serialcomm, message, 2);
     
     // request settings
     if(requestSettingsFlag) headtracker_requestHeadtrackerSettings(trackingData);
@@ -1780,11 +1785,11 @@ void setGyroDLPFBandwidth(headtrackerData *trackingData, unsigned char gyroDLPFB
 
 void setAccRange(headtrackerData *trackingData, unsigned char accRange, char requestSettingsFlag) {
     unsigned char message[2];
-
-	trackingData->accRange = accRange;
-	message[0] = R2H_TRANSMIT_ACCEL_RANGE;
-	message[1] = trackingData->accRange;
-	write_serial(trackingData->serialcomm, message, 2);
+    
+    trackingData->accRange = accRange;
+    message[0] = R2H_TRANSMIT_ACCEL_RANGE;
+    message[1] = trackingData->accRange;
+    write_serial(trackingData->serialcomm, message, 2);
     
     // request settings
     if(requestSettingsFlag) headtracker_requestHeadtrackerSettings(trackingData);
@@ -1792,7 +1797,7 @@ void setAccRange(headtrackerData *trackingData, unsigned char accRange, char req
 
 void setAccHardOffset(headtrackerData *trackingData, char *accHardOffset, char requestSettingsFlag) {
     int i;
-	for(i=0;i<3;i++) {
+    for(i=0;i<3;i++) {
         trackingData->accHardOffset[i] = accHardOffset[i];
     }
     
@@ -1804,11 +1809,11 @@ void setAccHardOffset(headtrackerData *trackingData, char *accHardOffset, char r
 
 void setAccFullResolutionBit(headtrackerData *trackingData, unsigned char accFullResolutionBit, char requestSettingsFlag) {
     unsigned char message[2];
-	
-	trackingData->accFullResolutionBit = accFullResolutionBit;
-	message[0] = R2H_TRANSMIT_ACCEL_FULL_RESOLUTION_BIT;
-	message[1] = trackingData->accFullResolutionBit;
-	write_serial(trackingData->serialcomm, message, 2);
+    
+    trackingData->accFullResolutionBit = accFullResolutionBit;
+    message[0] = R2H_TRANSMIT_ACCEL_FULL_RESOLUTION_BIT;
+    message[1] = trackingData->accFullResolutionBit;
+    write_serial(trackingData->serialcomm, message, 2);
     
     // request settings
     if(requestSettingsFlag) headtracker_requestHeadtrackerSettings(trackingData);
@@ -1816,11 +1821,11 @@ void setAccFullResolutionBit(headtrackerData *trackingData, unsigned char accFul
 
 void setAccDataRate(headtrackerData *trackingData, unsigned char accDataRate, char requestSettingsFlag) {
     unsigned char message[2];
-	
-	trackingData->accDataRate = accDataRate;
-	message[0] = R2H_TRANSMIT_ACCEL_DATARATE;
-	message[1] = trackingData->accDataRate;
-	write_serial(trackingData->serialcomm, message, 2);
+    
+    trackingData->accDataRate = accDataRate;
+    message[0] = R2H_TRANSMIT_ACCEL_DATARATE;
+    message[1] = trackingData->accDataRate;
+    write_serial(trackingData->serialcomm, message, 2);
     
     // request settings
     if(requestSettingsFlag) headtracker_requestHeadtrackerSettings(trackingData);
@@ -1828,11 +1833,11 @@ void setAccDataRate(headtrackerData *trackingData, unsigned char accDataRate, ch
 
 void setMagMeasurementBias(headtrackerData *trackingData, unsigned char magMeasurementBias, char requestSettingsFlag) {
     unsigned char message[2];
-	
-	trackingData->magMeasurementBias = magMeasurementBias;
-	message[0] = R2H_TRANSMIT_MAG_MEASUREMENT_BIAS;
-	message[1] = trackingData->magMeasurementBias;
-	write_serial(trackingData->serialcomm, message, 2);
+    
+    trackingData->magMeasurementBias = magMeasurementBias;
+    message[0] = R2H_TRANSMIT_MAG_MEASUREMENT_BIAS;
+    message[1] = trackingData->magMeasurementBias;
+    write_serial(trackingData->serialcomm, message, 2);
     
     // request settings
     if(requestSettingsFlag) headtracker_requestHeadtrackerSettings(trackingData);
@@ -1840,11 +1845,11 @@ void setMagMeasurementBias(headtrackerData *trackingData, unsigned char magMeasu
 
 void setMagSampleAveraging(headtrackerData *trackingData, unsigned char magSampleAveraging, char requestSettingsFlag) {
     unsigned char message[2];
-	
-	trackingData->magSampleAveraging = magSampleAveraging;
-	message[0] = R2H_TRANSMIT_MAG_SAMPLE_AVERAGING;
-	message[1] = trackingData->magSampleAveraging;
-	write_serial(trackingData->serialcomm, message, 2);
+    
+    trackingData->magSampleAveraging = magSampleAveraging;
+    message[0] = R2H_TRANSMIT_MAG_SAMPLE_AVERAGING;
+    message[1] = trackingData->magSampleAveraging;
+    write_serial(trackingData->serialcomm, message, 2);
     
     // request settings
     if(requestSettingsFlag) headtracker_requestHeadtrackerSettings(trackingData);
@@ -1855,10 +1860,10 @@ void setMagDataRate(headtrackerData *trackingData, unsigned char magDataRate, ch
     
     changeRTMagCalTimeSettings(trackingData);
     
-	trackingData->magDataRate = magDataRate;
-	message[0] = R2H_TRANSMIT_MAG_DATA_RATE;
-	message[1] = trackingData->magDataRate;
-	write_serial(trackingData->serialcomm, message, 2);
+    trackingData->magDataRate = magDataRate;
+    message[0] = R2H_TRANSMIT_MAG_DATA_RATE;
+    message[1] = trackingData->magDataRate;
+    write_serial(trackingData->serialcomm, message, 2);
     
     // request settings
     if(requestSettingsFlag) headtracker_requestHeadtrackerSettings(trackingData);
@@ -1866,11 +1871,11 @@ void setMagDataRate(headtrackerData *trackingData, unsigned char magDataRate, ch
 
 void setMagGain(headtrackerData *trackingData, unsigned char magGain, char requestSettingsFlag) {
     unsigned char message[2];
-	
-	trackingData->magGain = magGain;
-	message[0] = R2H_TRANSMIT_MAG_GAIN;
-	message[1] = trackingData->magGain;
-	write_serial(trackingData->serialcomm, message, 2);
+    
+    trackingData->magGain = magGain;
+    message[0] = R2H_TRANSMIT_MAG_GAIN;
+    message[1] = trackingData->magGain;
+    write_serial(trackingData->serialcomm, message, 2);
     
     // request settings
     if(requestSettingsFlag) headtracker_requestHeadtrackerSettings(trackingData);
@@ -1880,11 +1885,11 @@ void setMagMeasurementMode(headtrackerData *trackingData, unsigned char magMeasu
     unsigned char message[2];
     
     changeRTMagCalTimeSettings(trackingData);
-	
-	trackingData->magMeasurementMode = magMeasurementMode;
-	message[0] = R2H_TRANSMIT_MAG_MEASUREMENT_MODE;
-	message[1] = trackingData->magMeasurementMode;
-	write_serial(trackingData->serialcomm, message, 2);
+    
+    trackingData->magMeasurementMode = magMeasurementMode;
+    message[0] = R2H_TRANSMIT_MAG_MEASUREMENT_MODE;
+    message[1] = trackingData->magMeasurementMode;
+    write_serial(trackingData->serialcomm, message, 2);
     
     // request settings
     if(requestSettingsFlag) headtracker_requestHeadtrackerSettings(trackingData);
@@ -1897,7 +1902,7 @@ void setMagMeasurementMode(headtrackerData *trackingData, unsigned char magMeasu
 
 void setAccOffset(headtrackerData *trackingData, float* accOffset, char requestSettingsFlag) {
     int i;
-
+    
     for(i=0;i<3;i++)
         trackingData->accOffset[i] = accOffset[i];
     
@@ -1909,7 +1914,7 @@ void setAccOffset(headtrackerData *trackingData, float* accOffset, char requestS
 
 void setAccScaling(headtrackerData *trackingData, float* accScaling, char requestSettingsFlag) {
     int i;
-
+    
     for(i=0;i<3;i++) {
         trackingData->accScaling[i] = accScaling[i];
         trackingData->accScalingFactor[i] = 1/accScaling[i];
@@ -1923,7 +1928,7 @@ void setAccScaling(headtrackerData *trackingData, float* accScaling, char reques
 
 void setMagOffset(headtrackerData *trackingData, float* magOffset, char requestSettingsFlag) {
     int i;
-
+    
     for(i=0;i<3;i++)
         trackingData->magOffset[i] = magOffset[i];
     
@@ -1935,7 +1940,7 @@ void setMagOffset(headtrackerData *trackingData, float* magOffset, char requestS
 
 void setMagScaling(headtrackerData *trackingData, float* magScaling, char requestSettingsFlag) {
     int i;
-
+    
     for(i=0;i<3;i++) {
         trackingData->magScaling[i] = magScaling[i];
         trackingData->magScalingFactor[i] = 1/magScaling[i];
@@ -1960,8 +1965,8 @@ void setRTmagCalOn(headtrackerData *trackingData, char RTmagCalOn) {
     trackingData->RTMagCalAcquisitionRateCounter = trackingData->RTMagCalAcquisitionRateFactor;
 }
 
-void setRTmagMaxMemoryDurationStep1(headtrackerData *trackingData, float RTmagMaxMemoryDurationStep1) {
-    trackingData->RTmagMaxMemoryDurationStep1 = RTmagMaxMemoryDurationStep1;
+void setRTmagMaxMemoryDuration(headtrackerData *trackingData, float RTmagMaxMemoryDuration) {
+    trackingData->RTmagMaxMemoryDuration = RTmagMaxMemoryDuration;
     
     changeRTMagCalTimeSettings(trackingData);
 }
@@ -2016,48 +2021,48 @@ void headtracker_setReceptionStatus(headtrackerData *trackingData, int n) {
 // send a float array to the headtracker
 void headtracker_sendFloatArray2Headtracker(headtrackerData *trackingData, float* data, int numValues, unsigned char StartTransmitChar, unsigned char StopTransmitChar) {
     char charData[20];
-
-	unsigned char message[1000]; // the char array won't probably be longer as 1000
-	int messageLen;
+    
+    unsigned char message[1000]; // the char array won't probably be longer as 1000
+    int messageLen;
     
     int i;
-	unsigned int n;
+    unsigned int n;
     
-	messageLen = 0;
-
-	message[messageLen++] = StartTransmitChar;
+    messageLen = 0;
+    
+    message[messageLen++] = StartTransmitChar;
     for(i=0;i<numValues;i++)
-	{
+    {
 #if defined(_WIN32) || defined(_WIN64)
         sprintf_s(charData, 20, "%.2f", data[i]);
 #else /* #if defined(_WIN32) || defined(_WIN64) */
         sprintf(charData,"%.2f",data[i]);
 #endif /* #if defined(_WIN32) || defined(_WIN64) */
-
+        
         for(n=0;n<strlen(charData);n++)
             message[messageLen++] = charData[n];
         
         if(i<numValues-1)
             message[messageLen++] = ' '; // pas d'espace après le dernier
-	}
-	message[messageLen++] = StopTransmitChar;
-
-	write_serial(trackingData->serialcomm, message, messageLen);
+    }
+    message[messageLen++] = StopTransmitChar;
+    
+    write_serial(trackingData->serialcomm, message, messageLen);
 }
 
 
 // send a signed char array to the headtracker
 void headtracker_sendSignedCharArray2Headtracker(headtrackerData *trackingData, char *data, int numValues, unsigned char StartTransmitChar, unsigned char StopTransmitChar) {
     int i;
-	unsigned char message[1000];	
-	
-	message[0] = StartTransmitChar;
+    unsigned char message[1000];
+    
+    message[0] = StartTransmitChar;
     for(i=0;i<numValues;i++)
         message[i+1] = data[i];
-	message[numValues+1] = StopTransmitChar;
-
-	write_serial(trackingData->serialcomm, message, numValues+2);
-
+    message[numValues+1] = StopTransmitChar;
+    
+    write_serial(trackingData->serialcomm, message, numValues+2);
+    
 }
 
 
@@ -2128,9 +2133,9 @@ void changeRTMagCalTimeSettings(headtrackerData *trackingData) {
     RTmagCalibration_setCalibrationRateFactor(trackingData->RTmagCalibrationData, trackingData->RTMagCalibrationRateFactor);
     
     // 4/ update the max number of samples for step1
-    // update maxNumberOfSamplesStep1 according to RTmagMaxMemoryDurationStep1 and the sampling rate of the magnetometer
-    trackingData->RTmaxNumberOfSamplesStep1 = round(trackingData->RTmagMaxMemoryDurationStep1 * magRate);
-    RTmagCalibration_setMaxNumberOfSamplesStep1(trackingData->RTmagCalibrationData, trackingData->RTmaxNumberOfSamplesStep1);
+    // update maxNumberOfSamplesStep1 according to RTmagMaxMemoryDuration and the sampling rate of the magnetometer
+    trackingData->RTmaxNumberOfSamplesStep1 = round(trackingData->RTmagMaxMemoryDuration * magRate);
+    RTmagCalibration_setmaxNumberOfSamples(trackingData->RTmagCalibrationData, trackingData->RTmaxNumberOfSamplesStep1);
 }
 
 

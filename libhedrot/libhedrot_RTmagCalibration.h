@@ -26,6 +26,9 @@
 
 #define MAX_ALLOWED_STANDARD_DEVIATION_ERROR .1
 
+#define UPPER_NORM_FOR_ABSURD_VALUES 1.5 // for method RTmagCalibrationUpdateIterative
+#define UPPER_NORM2_FOR_ABSURD_VALUES UPPER_NORM_FOR_ABSURD_VALUES*UPPER_NORM_FOR_ABSURD_VALUES // for method RTmagCalibrationUpdateIterative
+
 //=====================================================================================================
 // structure definition: RTmagZoneData (structure that stores information per zone)
 //=====================================================================================================
@@ -46,7 +49,7 @@ typedef struct _RTmagCalData {
     float               RTmagMaxDistanceError;
     
     // for step 1 (with raw samples)
-    long                maxNumberOfSamplesStep1;
+    long                maxNumberOfSamples;
     long                sampleIndexStep1; // internal
     
     // for step 2 (with Fibonacci mapping)
@@ -60,8 +63,11 @@ typedef struct _RTmagCalData {
     float               estimatedOffset[3];
     float               estimatedScaling[3], estimatedScalingFactor[3];
     
-    // countainer for calibrating with ellipsoid fit and displaying purposes
+    // container for calibrating with ellipsoid fit and displaying purposes
     calibrationData*    calData;
+    
+    // temporary container for storing data before filtering
+    calibrationData*    TMPcalData;
     
     // internal data
     short               calibrationRateCounter;
@@ -76,11 +82,11 @@ typedef struct _RTmagCalData {
 //=====================================================================================================
 RTmagCalData* newRTmagCalData();
 void freeRTmagCalData(RTmagCalData* data);
-void initRTmagCalData(RTmagCalData* data, float* initalEstimatedOffset, float* initalEstimatedScaling, float RTmagMaxDistanceError, short calibrationRateFactor, long maxNumberOfSamplesStep1);
+void initRTmagCalData(RTmagCalData* data, float* initalEstimatedOffset, float* initalEstimatedScaling, float RTmagMaxDistanceError, short calibrationRateFactor, long maxNumberOfSamples);
 
 void RTmagCalibration_setCalibrationRateFactor(RTmagCalData* data, short calibrationRateFactor);
 
-void RTmagCalibration_setMaxNumberOfSamplesStep1(RTmagCalData* data, long maxNumberOfSamplesStep1);
+void RTmagCalibration_setmaxNumberOfSamples(RTmagCalData* data, long maxNumberOfSamples);
 
 void RTmagCalibration_setRTmagMaxDistanceError(RTmagCalData* data, float RTmagMaxDistanceError);
 

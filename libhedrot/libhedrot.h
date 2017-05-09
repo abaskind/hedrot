@@ -21,7 +21,7 @@
 
 
 // hedrot version
-#define HEDROT_VERSION "1.2.0beta1"
+#define HEDROT_VERSION "1.2.0beta2"
 
 //=====================================================================================================
 // static definitions
@@ -133,7 +133,7 @@ typedef struct _headtrackerData {
     char            offlineCalibrationMethod; //0 = double ellipsoid fit, 1 = Aussal
     char            RTmagCalibrationMethod; //0 = direct, 1 = iterative
     char            RTmagCalOn; // for real-time calibration
-    float           RTmagMaxMemoryDurationStep1; // RT mag calibration step 1: maximum duration of the memory used for calibration, in seconds
+    float           RTmagMaxMemoryDuration; // RT mag calibration step 1: maximum duration of the memory used for calibration, in seconds
     long            RTmaxNumberOfSamplesStep1; // same thing in samples
     float           RTmagMaxDistanceError; // for RT mag calibration step 2, tolerance on the radius for new points
     float           RTMagCalibrationPeriod; // RT mag calibration period in seconds
@@ -314,7 +314,7 @@ void setMagScaling(headtrackerData *trackingData, float* magScaling, char reques
 // public setters for mag real-time calibration
 //=====================================================================================================
 void setRTmagCalOn(headtrackerData *trackingData, char RTmagCalOn);
-void setRTmagMaxMemoryDurationStep1(headtrackerData *trackingData, float setRTmagMaxMemoryDurationStep1);
+void setRTmagMaxMemoryDuration(headtrackerData *trackingData, float setRTmagMaxMemoryDuration);
 void setRTMagCalibrationPeriod(headtrackerData *trackingData, float RTMagCalibrationPeriod);
 void setRTmagMaxDistanceError(headtrackerData *trackingData, float RTmagMaxDistanceError);
 

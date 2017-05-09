@@ -30,13 +30,13 @@
 // returns 1 (error) if calibration failed
 
 int accMagCalibration(calibrationData* calData, float* estimatedOffset, float* estimatedScaling) {
-    calibrationData TMPcalData1;
+    calibrationData* TMPcalData = (calibrationData*) malloc(sizeof(calibrationData)); // data after filtering
     float TMPestimatedOffset[3], TMPestimatedScaling[3];
     char err = 0;
-    double quadricCoefficients6[6]; // not used here, needed however to call ellipsoidFit
+    double quadricCoefficients6[6]; // not used here, needed however to call nonRotatedEllipsoidFit
     
-    // first pass: calls ellipsoidFit a first time
-    if( ellipsoidFit(calData, TMPestimatedOffset, TMPestimatedScaling, quadricCoefficients6, MAX_CONDITION_NUMBER_OFFLINE) ) {
+    // first pass: calls nonRotatedEllipsoidFit a first time
+    if( nonRotatedEllipsoidFit(calData, TMPestimatedOffset, TMPestimatedScaling, quadricCoefficients6, MAX_CONDITION_NUMBER_OFFLINE) ) {
         // if error, quits
         printf( "[libhedrot] (function accMagCalibration) first pass failed.\r\n" );
         err =  1;
@@ -52,10 +52,10 @@ int accMagCalibration(calibrationData* calData, float* estimatedOffset, float* e
     
 
     // based on the norm error from the first pass, filter out aberrant raw samples
-    filterCalData(calData, &TMPcalData1, TMPestimatedOffset);
+    filterCalData(calData, TMPcalData, TMPestimatedOffset);
     
-    // second pass: calls ellipsoidFit a second time
-    if( ellipsoidFit(&TMPcalData1, TMPestimatedOffset, TMPestimatedScaling, quadricCoefficients6, MAX_CONDITION_NUMBER_OFFLINE) ) {
+    // second pass: calls nonRotatedEllipsoidFit a second time
+    if( nonRotatedEllipsoidFit(TMPcalData, TMPestimatedOffset, TMPestimatedScaling, quadricCoefficients6, MAX_CONDITION_NUMBER_OFFLINE) ) {
         // if error, quits
         printf( "[libhedrot] (function accMagCalibration) second pass failed.\r\n" );
         err =  1;
@@ -66,8 +66,8 @@ int accMagCalibration(calibrationData* calData, float* estimatedOffset, float* e
     printf( "[libhedrot] (function accMagCalibration) second pass succeeded.\r\n" );
     printf( "           radii: %f %f %f\r\n", TMPestimatedScaling[0], TMPestimatedScaling[1], TMPestimatedScaling[2]);
     printf( "           offsets: %f %f %f\r\n", TMPestimatedOffset[0], TMPestimatedOffset[1], TMPestimatedOffset[2]);
-    printf( "           condition number for ellipsoid fit: %f\r\n", TMPcalData1.conditionNumber);
-    printf( "           maximum norm error: %f\r\n", TMPcalData1.maxNormError);
+    printf( "           condition number for ellipsoid fit: %f\r\n", TMPcalData->conditionNumber);
+    printf( "           maximum norm error: %f\r\n", TMPcalData->maxNormError);
     
     // save the final estimation values
     estimatedOffset[0] = (float) TMPestimatedOffset[0];
@@ -81,12 +81,12 @@ int accMagCalibration(calibrationData* calData, float* estimatedOffset, float* e
     cookCalibrationData(calData, estimatedOffset, estimatedScaling);
     
     // overwrite the stats that have just been computed by the previous one (which ignores the data that had been filtered out)
-    calData->maxNormError = TMPcalData1.maxNormError;
-    calData->normAverage = TMPcalData1.normAverage;
-    calData->normStdDev = TMPcalData1.normStdDev;
+    calData->maxNormError = TMPcalData->maxNormError;
+    calData->normAverage = TMPcalData->normAverage;
+    calData->normStdDev = TMPcalData->normStdDev;
     
     // set as condition number the one from the second pass
-    calData->conditionNumber = TMPcalData1.conditionNumber;
+    calData->conditionNumber = TMPcalData->conditionNumber;
     
 end:
 
@@ -105,7 +105,7 @@ end:
 // returns 1 (error) if calibration failed
 
 int myCalibration1(calibrationData* calData, float* estimatedOffset, float* estimatedScaling) {
-    calibrationData TMPcalData1;
+    calibrationData* TMPcalData = (calibrationData*) malloc(sizeof(calibrationData)); // data after filtering
     float TMPestimatedOffset[3], TMPestimatedScaling[3];
     int i;
     char err = 0;
@@ -120,10 +120,10 @@ int myCalibration1(calibrationData* calData, float* estimatedOffset, float* esti
     getMean3(&calData->rawSamples[0][0], calData->numberOfSamples, X0);
     
     // filter out aberrant raw samples
-    filterCalData(calData, &TMPcalData1, X0);
+    filterCalData(calData, TMPcalData, X0);
     
-    // first pass: calls quadricFit (rotated ellipsoid)
-    if( quadricFit(&TMPcalData1, quadricCoefficients9, MAX_CONDITION_NUMBER_OFFLINE) ) {
+    // first pass: calls rotatedEllipsoidFit (rotated ellipsoid)
+    if( rotatedEllipsoidFit(TMPcalData, quadricCoefficients9, MAX_CONDITION_NUMBER_OFFLINE) ) {
         // if error, quits
         printf( "[libhedrot] (function myCalibration1) first pass failed.\r\n" );
         err =  1;
@@ -136,8 +136,8 @@ int myCalibration1(calibrationData* calData, float* estimatedOffset, float* esti
            quadricCoefficients9[3], quadricCoefficients9[4], quadricCoefficients9[5],
            quadricCoefficients9[6], quadricCoefficients9[7], quadricCoefficients9[8] );
 
-    // second pass: calls ellipsoidFit a first time (forcing non-rotated ellipsoid)
-    if( ellipsoidFit(&TMPcalData1, TMPestimatedOffset, TMPestimatedScaling, quadricCoefficients6, MAX_CONDITION_NUMBER_OFFLINE) ) {
+    // second pass: calls nonRotatedEllipsoidFit a first time (forcing non-rotated ellipsoid)
+    if( nonRotatedEllipsoidFit(TMPcalData, TMPestimatedOffset, TMPestimatedScaling, quadricCoefficients6, MAX_CONDITION_NUMBER_OFFLINE) ) {
         // if error, quits
         printf( "[libhedrot] (function myCalibration1) second pass failed.\r\n" );
         err =  1;
@@ -212,8 +212,8 @@ int myCalibration1(calibrationData* calData, float* estimatedOffset, float* esti
     
     printf( "           radii: %f %f %f\r\n", estimatedScaling[0], estimatedScaling[1], estimatedScaling[2]);
     printf( "           offsets: %f %f %f\r\n", estimatedOffset[0], estimatedOffset[1], estimatedOffset[2]);
-    printf( "           condition number for ellipsoid fit: %f\r\n", TMPcalData1.conditionNumber);
-    printf( "           maximum norm error: %f\r\n", TMPcalData1.maxNormError);
+    printf( "           condition number for ellipsoid fit: %f\r\n", TMPcalData->conditionNumber);
+    printf( "           maximum norm error: %f\r\n", TMPcalData->maxNormError);
     
     
     
@@ -221,10 +221,10 @@ int myCalibration1(calibrationData* calData, float* estimatedOffset, float* esti
     cookCalibrationData(calData, estimatedOffset, estimatedScaling);
     
     // overwrite the max norm error that has been just computed by the previous one (which ignores the data that had been filtered out)
-    calData->maxNormError = TMPcalData1.maxNormError;
+    calData->maxNormError = TMPcalData->maxNormError;
     
     // set as condition number the one from the second pass
-    calData->conditionNumber = TMPcalData1.conditionNumber;
+    calData->conditionNumber = TMPcalData->conditionNumber;
     
 end:
 
@@ -234,7 +234,7 @@ end:
 
 
 //=====================================================================================================
-// function ellipsoidFit
+// function nonRotatedEllipsoidFit
 //=====================================================================================================
 //
 // find the center and raddii of a set of raw data (Nx3), assumed to be on a non rotated ellipsoid
@@ -250,7 +250,7 @@ end:
 // ... with gamma = 1 + ( d^2/a + e^2/b + f^2/c );
 //
 // returns 1 (error) if calibration failed
-int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estimatedScaling, double *quadricCoefficients, double maxConditionNumber) {
+int nonRotatedEllipsoidFit(calibrationData* calData, float* estimatedOffset, float* estimatedScaling, double *quadricCoefficients, double maxConditionNumber) {
     int i;
     char err = 0;
     double gamma;
@@ -383,7 +383,7 @@ int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estima
     estimatedScaling[1] = TMPestimatedScaling[1];
     estimatedScaling[2] = TMPestimatedScaling[2];
     
-    // compute the condition number
+    // store the condition number
     calData->conditionNumber = vectorS[0]/vectorS[5];
     
     // cook extra data (for displaying/debugging purposes)
@@ -408,7 +408,7 @@ end:
 
 
 //=====================================================================================================
-// function quadricFit
+// function rotatedEllipsoidFit
 //=====================================================================================================
 //
 // find the 9 coefficients of a set of raw data (Nx3), assumed to be on a quadric
@@ -424,7 +424,7 @@ end:
 //
 //
 // returns 1 (error) if calibration failed
-int quadricFit(calibrationData* calData, double *quadricCoefficients, double maxConditionNumber) {
+int rotatedEllipsoidFit(calibrationData* calData, double *quadricCoefficients, double maxConditionNumber) {
     int i;
     char err = 0;
     

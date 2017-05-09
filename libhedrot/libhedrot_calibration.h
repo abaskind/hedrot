@@ -39,8 +39,8 @@ int accMagCalibration(calibrationData* calData, float* estimatedOffset, float* e
 
 int myCalibration1(calibrationData* calData, float* estimatedOffset, float* estimatedScaling);
 
-int ellipsoidFit(calibrationData* calData, float* estimatedOffset, float* estimatedScaling, double *quadricCoefficients, double maxConditionNumber);
-int quadricFit(calibrationData* calData, double *quadricCoefficients, double maxConditionNumber);
+int nonRotatedEllipsoidFit(calibrationData* calData, float* estimatedOffset, float* estimatedScaling, double *quadricCoefficients, double maxConditionNumber);
+int rotatedEllipsoidFit(calibrationData* calData, double *quadricCoefficients, double maxConditionNumber);
 
 int filterCalData(calibrationData *inCalData, calibrationData *outCalData, float center[3]);
 

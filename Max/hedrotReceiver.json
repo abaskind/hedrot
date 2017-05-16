@@ -31,7 +31,11 @@
 					"ReceiverSettings::axesReference" : [ 0 ],
 					"ReceiverSettings::invertRotation" : [ 0 ],
 					"ReceiverSettings::outputDataPeriod" : [ 5 ],
-					"ReceiverSettings::rotationOrder" : [ 0 ]
+					"ReceiverSettings::rotationOrder" : [ 0 ],
+					"Real-Time Magnetometer Calibration::RTMagCalibrationPeriod" : [ 0.1 ],
+					"Real-Time Magnetometer Calibration::RTmagCalibrationMethod" : [ 0 ],
+					"Real-Time Magnetometer Calibration::RTmagMaxDistanceError" : [ 0.05 ],
+					"Real-Time Magnetometer Calibration::RTmagMaxMemoryDuration" : [ 10.0 ]
 				}
 
 			}
@@ -65,7 +69,11 @@
 					"ReceiverSettings::axesReference" : [ 0 ],
 					"ReceiverSettings::invertRotation" : [ 0 ],
 					"ReceiverSettings::outputDataPeriod" : [ 5 ],
-					"ReceiverSettings::rotationOrder" : [ 0 ]
+					"ReceiverSettings::rotationOrder" : [ 0 ],
+					"Real-Time Magnetometer Calibration::RTMagCalibrationPeriod" : [ 0.1 ],
+					"Real-Time Magnetometer Calibration::RTmagCalibrationMethod" : [ 0 ],
+					"Real-Time Magnetometer Calibration::RTmagMaxDistanceError" : [ 0.05 ],
+					"Real-Time Magnetometer Calibration::RTmagMaxMemoryDuration" : [ 10.0 ]
 				}
 
 			}
@@ -99,7 +107,11 @@
 					"ReceiverSettings::axesReference" : [ 1 ],
 					"ReceiverSettings::invertRotation" : [ 1 ],
 					"ReceiverSettings::outputDataPeriod" : [ 5 ],
-					"ReceiverSettings::rotationOrder" : [ 0 ]
+					"ReceiverSettings::rotationOrder" : [ 0 ],
+					"Real-Time Magnetometer Calibration::RTMagCalibrationPeriod" : [ 0.1 ],
+					"Real-Time Magnetometer Calibration::RTmagCalibrationMethod" : [ 0 ],
+					"Real-Time Magnetometer Calibration::RTmagMaxDistanceError" : [ 0.05 ],
+					"Real-Time Magnetometer Calibration::RTmagMaxMemoryDuration" : [ 10.0 ]
 				}
 
 			}
@@ -133,7 +145,11 @@
 					"ReceiverSettings::axesReference" : [ 2 ],
 					"ReceiverSettings::invertRotation" : [ 1 ],
 					"ReceiverSettings::outputDataPeriod" : [ 5 ],
-					"ReceiverSettings::rotationOrder" : [ 0 ]
+					"ReceiverSettings::rotationOrder" : [ 0 ],
+					"Real-Time Magnetometer Calibration::RTMagCalibrationPeriod" : [ 0.1 ],
+					"Real-Time Magnetometer Calibration::RTmagCalibrationMethod" : [ 0 ],
+					"Real-Time Magnetometer Calibration::RTmagMaxDistanceError" : [ 0.05 ],
+					"Real-Time Magnetometer Calibration::RTmagMaxMemoryDuration" : [ 10.0 ]
 				}
 
 			}

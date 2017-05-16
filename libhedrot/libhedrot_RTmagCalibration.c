@@ -345,6 +345,13 @@ short RTmagCalibrationUpdateDirect( RTmagCalData* data, short rawPoint[3]) {
                 
             } else {
                 printf("standard deviation too high, calibration rejected\r\n");
+                // the previous estimation was better, keep it
+                data->estimatedOffset[0] = data->previousEstimatedOffset[0];
+                data->estimatedOffset[1] = data->previousEstimatedOffset[1];
+                data->estimatedOffset[2] = data->previousEstimatedOffset[2];
+                data->estimatedScaling[0] = data->previousEstimatedScaling[0];
+                data->estimatedScaling[1] = data->previousEstimatedScaling[1];
+                data->estimatedScaling[2] = data->previousEstimatedScaling[2];
                 return 2;
             }
         } else { // calibration failed

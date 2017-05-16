@@ -21,7 +21,7 @@
 
 
 // hedrot version
-#define HEDROT_VERSION "1.2.0beta2"
+#define HEDROT_VERSION "1.2.0beta3"
 
 //=====================================================================================================
 // static definitions

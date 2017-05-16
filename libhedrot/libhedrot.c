@@ -75,7 +75,7 @@ headtrackerData* headtracker_new() {
     trackingData->RTmagCalOn = 0;
     trackingData->RTmagMaxDistanceError = .1; // 10% distance error compared to the previously calibrated set is allowed
     trackingData->RTMagCalibrationPeriod = .1; // RT calibration in seconds
-    trackingData->RTmagMaxMemoryDuration = 6; // maximum duration of the memory used for calibration step 1, in seconds
+    trackingData->RTmagMaxMemoryDuration = 10; // maximum duration of the memory used for calibration step 1, in seconds
     
     
     headtracker_init(trackingData);

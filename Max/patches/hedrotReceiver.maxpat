@@ -111,7 +111,7 @@
 							"modernui" : 1
 						}
 ,
-						"rect" : [ 680.0, 56.0, 553.0, 623.0 ],
+						"rect" : [ 712.0, 44.0, 553.0, 623.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 1,
 						"default_fontsize" : 12.0,
@@ -139,6 +139,27 @@
 						"style" : "",
 						"subpatcher_template" : "",
 						"boxes" : [ 							{
+								"box" : 								{
+									"id" : "obj-36",
+									"maxclass" : "newobj",
+									"numinlets" : 1,
+									"numoutlets" : 4,
+									"outlettype" : [ "", "", "", "" ],
+									"patching_rect" : [ 219.0, 10.0, 144.0, 22.0 ],
+									"restore" : 									{
+										"RTMagCalibrationPeriod" : [ 0.1 ],
+										"RTmagCalibrationMethod" : [ 0 ],
+										"RTmagMaxDistanceError" : [ 0.05 ],
+										"RTmagMaxMemoryDuration" : [ 10.0 ]
+									}
+,
+									"style" : "",
+									"text" : "autopattr @autorestore 0",
+									"varname" : "u962001272"
+								}
+
+							}
+, 							{
 								"box" : 								{
 									"fontname" : "Arial",
 									"fontsize" : 12.0,
@@ -2730,7 +2751,8 @@
 					}
 ,
 					"style" : "",
-					"text" : "p \"Real-Time Magnetometer Calibration\""
+					"text" : "p \"Real-Time Magnetometer Calibration\"",
+					"varname" : "Real-Time Magnetometer Calibration"
 				}
 
 			}
@@ -9653,7 +9675,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u829001977"
+									"varname" : "u264001167"
 								}
 
 							}
@@ -15398,7 +15420,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u135001976"
+									"varname" : "u699001166"
 								}
 
 							}
@@ -17017,7 +17039,7 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 26.0, 84.0, 512.67334, 29.0 ],
 					"style" : "",
-					"text" : "no headtracker connected",
+					"text" : "headtracker transmitting...",
 					"textcolor" : [ 0.0, 0.501961, 1.0, 1.0 ],
 					"textjustification" : 1
 				}
@@ -18160,6 +18182,7 @@
 								"box" : 								{
 									"fontname" : "Arial Bold",
 									"fontsize" : 14.0,
+									"hidden" : 1,
 									"id" : "obj-128",
 									"maxclass" : "comment",
 									"numinlets" : 1,
@@ -18220,6 +18243,7 @@
 , 							{
 								"box" : 								{
 									"allowdrag" : 0,
+									"hidden" : 1,
 									"id" : "obj-133",
 									"items" : [ 0.75, "Hz", ",", 1.5, "Hz", ",", 3, "Hz", ",", 7.5, "Hz", ",", 15, "Hz", ",", 30, "Hz", ",", 75, "Hz" ],
 									"maxclass" : "umenu",
@@ -32352,7 +32376,7 @@
 					"fontsize" : 18.0,
 					"id" : "obj-86",
 					"ignoreclick" : 1,
-					"items" : "<empty>",
+					"items" : [ 0, "/dev/cu.Bluetooth-Incoming-Port", ",", 1, "/dev/cu.usbmodem2390101" ],
 					"labelclick" : 1,
 					"maxclass" : "umenu",
 					"numinlets" : 1,
@@ -35624,10 +35648,10 @@
 										"MadgwickBetaGain" : 1.0,
 										"MadgwickBetaMax" : 10.0,
 										"RTMagCalibrationPeriod" : 0.1,
-										"RTmagCalOn" : 0,
+										"RTmagCalOn" : 1,
 										"RTmagCalibrationMethod" : 0,
 										"RTmagMaxDistanceError" : 0.05,
-										"RTmagMaxMemoryDuration" : 6.0,
+										"RTmagMaxMemoryDuration" : 10.0,
 										"accCalMaxGyroNorm" : 0.5,
 										"accLPtimeConstant" : 0.1,
 										"autoDiscover" : 1,
@@ -39268,7 +39292,8 @@
 													"patching_rect" : [ 51.0, 145.0, 168.0, 35.0 ],
 													"presentation" : 1,
 													"presentation_rect" : [ 3.0, 27.0, 238.0, 23.0 ],
-													"style" : ""
+													"style" : "",
+													"text" : "default"
 												}
 
 											}
@@ -39836,7 +39861,7 @@
 													"presentation_linecount" : 2,
 													"presentation_rect" : [ 8.0, 6.0, 331.0, 47.0 ],
 													"style" : "",
-													"text" : "slot 4 already used by preset <<IRCAM spat>>. Confirm ?"
+													"text" : "slot 1 already used by preset <<default>>. Confirm ?"
 												}
 
 											}
@@ -41715,13 +41740,13 @@
 					"restore" : 					{
 						"autodiscover" : [ 1 ],
 						"invertRotation" : [ 0 ],
-						"serialport" : [ "" ],
+						"serialport" : [ "1 /dev/cu.usbmodem2390101" ],
 						"values_to_transmit" : [ 1 ]
 					}
 ,
 					"style" : "",
 					"text" : "autopattr @autorestore 0",
-					"varname" : "u989001978"
+					"varname" : "u756001168"
 				}
 
 			}

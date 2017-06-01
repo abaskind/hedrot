@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_about">A propos</string>
+    <string name="action_settings">Paramètres avancés</string>
+    <string name="axis_references">Référence des axes</string>
+    <string name="axis_references_desc">Choisir le repère X Y Z entre trois possibilités</string>
+    <string name="beta_gain_desc">Variation de beta en fonction du mouvement.</string>
+    <string name="beta_max_desc">Quand beta max est petit le head tracker ne depend que du gyroscope (rapide. Quand beta max est grand, le head-tracker ne dépend que de l\'accéleromètre et du magnétomètre.</string>
+    <string name="AlertTitle">Erreur</string>
+    <string name="IPEmpty">Une adresse IP est requise.</string>
+    <string name="InvalidPort">Numéro de port invalide ou absent.</string>
+    <string name="compatibility_cat">Options de compatibilité</string>
+    <string name="ipTV">Adresse IP</string>
+    <string name="logoDesc">Logo de MyBino</string>
+    <string name="logo_content_desc">Bouton principal, quand le headtracker est à l\'arrêt, cliquer pour démarrer, quand le headtracker est en marche, effectuez un long clic pour l\'arrêter ou appuyez longuement pour centrer.</string>
+    <string name="lowpassfilter_accel">Constante temporelle du passe-bas de l\'accéleromètre (en s)</string>
+    <string name="lowpassfilter_accel_desc">Réduit le bruit des mesures de l\'accéléromètre. Devrait rester petit, sinon une latence risque d\'apparaître. Valeurs en secondes attendues.</string>
+    <string name="lowprec_msg">La précision est mauvaise. Vous devriez calibrer le magnétomètre. Pour se faire, prenez votre casque (avec le téléphone accroché dessus), et effectuez des \"8\" dans l\'espace.</string>
+    <string name="lowprec_title">Faible précision</string>
+    <string name="pitchTV">Tanguage</string>
+    <string name="portTV">Numéro de port</string>
+    <string name="restore_default">Les réglages par défaut ont été rétablis.</string>
+    <string name="restore_default_button">Valeurs par défaut</string>
+    <string name="rollTV">Roulis</string>
+    <string name="rotations_direction">Sens de rotations</string>
+    <string name="rotations_order">Ordre des rotations</string>
+    <string name="rotations_order_desc">Détermine l\'ordre dans lequel les angles sont déduits du quaternion.</string>
+    <string name="sensor_fusion_cat">Valeurs de la fusion de capteurs</string>
+    <string name="startBT">Démarrer</string>
+    <string name="title_activity_advanced_settings">Paramètres avancés</string>
+    <string name="update_time">Période d\'envoi (ms)</string>
+    <string name="update_time_desc">Défini l\'écart entre deux envois. Une valeur en millisecondes est attendues</string>
+    <string name="usage">Pour démarrer le head-tracker, touchez l\'écran une fois. Une fois que le headtracker est démarré touchez une fois pour centrer les angles. Pour arrêter le headtracker appuyez longuement sur l\'écran.</string>
+    <string name="usageTVIP">Entrez l\'adresse IP de votre ordinateur.\n Format IPv4 seulement, cela devrait ressembler à l\'adresse ci dessous :\n 192 . 168 . 1 .2\n Si vous ne savez pas comment obtenir votre adresse IP, visitez ce site web (Attention l\'adresse affichée sur le site est celle du téléphone si vous le visitez avec le téléphone) :\n<a href="http://www.howtofindmyipaddress.com/">www.howtofindmyipaddress.com</a></string>
+    <string name="usageTVPort">Le numéro de port doit être le même que sur MyBino.\n Par défaut 2001</string>
+    <string name="usageTitle">Instructions</string>
+    <string name="warning_pref">Vous êtes dans les paramètres avancés, ne modifiez ces valeurs uniquement si vous savez ce que vous faîtes. Si vous cassez quelque chose n\'hésitez pas à restorer les valeurs par défaut à l\'aide du bouton ci-dessous</string>
+    <string name="yawTV">Azimut</string>
+    <string-array name="axis_references_array">
+        <item>X: à droite, Y: derrière, Z: en bas</item>
+        <item>X: à droite, Y: devant, Z: en haut</item>
+        <item>X: devant, Y: gauche, Z: en haut</item>
+    </string-array>
+    <string-array name="rotations_order_array">
+        <item>Azimut Tanguage Roulis</item>
+        <item>Roulis Tanguage Azimut</item>
+    </string-array>
+    <string-array name="rotations_direction_array">
+        <item>Sens horaire</item>
+        <item>Sens anti-horaire</item>
+    </string-array>
+</resources>

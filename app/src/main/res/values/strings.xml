@@ -1,0 +1,111 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!--_____________________________________APP NAME____________________________________________-->
+    <string name="app_name" translatable="false">SmartRot</string>
+    
+    <!--____________________________Welcome screen strings_______________________________________-->
+    <string name="logoDesc">MyBino logo</string>
+    <string name="ipTV">IP address</string>
+    <string name="portTV">Port number</string>
+    <string name="startBT">Start</string>
+    <string name="ipHint" translatable="false">192.168.1.1</string>
+    <string name="portHint" translatable="false">2001</string>
+    <string name="usageTitle">Usage</string>
+    <string name="usage">To launch head-tracker
+    touch the screen once. Once head-tracker is running, touch once to center angles. To stop
+    head-tracking press the screen long time.</string>
+    <string name="usageTVIP">
+        Enter your computer\'s IP address.\n
+        IPv4 format only, it should looks like the address below :\n
+        192 . 168 . 1 . 2\n
+        If you do not know ho to get your IP address, visit this website (Be careful if you visit it
+        with your phone, the address given is the one of your phone):\n
+        <a href="http://www.howtofindmyipaddress.com/">www.howtofindmyipaddress.com</a>
+    </string>
+    <string name="usageTVPort">This need to be the same as in MyBino.\n
+    Default is 2001.\n</string>
+    <string name="AlertTitle">Error</string>
+    <string name="IPEmpty">IP address is needed.\n</string>
+    <string name="InvalidPort">Empty or invalid port number.\n</string>
+
+    <!--_______________________________Advanced settings menu strings____________________________-->
+    <string name="title_activity_advanced_settings">Advanced settings</string>
+    <string name="warning_pref">
+        This is the advanced settings section. Be sure you know what you do before changing values.
+        If you broke something, do not hesitate restore defaults values with the button above.
+    </string>
+    <string name="restore_default_button">Default values</string>
+    <string name="restore_default">Default settings have been restored.</string>
+    <string name="update_time">Sending Period (ms)</string>
+    <string name="update_time_desc">Defines the time between two sending.
+        Milliseconds values expected.</string>
+    <!--Sensor fusion settings -->
+    <string name="sensor_fusion_cat">Sensor fusion values</string>
+    <string name="lowpassfilter_accel">Accelerometer low-pass filter time constant (s)</string>
+    <string name="lowpassfilter_accel_desc">Reduces the background noise of the output data of the
+    accelerometer. It should remain small, otherwise latency will be introduced.
+        Seconds values expected.</string>
+    <string name="beta_max" translatable="false">Beta max</string>
+    <string name="beta_max_desc">If beta max is small the head tracker depends only on the gyroscope
+        data (quick and reliable if movements, but entails drifts). If beta max is high the
+    head tracker depends only on the accelerometer and the magnetometer (biases in cases of movement,
+    but gives a reliable estimate if no movement).</string>
+    <string name="beta_gain" translatable="false">Beta gain</string>
+    <string name="beta_gain_desc">Beta variation according to movement.</string>
+    <!-- Compatibilities settings -->
+    <string name="compatibility_cat">Compatibilities settings</string>
+    <string name="axis_references">Axis references</string>
+    <string name="axis_references_desc">Changes the X Y Z coordinate system among three
+        possibilities.</string>
+    <string-array name="axis_references_array">
+        <item>X: right, Y: back, Z: down</item>
+        <item>X: right, Y: front, Z: up</item>
+        <item>X: front, Y: left, Z: up</item>
+    </string-array>
+    <string-array name="axis_references_values" tools:ignore="MissingTranslation">
+        <item>0</item>
+        <item>1</item>
+        <item>3</item>
+    </string-array>
+    <string name="rotations_order">Rotations order</string>
+    <string name="rotations_order_desc">Determines in which order the yaw, pitch and roll angles are
+    derived from the quaternion, but modifies the angles.</string>
+    <string-array name="rotations_order_array">
+        <item>Yaw Pitch Roll</item>
+        <item>Roll Pitch Yaw</item>
+    </string-array>
+    <string-array name="rotations_order_values" tools:ignore="MissingTranslation">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    <string name="rotations_direction">Rotations direction</string>
+    <string-array name="rotations_direction_array">
+        <item>Clockwise direction</item>
+        <item>Counter clockwise direction</item>
+    </string-array>
+    <string-array name="rotations_direction_values" translatable="false">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    
+    <!--______________MENU (ACTIONBAR) ENTRIES______-->
+    <!-- Menu strings -->
+    <string name="action_settings">Advanced settings</string>
+    <string name="action_about">About</string>
+    
+    <!--_______________________________MAIN ACTIVITY STRINGS_____________________________________-->
+    <string name="yawTV">Yaw</string>
+    <string name="pitchTV">Pitch</string>
+    <string name="rollTV">Roll</string>
+    <string name="logo_content_desc">Main button, when headtracker stopped, click to start,
+    when headtracker is started, click to stop, long click to center</string>
+
+    <!--_______________________________Low precision dialog______________________________________-->
+    <string name="lowprec_msg">Precision is low. You need to calibrate your magnetometer. To do so,
+        take your headset with phone attached on it and make "8" in the space.</string>
+    <string name="lowprec_title">Low precision</string>
+
+    <!--___________________________________Bottome line_________________________________________-->
+    <string name="bottom_line" translatable="false">
+        Designed for <a href="http://www.cmap.polytechnique.fr/xaudio/mybino/">MyBino</a> - v0.9
+    </string>
+</resources>

@@ -1,0 +1,61 @@
+<!DOCTYPE html/>
+<html lang="en-US">
+    <head>
+        <meta charset="utf8"/>
+        <link rel="stylesheet" type="text/css" href="style.css"/>
+        <title>About</title>
+    </head>
+
+    <body>
+        <h1>About</h1>
+        <p>
+            This software was developped by the
+            <a href="http://www.cmap.polytechnique.fr/xaudio/">X-Audio</a> team* : <br/>
+            François Alouges - Professor<br/>
+            Matthieu Aussal - Research Engineer<br/>
+            Tarek Marcé - Android developer<br/>
+            François Salmon - Sound Engineer<br/><br/>
+            In collaboration with the CNSMDP* : <br/>
+            Alexis Baskind - Sound Engineer<br/>
+            Catherine de Boishéraud - Sound Engineer<br/>
+            Jean-Marc Lyzwa - Sound Engineer<br/>
+            Jean-Christophe Messonnier - Sound Engineer<br/><br/>
+            Fundings* : <br/>
+            CNRS - INSMI<br/>
+            CNSMDP<br/>
+            Ecole Polytechnique - CMAP<br/>
+            <br/>
+            * in alphabetical order
+        </p>
+        <p>
+        <img src="x_logo.png" alt="logo polytechnique" width="192px"/><br/><br/>
+        <img src="cmap.jpg" alt="cmap logo" width="120px"/><br/><br/>
+        <img src="cnsmdp.png" alt="Conservatoir logo" width="192px"/><br/><br/>
+        <img src="logo-cnrs.png" alt="CNRS logo" width="100px"/><br/><br/>
+        </p>
+
+        <h1>License</h1>
+        <p><a href="license.html">GNU General Public License</a><br/>
+        <img src="gplv3-127x51.png" alt="GPLv3 logo"/>
+        </p>
+        <p>
+        SmartRot by <a href="http://www.cmap.polytechnique.fr/xaudio/">X-Audio</a>
+            is the mobile version of <a href="https://abaskind.github.io/hedrot/">hedrot</a>.<br/>
+        Part of code is derived from Sebastian Madgwick's open-source gradient descent angle
+            estimation algorithm
+            (<a href="http://x-io.co.uk/open-source-imu-and-ahrs-algorithms/">http://x-io.co.uk/open-source-imu-and-ahrs-algorithms/</a>).<br/>
+        This programm use <a href="http://www.illposed.com/software/javaosc.html">Illposed's JavaOSC library</a>
+            (<a href="JAVAOSC_LICENSE">License</a>)
+        </p>
+        <h1>OSC messages</h1>
+        <p>
+            Angles are send with three different OSC messages:
+        </p>
+            <ul>
+                <li>/smartrot/yaw</li>
+                <li>/smartrot/pitch</li>
+                <li>/smartrot/roll</li>
+            </ul>
+    </body>
+</html>
+

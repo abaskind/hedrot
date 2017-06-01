@@ -1,0 +1,35 @@
+<resources>
+    <style name="BaseTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Custom theme -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:colorBackground">@color/colorPrimaryDark</item>
+        <item name="android:windowBackground">@color/colorPrimaryDark</item>
+        <item name="android:colorForeground">@android:color/white</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:itemBackground">@android:color/white</item>
+
+        <!-- Define alert dialog style -->
+        <item name="alertDialogTheme">@style/DialogTheme</item>
+        <item name="android:alertDialogTheme">@style/DialogTheme</item>
+
+        <!-- Define Menu style -->
+        <item name="android:itemTextAppearance">@style/MenuTheme</item>
+    </style>
+
+    <!-- Old APIs theme -->
+    <style name="AppTheme" parent="BaseTheme" />
+
+    <!-- Dialog style -->
+    <style name="DialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
+    <!-- Menu style -->
+    <style name="MenuTheme">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+</resources>

@@ -1,0 +1,25 @@
+html{
+    background: rgb(109, 204, 187);
+}
+
+body {
+    margin: 50px 0 0 0;
+    padding: 10px;
+    background: white;
+    color: rgb(109, 204, 187);
+    font-family: "Open Sans",Arial,sans-serif;
+}
+
+h1 {
+    font-family: "Montserrat",Arial,sans-serif;
+}
+
+a {
+    color: rgb(109, 204, 187);
+    font-style: underline;
+}
+
+p {
+    font-size: 16px;
+    line-height: 26px;
+}

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+        android:key="pref_reset_default"
+        android:layout="@layout/button_pref"/>
+
+    <!-- Customs settings -->
+    <EditTextPreference
+        android:dialogTitle="@string/update_time"
+        android:inputType="number"
+        android:key="pref_update_time"
+        android:singleLine="false"
+        android:summary="@string/update_time_desc"
+        android:textColor="@color/colorAccent"
+        android:title="@string/update_time" />
+
+    <PreferenceCategory
+        android:title="@string/sensor_fusion_cat"
+        android:key="pref_sensor_fusion_cat">
+        <EditTextPreference
+            android:dialogTitle="@string/lowpassfilter_accel"
+            android:summary="@string/lowpassfilter_accel_desc"
+            android:inputType="numberDecimal"
+            android:key="pref_lowpassfilter_accel"
+            android:textColor="@color/colorAccent"
+            android:title="@string/lowpassfilter_accel" />
+        <EditTextPreference
+            android:key="pref_beta_max"
+            android:summary="@string/beta_max_desc"
+            android:title="@string/beta_max"
+            android:dialogTitle="@string/beta_max"
+            android:textColor="@color/colorAccent"
+            android:inputType="numberDecimal"/>
+        <EditTextPreference
+            android:key="pref_beta_gain"
+            android:summary="@string/beta_gain_desc"
+            android:title="@string/beta_gain"
+            android:dialogTitle="@string/beta_gain"
+            android:textColor="@color/colorAccent"
+            android:inputType="numberDecimal"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/compatibility_cat"
+        android:key="pref_compat_cat">
+        <ListPreference
+            android:key="pref_axis_ref"
+            android:summary="@string/axis_references_desc"
+            android:title="@string/axis_references"
+            android:dialogTitle="@string/axis_references"
+            android:entries="@array/axis_references_array"
+            android:entryValues="@array/axis_references_values"
+            android:defaultValue="0"/>
+        <ListPreference
+            android:key="pref_rotations_order"
+            android:summary="@string/rotations_order_desc"
+            android:title="@string/rotations_order"
+            android:dialogTitle="@string/rotations_order"
+            android:entries="@array/rotations_order_array"
+            android:entryValues="@array/rotations_order_values"
+            android:defaultValue="0"/>
+        <ListPreference
+            android:key="pref_rotations_direction"
+            android:title="@string/rotations_direction"
+            android:dialogTitle="@string/rotations_order"
+            android:entries="@array/rotations_direction_array"
+            android:entryValues="@array/rotations_direction_values"
+            android:defaultValue="0"/>
+    </PreferenceCategory>
+</PreferenceScreen>

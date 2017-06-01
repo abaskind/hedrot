@@ -13,28 +13,27 @@ A long press on the screen stops the headtracker.
 ## About
 
 This software was developped by the X-Audio team\* :
-François Alouges - Professor
-Matthieu Aussal - Research Engineer
-Tarek Marcé - Android developer
-François Salmon - Sound Engineer
+- François Alouges - Professor
+- Matthieu Aussal - Research Engineer
+- Tarek Marcé - Android developer
+- François Salmon - Sound Engineer
 
 In collaboration with the CNSMDP\* :
-Alexis Baskind - Sound Engineer
-Catherine de Boishéraud - Sound Engineer
-Jean-Marc Lyzwa - Sound Engineer
-Jean-Christophe Messonnier - Sound Engineer
+- Alexis Baskind - Sound Engineer
+- Catherine de Boishéraud - Sound Engineer
+- Jean-Marc Lyzwa - Sound Engineer
+- Jean-Christophe Messonnier - Sound Engineer
 
 Fundings\* :
-CNRS - INSMI
-CNSMDP
-Ecole Polytechnique - CMAP
+- CNRS - INSMI
+- CNSMDP
+- Ecole Polytechnique - CMAP
 
 \* in alphabetical order
 
 ## License
 
-GNU General Public License
-
+The code is protected by GNU General Public License.
 
 SmartRot by X-Audio is the mobile version of hedrot.
 Part of code is derived from Sebastian Madgwick's open-source gradient descent angle estimation algorithm (http://x-io.co.uk/open-source-imu-and-ahrs-algorithms/).

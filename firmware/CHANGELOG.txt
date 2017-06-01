@@ -1,4 +1,0 @@
-hedrot firmware, changelog:
-
-Version 7 (24/10/16)
-	. changed key strings from function TransmitInfo() according to the internal variable names (easier to handle on the receiver side)

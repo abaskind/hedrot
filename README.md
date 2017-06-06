@@ -12,11 +12,11 @@ The estimation algorithm is based on a modified version of the precise and effic
 ## Licensing and Credits
 The first development phase of Hedrot has achieved in collaboration with the Conservatoire National Supérieur de Musique et de Danse de Paris (http://www.conservatoiredeparis.fr/) as part of the "Bili" project (http://www.bili-project.org/).
 
+Matthieu Aussal (CMAP - Ecole Polytechnique / CNRS) contributed to new calibration routines (version > 1.2)
+
 Hedrot is licensed under the terms of the GNU General Public License (version 3) as published by the Free Software Foundation.
 
 Part of code is derived from Sebastian Madgwick's open-source gradient descent angle estimation algorithm (http://x-io.co.uk/open-source-imu-and-ahrs-algorithms/)
-Part of code is derived from "comport", (c) 1998-2005  Winfried Ritsch, Institute for Electronic Music - Graz.
-Part of code is derived from Yuri Petrov "ellipsoid fit" algorithm (initially written for Matlab).
 
 
 ### Developers and Contributors

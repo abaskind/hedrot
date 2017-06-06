@@ -4,7 +4,9 @@
 //
 //  Created by Alexis Baskind on 17/04/17.
 //
+//  Part of code is derived from Matthieu Aussal, CMAP - Ecole Polytechnique / CNRS
 //
+
 
 #include "libhedrot_calibration.h"
 

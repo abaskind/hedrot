@@ -3,9 +3,10 @@
 // all functions for communicating with the headtracker, receiving the raw data and cook the angles
 // header file
 //
-// Part of code is derived from Sebastian Madgwick's open-source gradient descent angle estimation algorithm
+// Copyright 2016 Alexis Baskind (main author)
+//                Matthieu Aussal, CMAP - Ecole Polytechnique / CNRS (for calibration routines)
 //
-// Copyright 2016 Alexis Baskind
+// Part of code is derived from Sebastian Madgwick's open-source gradient descent angle estimation algorithm
 
 
 #ifndef libheadtracker_h

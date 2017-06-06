@@ -4,7 +4,9 @@
 //
 //  Created by Alexis Baskind on 06/05/17.
 //
+//  Part of code is derived from Matthieu Aussal, CMAP - Ecole Polytechnique / CNRS
 //
+
 
 #ifndef __hedrot_receiver__libhedrot_RTmagCalibration__
 #define __hedrot_receiver__libhedrot_RTmagCalibration__

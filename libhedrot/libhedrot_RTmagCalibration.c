@@ -6,7 +6,9 @@
 //
 //  Created by Alexis Baskind on 06/05/17.
 //
+//  Part of code is derived from Matthieu Aussal, CMAP - Ecole Polytechnique / CNRS
 //
+
 
 #include "libhedrot_RTmagCalibration.h"
 

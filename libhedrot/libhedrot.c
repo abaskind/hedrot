@@ -2,9 +2,11 @@
 // libhedrot.c
 // all functions for communicating with the headtracker, receiving the raw data and cook the angles
 //
-// Part of code is derived from Sebastian Madgwick's open-source gradient descent angle estimation algorithm
 //
-// Copyright 2016 Alexis Baskind
+// Copyright 2016 Alexis Baskind (main author)
+//                Matthieu Aussal, CMAP - Ecole Polytechnique / CNRS (for calibration routines)
+//
+// Part of code is derived from Sebastian Madgwick's open-source gradient descent angle estimation algorithm
 
 
 //---------------------------------------------------------------------------------------------------

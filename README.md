@@ -23,6 +23,8 @@ Part of code is derived from Yuri Petrov "ellipsoid fit" algorithm (initially wr
 * Alexis Baskind (sound engineer, main developer)
 * Jean-Christophe Messonnier (sound engineer)
 * Jean-Marc Lyzwa (sound engineer)
+* Matthieu Aussal, CMAP - Ecole Polytechnique / CNRS (calibration routines)
+
 
 ## Hardware Requirements
 - Head tracker parts:

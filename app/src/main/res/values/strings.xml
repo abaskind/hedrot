@@ -106,6 +106,6 @@
 
     <!--___________________________________Bottome line_________________________________________-->
     <string name="bottom_line" translatable="false">
-        Designed for <a href="http://www.cmap.polytechnique.fr/xaudio/mybino/">MyBino</a> - v0.9
+        Designed for <a href="http://www.cmap.polytechnique.fr/xaudio/mybino/">MyBino</a> - v1.0
     </string>
 </resources>

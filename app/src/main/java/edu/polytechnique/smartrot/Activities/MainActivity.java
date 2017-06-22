@@ -162,7 +162,7 @@ public class MainActivity extends MenuActivity {
 
     private void rotateImage(){
         float angle = ht.getValues()[0];
-        imageButton.setRotation(-angle + 90);
+        imageButton.setRotation(-angle - 90);
     }
 
     private void displayAlert(String message, String title){

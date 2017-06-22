@@ -79,7 +79,7 @@
             <TextView android:text="@string/ipTV" />
             <EditText
                 android:id="@+id/ipET"
-                android:inputType="number"
+                android:inputType="numberDecimal"
                 android:digits="0123456789."
                 android:hint="@string/ipHint"/>
         </TableRow>

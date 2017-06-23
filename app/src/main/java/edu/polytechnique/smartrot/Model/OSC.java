@@ -41,6 +41,13 @@ class OSC extends Thread {
      * Thread stay alive while keepGoing is true.
      */
     private boolean keepGoing = true;
+    /**
+     * The yaw pitch roll values to send.
+     * A simple copy of the "values" array in headtracker
+     * class.
+     */
+    @SuppressWarnings("CanBeFinal")
+    private float[] ypr;
 
     /**
      * Constructor
@@ -49,46 +56,50 @@ class OSC extends Thread {
      * Address IP of the server (MyBino).
      * @param port
      * Port number to use.
+     * @param values
+     * Yaw Pitch Roll values array,
+     * transmit by headtracker class.
      * @see #ipAddress
      * @see #portNumber
      */
-    public OSC(String ip, int port){
+    public OSC(String ip, int port, float[] values){
         this.ipAddress = ip;
         this.portNumber = port;
+        this.ypr = values;
     }
     /**
      * Run method, called from start() method of Thread class.
      * This will run the OSC Thread.
-     * While the Thread is alive all yaw-pitch-roll values will
-     * be send for each sendYawPitchRoll() method calls.
+     * The Thread sleep between sendings.
+     * When the thread is woke up by the notify() or notifyAll()
+     * method the Thread send values and back to sleep.
      * Stop the thread with stopOSC() method.
-     * @see #sendYawPitchRoll(float[])
+     * @see #sendYawPitchRoll()
      * @see #stopOSC()
      * @see Thread
      */
     @Override
     public void run(){
         super.run();
-        try {
-            connect();
-            //noinspection StatementWithEmptyBody
-            while(this.keepGoing){
-            }
-        }catch (Exception e){
-            interrupt();
+        connect();
+        while (keepGoing){
+            sendYawPitchRoll();
+            try {
+                this.wait();
+            }catch (Exception ignored){}
         }
     }
     /**
      * Try to connect to the server through OSC.
      * IP address and port number uses are the ones give
      * as class constructor arguments.
-     * @throws Exception
-     * If connection unsuccessful throws Exception
      * @see #ipAddress
      * @see #portNumber
      */
-    private void connect() throws Exception{
-        portOut = new OSCPortOut(InetAddress.getByName(this.ipAddress), portNumber);
+    private void connect(){
+        try{
+            portOut = new OSCPortOut(InetAddress.getByName(this.ipAddress), portNumber);
+        }catch(Exception ignored){}
     }
     /**
      * Send a packet.
@@ -107,12 +118,11 @@ class OSC extends Thread {
      * /smartrot/yaw
      * /smartrot/pitch
      * /smartrot/roll
-     * @param ypr a size 3 float array which contain yaw-pitch-roll values.
      */
-    void sendYawPitchRoll(float[] ypr){
-        send(new OSCMessage("/smartrot/yaw", Collections.singleton((Object)ypr[0])));
-        send(new OSCMessage("/smartrot/pitch", Collections.singleton((Object)ypr[1])));
-        send(new OSCMessage("/smartrot/roll", Collections.singleton((Object)ypr[2])));
+    private void sendYawPitchRoll(){
+        send(new OSCMessage("/smartrot/yaw", Collections.singleton((Object) ypr[0])));
+        send(new OSCMessage("/smartrot/pitch", Collections.singleton((Object) ypr[1])));
+        send(new OSCMessage("/smartrot/roll", Collections.singleton((Object) ypr[2])));
     }
     /**
      * Stop the OSC thread

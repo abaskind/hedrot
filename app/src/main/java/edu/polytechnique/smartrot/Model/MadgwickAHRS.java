@@ -4,7 +4,7 @@ package edu.polytechnique.smartrot.Model;
  * MadgwickAHRS
  * Headtracker computation class.
  *
- * Code is based on Alexis Baskind libhedrot algorithm.
+ * Code is based on Alexis Baskind's libhedrot algorithm.
  * Part of code is derived from Sebastian Madgwick's open-source gradient descent angle estimation algorithm.
  *
  * Copyright 2017 Ecole Polytechnique
@@ -30,7 +30,7 @@ class MadgwickAHRS {
     private int orientation;
 
     //Rotation order
-    private boolean pitchRollYaw;
+    private int order;
 
     //Rotations direction inversion
     private boolean invertRotationDirection;
@@ -42,7 +42,7 @@ class MadgwickAHRS {
         qref = new float[]{1f, 0f, 0f, 0f};
         qcent = new float[]{1f, 0f, 0f, 0f};
         orientation = 0;
-        pitchRollYaw = false;
+        order = 1;
         invertRotationDirection = false;
     }
 
@@ -50,14 +50,26 @@ class MadgwickAHRS {
         MadgYaw = Math.toDegrees(Math.atan2(2.0f * (qcent[1] * qcent[2] + qcent[3] * qcent[0]), 1.0f - 2.0f * (qcent[2] * qcent[2] + qcent[3] * qcent[3])));
         MadgPitch = Math.toDegrees(Math.asin(Math.min(Math.max(2.0f * (qcent[0] * qcent[2] - qcent[3] * qcent[1]), -1), 1)));
         MadgRoll = Math.toDegrees(Math.atan2(2.0f * (qcent[2] * qcent[3] + qcent[1] * qcent[0]), 1.0f - 2.0f * (qcent[1] * qcent[1] + qcent[2] * qcent[2])));
-        if (pitchRollYaw) yawPitchRoll_2_pitchRollYaw();
+        applyRotationOrder();
         if (invertRotationDirection) inverseRotationDirection();
     }
 
-    private void yawPitchRoll_2_pitchRollYaw() {
-        double temp = MadgYaw;
-        MadgYaw = MadgRoll;
-        MadgRoll = temp;
+    private void applyRotationOrder() {
+        double temp;
+        switch (this.order){
+            case 0:
+                break;
+            case 1:
+                temp = MadgPitch;
+                MadgPitch = -MadgRoll;
+                MadgRoll = temp;
+                break;
+            case 2:
+                temp = MadgYaw;
+                MadgYaw = MadgRoll;
+                MadgRoll = temp;
+                break;
+        }
     }
 
     private void inverseRotationDirection() {
@@ -278,11 +290,12 @@ class MadgwickAHRS {
 
     /**
      * Define rotations orders.
-     * @param pitchRollYaw true = yaw pitch roll, false = roll pitch yaw
+     * @param order The rotation order choosed,
+     *              values can be 0, 1 or 2
      * @see Headtracker#setRollPitchYaw(int)
      */
-    void setRollPitchYaw(boolean pitchRollYaw) {
-        this.pitchRollYaw = pitchRollYaw;
+    void setRotationOrder(int order) {
+        this.order = order;
     }
 
     /**

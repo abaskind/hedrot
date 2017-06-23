@@ -71,11 +71,13 @@
     derived from the quaternion, but modifies the angles.</string>
     <string-array name="rotations_order_array">
         <item>Yaw Pitch Roll</item>
+        <item>Yaw Roll Pitch</item>
         <item>Roll Pitch Yaw</item>
     </string-array>
     <string-array name="rotations_order_values" tools:ignore="MissingTranslation">
         <item>0</item>
         <item>1</item>
+        <item>2</item>
     </string-array>
     <string name="rotations_direction">Rotations direction</string>
     <string-array name="rotations_direction_array">
@@ -86,6 +88,15 @@
         <item>0</item>
         <item>1</item>
     </string-array>
+
+        <!--Settings defaults values strings-->
+        <string name="update_time_default" translatable="false">10</string>
+        <string name="lowpassfilter_accel_default" translatable="false">0.01</string>
+        <string name="beta_max_default" translatable="false">2.5</string>
+        <string name="beta_gain_default" translatable="false">1.</string>
+        <string name="axis_ref_default" translatable="false">0</string>
+        <string name="rotations_order_default" translatable="false">1</string>
+        <string name="rotations_direction_default" translatable="false">0</string>
     
     <!--______________MENU (ACTIONBAR) ENTRIES______-->
     <!-- Menu strings -->
@@ -106,6 +117,6 @@
 
     <!--___________________________________Bottome line_________________________________________-->
     <string name="bottom_line" translatable="false">
-        Designed for <a href="http://www.cmap.polytechnique.fr/xaudio/mybino/">MyBino</a> - v1.0
+        Designed for <a href="http://www.cmap.polytechnique.fr/xaudio/mybino/">MyBino</a> - v1.0.1
     </string>
 </resources>

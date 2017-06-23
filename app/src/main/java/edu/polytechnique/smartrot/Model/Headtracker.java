@@ -119,7 +119,7 @@ public class Headtracker {
         this.accelValues = new float[3];
         this.gyroValues = new float[3];
         this.magnetValues = new float[3];
-        this.rate = 2;
+        this.rate = 10;
         this.madgwickAHRS = new MadgwickAHRS();
         this.lastUpdate = System.currentTimeMillis();
     }
@@ -190,7 +190,7 @@ public class Headtracker {
         sensorManager.registerListener(sensorsListener, accel, SensorManager.SENSOR_DELAY_FASTEST);
         sensorManager.registerListener(sensorsListener, gyro, SensorManager.SENSOR_DELAY_FASTEST);
         sensorManager.registerListener(sensorsListener, magnet, SensorManager.SENSOR_DELAY_FASTEST);
-        osc = new OSC(this.ip, this.port);
+        osc = new OSC(ip,port,values);
         osc.start();
         timer = new Timer();
         timer.scheduleAtFixedRate(new DoMadgwick(), 100, rate);
@@ -280,8 +280,7 @@ public class Headtracker {
      * @param i 0 for YawPitchRoll 1 for RollPitchYaw
      */
     public void setRollPitchYaw(int i) {
-        if(i == 0) madgwickAHRS.setRollPitchYaw(false);
-        if(i == 1) madgwickAHRS.setRollPitchYaw(true);
+        madgwickAHRS.setRotationOrder(i);
     }
 
     /**
@@ -298,7 +297,6 @@ public class Headtracker {
      * The Yaw-pitch-roll computation and OSC sending
      * TimerTask.
      * @see TimerTask
-     * @see OSC#sendYawPitchRoll(float[])
      */
     private class DoMadgwick extends TimerTask {
         @Override
@@ -312,7 +310,10 @@ public class Headtracker {
             values[0] = (float) madgwickAHRS.MadgYaw;
             values[1] = (float) madgwickAHRS.MadgPitch;
             values[2] = (float) madgwickAHRS.MadgRoll;
-            osc.sendYawPitchRoll(values);
+            //noinspection SynchronizeOnNonFinalField
+            synchronized (osc){
+                osc.notifyAll();
+            }
         }
     }
 }

@@ -29,13 +29,13 @@ public class AdvancedSettings extends AppCompatActivity implements View.OnClickL
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor e = sp.edit();
-        e.putString(MainActivity.UPDATE_TIME, "2");
-        e.putString(MainActivity.LOWPASSFILTER_ACCEL,"0.01");
-        e.putString(MainActivity.BETA_MAX, "2.5");
-        e.putString(MainActivity.BETA_GAIN, "1.");
-        e.putString(MainActivity.AXIS_REF, "0");
-        e.putString(MainActivity.ROTATIONS_ORDER, "0");
-        e.putString(MainActivity.ROTATIONS_DIRECTION, "0");
+        e.putString(MainActivity.UPDATE_TIME, getString(R.string.update_time_default));
+        e.putString(MainActivity.LOWPASSFILTER_ACCEL, getString(R.string.lowpassfilter_accel_default));
+        e.putString(MainActivity.BETA_MAX, getString(R.string.beta_max_default));
+        e.putString(MainActivity.BETA_GAIN, getString(R.string.beta_gain_default));
+        e.putString(MainActivity.AXIS_REF, getString(R.string.axis_ref_default));
+        e.putString(MainActivity.ROTATIONS_ORDER, getString(R.string.rotations_order_default));
+        e.putString(MainActivity.ROTATIONS_DIRECTION, getString(R.string.rotations_direction_default));
         e.apply();
         putFragment();
     }
@@ -60,13 +60,13 @@ public class AdvancedSettings extends AppCompatActivity implements View.OnClickL
     public void onClick(View v) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor e = sp.edit();
-        e.putString(MainActivity.UPDATE_TIME, "2");
-        e.putString(MainActivity.LOWPASSFILTER_ACCEL,"0.01");
-        e.putString(MainActivity.BETA_MAX, "2.5");
-        e.putString(MainActivity.BETA_GAIN, "1.");
-        e.putString(MainActivity.AXIS_REF, "0");
-        e.putString(MainActivity.ROTATIONS_ORDER, "0");
-        e.putString(MainActivity.ROTATIONS_DIRECTION, "0");
+        e.putString(MainActivity.UPDATE_TIME, getString(R.string.update_time_default));
+        e.putString(MainActivity.LOWPASSFILTER_ACCEL, getString(R.string.lowpassfilter_accel_default));
+        e.putString(MainActivity.BETA_MAX, getString(R.string.beta_max_default));
+        e.putString(MainActivity.BETA_GAIN, getString(R.string.beta_gain_default));
+        e.putString(MainActivity.AXIS_REF, getString(R.string.axis_ref_default));
+        e.putString(MainActivity.ROTATIONS_ORDER, getString(R.string.rotations_order_default));
+        e.putString(MainActivity.ROTATIONS_DIRECTION, getString(R.string.rotations_direction_default));
         e.apply();
         putFragment();
         (Toast.makeText(this,getString(R.string.restore_default),Toast.LENGTH_LONG)).show();

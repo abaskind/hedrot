@@ -43,6 +43,7 @@
     </string-array>
     <string-array name="rotations_order_array">
         <item>Azimut Tanguage Roulis</item>
+        <item>Azimut Roulis Tanguage</item>
         <item>Roulis Tanguage Azimut</item>
     </string-array>
     <string-array name="rotations_direction_array">

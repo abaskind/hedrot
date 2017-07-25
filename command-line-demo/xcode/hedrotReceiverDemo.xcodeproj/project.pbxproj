@@ -7,12 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		164863FC1F27940E00698E6C /* libhedrot_calibration.c in Sources */ = {isa = PBXBuildFile; fileRef = 164863F61F27940E00698E6C /* libhedrot_calibration.c */; };
+		164863FD1F27940E00698E6C /* libhedrot_RTmagCalibration.c in Sources */ = {isa = PBXBuildFile; fileRef = 164863F81F27940E00698E6C /* libhedrot_RTmagCalibration.c */; };
+		164863FE1F27940E00698E6C /* libhedrot_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 164863FA1F27940E00698E6C /* libhedrot_utils.c */; };
 		16FEAF4E1DCBDB1B007B9E47 /* hedrotReceiverDemo.c in Sources */ = {isa = PBXBuildFile; fileRef = 16FEAF4D1DCBDB1B007B9E47 /* hedrotReceiverDemo.c */; };
 		16FEAF5A1DCBDB51007B9E47 /* libhedrot.c in Sources */ = {isa = PBXBuildFile; fileRef = 16FEAF561DCBDB4A007B9E47 /* libhedrot.c */; };
 		16FEAF5B1DCBDB53007B9E47 /* libhedrot_serialcomm.c in Sources */ = {isa = PBXBuildFile; fileRef = 16FEAF581DCBDB4A007B9E47 /* libhedrot_serialcomm.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		164863F61F27940E00698E6C /* libhedrot_calibration.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = libhedrot_calibration.c; sourceTree = "<group>"; };
+		164863F71F27940E00698E6C /* libhedrot_calibration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libhedrot_calibration.h; sourceTree = "<group>"; };
+		164863F81F27940E00698E6C /* libhedrot_RTmagCalibration.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = libhedrot_RTmagCalibration.c; sourceTree = "<group>"; };
+		164863F91F27940E00698E6C /* libhedrot_RTmagCalibration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libhedrot_RTmagCalibration.h; sourceTree = "<group>"; };
+		164863FA1F27940E00698E6C /* libhedrot_utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = libhedrot_utils.c; sourceTree = "<group>"; };
+		164863FB1F27940E00698E6C /* libhedrot_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libhedrot_utils.h; sourceTree = "<group>"; };
 		166D0E481DB3E54D007B85B9 /* hedrotReceiverDemo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = hedrotReceiverDemo; sourceTree = BUILT_PRODUCTS_DIR; };
 		16FEAF4D1DCBDB1B007B9E47 /* hedrotReceiverDemo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hedrotReceiverDemo.c; path = ../source/hedrotReceiverDemo.c; sourceTree = "<group>"; };
 		16FEAF561DCBDB4A007B9E47 /* libhedrot.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = libhedrot.c; sourceTree = "<group>"; };
@@ -58,6 +67,12 @@
 				16FEAF571DCBDB4A007B9E47 /* libhedrot.h */,
 				16FEAF581DCBDB4A007B9E47 /* libhedrot_serialcomm.c */,
 				16FEAF591DCBDB4A007B9E47 /* libhedrot_serialcomm.h */,
+				164863F61F27940E00698E6C /* libhedrot_calibration.c */,
+				164863F71F27940E00698E6C /* libhedrot_calibration.h */,
+				164863F81F27940E00698E6C /* libhedrot_RTmagCalibration.c */,
+				164863F91F27940E00698E6C /* libhedrot_RTmagCalibration.h */,
+				164863FA1F27940E00698E6C /* libhedrot_utils.c */,
+				164863FB1F27940E00698E6C /* libhedrot_utils.h */,
 			);
 			name = libhedrot;
 			path = ../../libhedrot;
@@ -144,7 +159,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				164863FD1F27940E00698E6C /* libhedrot_RTmagCalibration.c in Sources */,
+				164863FC1F27940E00698E6C /* libhedrot_calibration.c in Sources */,
 				16FEAF4E1DCBDB1B007B9E47 /* hedrotReceiverDemo.c in Sources */,
+				164863FE1F27940E00698E6C /* libhedrot_utils.c in Sources */,
 				16FEAF5B1DCBDB53007B9E47 /* libhedrot_serialcomm.c in Sources */,
 				16FEAF5A1DCBDB51007B9E47 /* libhedrot.c in Sources */,
 			);

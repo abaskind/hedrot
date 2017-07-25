@@ -7,6 +7,8 @@
 //
 
 #include "libhedrot_utils.h"
+#include <string.h>
+#include <stdlib.h>
 
 
 //=====================================================================================================
@@ -141,13 +143,13 @@ int stringToChars(char* valueBuffer, char* data, int nvalues) {
 // get average point in a set of data (short format) over 3 dimensions
 // careful: memory for double* rawMean has to be allocated first!!
 void getMean3(double *samples, long numberOfSamples, float* mean) {
-    int n;
+    long n;
     
     // initialization
     mean[0] = 0;
     mean[1] = 0;
     mean[2] = 0;
-    n = 3*numberOfSamples;
+    n = 3 * numberOfSamples;
     
     while(n--) {
         mean[0] += *samples++;
@@ -169,7 +171,7 @@ void getMean3(double *samples, long numberOfSamples, float* mean) {
 // get average point in a set of data (float format), 1 dimension
 // careful: memory for double* rawMean has to be allocated first!!
 float getMean1f(float *samples, long numberOfSamples) {
-    int n;
+    long n;
     float mean = 0;
 
     n = numberOfSamples;
@@ -187,7 +189,7 @@ float getMean1f(float *samples, long numberOfSamples) {
 //
 // get variance (centered moment 2nd order, square of the std deviation) per axis in a set of data (double version)
 float getStdDev1f(float *samples, long numberOfSamples, float mean) {
-    int n;
+    long n;
     double TMPval;
     float var = 0;
 

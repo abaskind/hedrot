@@ -273,8 +273,8 @@ int nonRotatedEllipsoidFit(calibrationData* calData, float* estimatedOffset, flo
     __CLPK_integer rank; // effective rank of the matrix
     double wkopt;
     double *work = NULL;
-    __CLPK_integer n = calData->numberOfSamples;
-    __CLPK_integer lda = calData->numberOfSamples, ldb = calData->numberOfSamples;
+    __CLPK_integer n = (int) calData->numberOfSamples;
+    __CLPK_integer lda = (int) calData->numberOfSamples, ldb = (int) calData->numberOfSamples;
     __CLPK_integer lwork, info;
 #else
 #if defined(_WIN32) || defined(_WIN64)
@@ -442,8 +442,8 @@ int rotatedEllipsoidFit(calibrationData* calData, double *quadricCoefficients, d
     __CLPK_integer rank; // effective rank of the matrix
     double wkopt;
     double *work;
-    __CLPK_integer n = calData->numberOfSamples;
-    __CLPK_integer lda = calData->numberOfSamples, ldb = calData->numberOfSamples;
+    __CLPK_integer n = (int) calData->numberOfSamples;
+    __CLPK_integer lda = (int) calData->numberOfSamples, ldb = (int) calData->numberOfSamples;
     __CLPK_integer lwork, info;
 #else
 #if defined(_WIN32) || defined(_WIN64)

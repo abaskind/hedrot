@@ -549,6 +549,9 @@ int calibrateAcc(headtrackerData *trackingData) {
         case 1: // Matthieu Aussal's method "mycalibration"
             err = myCalibration1(trackingData->accCalibrationData, trackingData->accOffset, trackingData->accScaling);
             break;
+        default:
+            err = 1;
+            break;
     }
     
     if (!err) {
@@ -584,6 +587,9 @@ int calibrateMag(headtrackerData *trackingData) {
             break;
         case 1: // Matthieu Aussal's method "mycalibration"
             err = myCalibration1(trackingData->magCalibrationData, trackingData->magOffset, trackingData->magScaling);
+            break;
+        default:
+            err = 1;
             break;
     }
     
@@ -2091,7 +2097,7 @@ void changeRTMagCalTimeSettings(headtrackerData *trackingData) {
     // update all timing constants in samples based on their values in seconds
     
     // change the subsampling factor for acquisition of the magnetometer data, depending on its settings
-    short magRate;
+    short magRate = 160;
     
     // 1/ get the actual rate of the magnetometer
     switch(trackingData->magMeasurementMode) {

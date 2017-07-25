@@ -12,6 +12,7 @@
 #define __hedrot_receiver__libhedrot_RTmagCalibration__
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "libhedrot_utils.h"
 #include "libhedrot_calibration.h"
 

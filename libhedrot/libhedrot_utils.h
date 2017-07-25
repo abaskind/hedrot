@@ -10,6 +10,7 @@
 #define __hedrot_receiver__libhedrot_utils__
 
 #include <stdio.h>
+#include <math.h>
 
 // math utils
 #define M_PI_float (float)      3.14159265358979323846264338327950288

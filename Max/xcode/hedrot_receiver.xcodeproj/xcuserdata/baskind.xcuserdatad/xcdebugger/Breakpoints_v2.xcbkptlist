@@ -62,9 +62,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "172"
-            endingLineNumber = "172"
-            landmarkName = "addPoint2FibonnaciZone()"
-            landmarkType = "7">
+            endingLineNumber = "172">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -238,9 +236,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "218"
-            endingLineNumber = "218"
-            landmarkName = "RTmagCalibrationUpdateDirect()"
-            landmarkType = "7">
+            endingLineNumber = "218">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

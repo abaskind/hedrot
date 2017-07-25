@@ -34,11 +34,16 @@ cp -R $rootDirectory/Max/hedrotReceiver.json $packageFolder
 
 appcontentsdirectory=$packageFolder/hedrotReceiver.app/Contents
 
-#update the version number in Info.plist
+#update the version number and icon in Info.plist
 /usr/libexec/PlistBuddy -c "Set :CFBundleGetInfoString '${hedrotVersion}'" $appcontentsdirectory/Info.plist
 /usr/libexec/PlistBuddy -c "Set :CFBundleLongVersionString '${hedrotVersion}'" $appcontentsdirectory/Info.plist
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString '${hedrotVersion}'" $appcontentsdirectory/Info.plist
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion '${hedrotVersion}'" $appcontentsdirectory/Info.plist
+/usr/libexec/PlistBuddy -c "Set :CFBundleIconFile 'hedrot.icns'" $appcontentsdirectory/Info.plist
+
+
+rm $appcontentsdirectory/Resources/*.icns
+cp ../logo/hedrot.icns $appcontentsdirectory/Resources/
 
 
 
@@ -75,6 +80,10 @@ cp "$rootDirectory/scripts/README-DISTRIBUTION.txt" "$packageFolder/README.txt"
 perl -pi -w -e  "s/Hedrot Version: XXXX/Hedrot Version: $hedrotVersion/g;" $packageFolder/README.txt
 perl -pi -w -e  "s/Firmware Version: YYYY/Firmware Version: $hedrotFirmwareVersion/g;" $packageFolder/README.txt
 
+######### change icon of the app folder #############################
+Rez -append ../logo/hedrot.rsrc -o $packageFolder$'/Icon\r'
+SetFile -a C $packageFolder/
+SetFile -a V $packageFolder$'/Icon\r'
 
 
 ######### DMG #############################

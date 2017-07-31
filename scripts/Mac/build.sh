@@ -19,4 +19,4 @@ $ArduinoAppPath -v --board teensy:avr:teensy31:usb=serial --pref build.path=$roo
 xcodebuild -configuration Release -project $rootDirectory/command-line-demo/xcode/hedrotReceiverDemo.xcodeproj
 
 ######### build the Max external #############################
-xcodebuild -configuration Deployment -project $rootDirectory/Max/xcode/hedrot_receiver.xcodeproj
+xcodebuild -configuration Deployment -project $rootDirectory/hedrotReceiver/xcode/hedrot_receiver.xcodeproj

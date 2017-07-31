@@ -29,8 +29,8 @@ mkdir $packageFolder
 ######### prepare and copy Max Standalone #############################
 
 #copy the standalone and the default preset file
-cp -R $rootDirectory/Max/hedrotReceiver.app $packageFolder
-cp -R $rootDirectory/Max/hedrotReceiver.json $packageFolder
+cp -R $rootDirectory/hedrotReceiver/hedrotReceiver.app $packageFolder
+cp -R $rootDirectory/hedrotReceiver/hedrotReceiver.json $packageFolder
 
 appcontentsdirectory=$packageFolder/hedrotReceiver.app/Contents
 
@@ -57,10 +57,10 @@ cp "$rootDirectory/firmware/build/hedrot-firmware.ino.hex" "$packageFolder/firmw
 cp "$rootDirectory/firmware/CHANGELOG.txt" "$packageFolder/firmware/"
 
 ######### copy the max source code and external #############################
-mkdir $packageFolder/Max
-cp $rootDirectory/Max/hedrotReceiver.json $packageFolder/Max/
-cp $rootDirectory/Max/patches/*.maxpat $packageFolder/Max/
-cp -R $rootDirectory/Max/hedrot_receiver.mxo $packageFolder/Max/
+mkdir $packageFolder/hedrotReceiver
+cp $rootDirectory/hedrotReceiver/hedrotReceiver.json $packageFolder/hedrotReceiver/
+cp $rootDirectory/hedrotReceiver/patches/*.maxpat $packageFolder/hedrotReceiver/
+cp -R $rootDirectory/hedrotReceiver/hedrot_receiver.mxo $packageFolder/hedrotReceiver/
 
 ######### copy the examples folder #############################
 mkdir $packageFolder/examples

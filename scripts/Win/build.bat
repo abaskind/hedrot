@@ -5,7 +5,7 @@ echo 	. the command-line demo (in command-line-demo/xcode/hedrotReceiverDemo)
 echo 	. the max external hedrotReceiver.mxe64
 echo --
 echo The Standlone hedrotReceiver has to be rebuilt afterwards in Max!!!!
-echo     the 64 bit version of the Standlone hedrotReceiver has to be built in the folder Max\standalone-Win\x64
+echo     the 64 bit version of the Standlone hedrotReceiver has to be built in the folder hedrotReceiver\standalone-Win\x64
 echo --
 
 set thisDirectory=%cd%
@@ -25,4 +25,4 @@ REM ######### build the command-line demo #############################
 "%MSBuildPath%\MSBuild.exe" /t:Build "%rootDirectory%\command-line-demo\visual studio\hedrotReceiverDemo.vcxproj" /p:CommonProgramFiles="C:\Program Files (x86)\Common Files" /p:PlatformToolset=v110 /p:Configuration=Release /p:Platform=x64 /p:"VCTargetsPath=%VCTargetsPath%"
 
 REM ######### build the Max external #############################
-"%MSBuildPath%\MSBuild.exe" /t:Build "%rootDirectory%\Max\visual studio\hedrot_receiver.vcxproj" /p:CommonProgramFiles="C:\Program Files (x86)\Common Files" /p:PlatformToolset=v110 /p:Configuration=Release /p:Platform=x64 /p:"VCTargetsPath=%VCTargetsPath%"
+"%MSBuildPath%\MSBuild.exe" /t:Build "%rootDirectory%\hedrotReceiver\visual studio\hedrot_receiver.vcxproj" /p:CommonProgramFiles="C:\Program Files (x86)\Common Files" /p:PlatformToolset=v110 /p:Configuration=Release /p:Platform=x64 /p:"VCTargetsPath=%VCTargetsPath%"

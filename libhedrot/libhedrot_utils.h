@@ -12,23 +12,27 @@
 #include <stdio.h>
 #include <math.h>
 
+// double floating point modulo
+double mod(double a, double N);
+
+// round (not defined in VS2012)
+#if defined(_WIN32) || defined(_WIN64)
+double round(double value);
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
+
 // math utils
 #define M_PI_float (float)      3.14159265358979323846264338327950288
 #define	DEGREE_TO_RAD           M_PI_float / 180.0f
 #define	RAD_TO_DEGREE           180.0f / M_PI_float
 
-#ifndef min
-#define min(a,b) (((a)<(b))?(a):(b))
-#endif
-
-#ifndef max
-#define max(a,b) (((a)>(b))?(a):(b))
-#endif
-
 #ifndef sign
 #define sign(a) (((a)>=0.0)*2-1)
 #endif
 
+// prototypes
+#if defined(_WIN32) || defined(_WIN64)
+# define strtok_r strtok_s // strtok_r does not exist on windows, use strtok_s instead
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
 
 //=====================================================================================================
 // utils

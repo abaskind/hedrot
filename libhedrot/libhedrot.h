@@ -34,10 +34,6 @@
 #define PINGTIME                0.5  // time delay in seconds between two pings when the headtracker has been found
 #define AUTODISCOVER_MAX_TIME   0.1  // max time period in seconds between autodiscover ping and headtracker response
 
-// prototypes
-#if defined(_WIN32) || defined(_WIN64)
-# define strtok_r strtok_s // strtok_r does not exist on windows, use strtok_s instead
-#endif /* #if defined(_WIN32) || defined(_WIN64) */
 
 
 // communication states

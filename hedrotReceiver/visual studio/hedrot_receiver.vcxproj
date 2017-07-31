@@ -98,8 +98,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\firmware\hedrot-firmware;..\..\libhedrot;..\source;$(C74SUPPORT)\max-includes;$(C74SUPPORT)\msp-includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN_VERSION;WIN32;_DEBUG;_WINDOWS;_USRDLL;WIN_EXT_VERSION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Baskind\Desktop\Developpement\libraries\lapack-3.7.0-lib\include;..\..\firmware\hedrot-firmware;..\..\libhedrot;..\source;$(C74SUPPORT)\max-includes;$(C74SUPPORT)\msp-includes;$(C74SUPPORT)\jit-includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ADD_;HAVE_LAPACK_CONFIG_H;LAPACK_COMPLEX_STRUCTURE;WIN_VERSION;WIN32;_DEBUG;_WINDOWS;_USRDLL;WIN_EXT_VERSION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling />
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -132,6 +132,8 @@
       <DataExecutionPrevention />
       <ImportLibrary>$(IntDir)$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>C:\Users\Baskind\Desktop\Developpement\libraries\lapack-3.7.0-lib\lib;$(C74SUPPORT)\max-includes;$(C74SUPPORT)\msp-includes;$(C74SUPPORT)\jit-includes;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libblas.dll.a;liblapack.dll.a;liblapacke.dll.a;MaxAPI.lib;MaxAudio.lib;jitlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -228,7 +230,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>C:\Users\Baskind\Desktop\Developpement\libraries\lapack for windows\include;..\..\firmware\hedrot-firmware;..\..\libhedrot;..\source;$(C74SUPPORT)\max-includes;$(C74SUPPORT)\msp-includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Baskind\Desktop\Developpement\libraries\lapack-3.7.0-lib\include;..\..\firmware\hedrot-firmware;..\..\libhedrot;..\source;$(C74SUPPORT)\max-includes;$(C74SUPPORT)\msp-includes;$(C74SUPPORT)\jit-includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ADD_;HAVE_LAPACK_CONFIG_H;LAPACK_COMPLEX_STRUCTURE;WIN32;NDEBUG;_CONSOLE;WIN_VERSION;WIN32;NDEBUG;_WINDOWS;_USRDLL;WIN_EXT_VERSION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling />
@@ -263,15 +265,27 @@
       <DataExecutionPrevention />
       <ImportLibrary>$(IntDir)$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalLibraryDirectories>C:\Users\Baskind\Desktop\Developpement\libraries\lapack for windows\dll\x64;$(C74SUPPORT)\max-includes\x64;$(C74SUPPORT)\msp-includes\x64;$(C74SUPPORT)\jit-includes\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>liblapacke.lib;liblapack.lib;libblas.lib;MaxAPI.lib;MaxAudio.lib;jitlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Baskind\Desktop\Developpement\libraries\lapack-3.7.0-lib\lib;$(C74SUPPORT)\max-includes\x64;$(C74SUPPORT)\msp-includes\x64;$(C74SUPPORT)\jit-includes\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libblas.dll.a;liblapack.dll.a;liblapacke.dll.a;MaxAPI.lib;MaxAudio.lib;jitlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="$(C74SUPPORT)\max-includes\common\dllmain_win.c" />
+    <ClCompile Include="..\..\..\..\MaxSDK-6.1.4\c74support\max-includes\common\commonsyms.c" />
     <ClCompile Include="..\..\libhedrot\libhedrot.c" />
+    <ClCompile Include="..\..\libhedrot\libhedrot_calibration.c" />
+    <ClCompile Include="..\..\libhedrot\libhedrot_RTmagCalibration.c" />
     <ClCompile Include="..\..\libhedrot\libhedrot_serialcomm.c" />
+    <ClCompile Include="..\..\libhedrot\libhedrot_utils.c" />
     <ClCompile Include="..\source\hedrot_receiver.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\libhedrot\libhedrot.h" />
+    <ClInclude Include="..\..\libhedrot\libhedrot_calibration.h" />
+    <ClInclude Include="..\..\libhedrot\libhedrot_RTmagCalibration.h" />
+    <ClInclude Include="..\..\libhedrot\libhedrot_serialcomm.h" />
+    <ClInclude Include="..\..\libhedrot\libhedrot_utils.h" />
+    <ClInclude Include="..\source\hedrot_receiver.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

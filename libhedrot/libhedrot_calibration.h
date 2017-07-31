@@ -12,8 +12,6 @@
 #ifndef __hedrot_receiver__libhedrot_calibration__
 #define __hedrot_receiver__libhedrot_calibration__
 
-#include <stdio.h>
-
 // constants
 #define MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION 100000
 #define MAX_CONDITION_NUMBER_OFFLINE 100000

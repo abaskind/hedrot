@@ -57,10 +57,10 @@ cp "$rootDirectory/firmware/build/hedrot-firmware.ino.hex" "$packageFolder/firmw
 cp "$rootDirectory/firmware/CHANGELOG.txt" "$packageFolder/firmware/"
 
 ######### copy the max source code and external #############################
-mkdir $packageFolder/hedrotReceiver
-cp $rootDirectory/hedrotReceiver/hedrotReceiver.json $packageFolder/hedrotReceiver/
-cp $rootDirectory/hedrotReceiver/patches/*.maxpat $packageFolder/hedrotReceiver/
-cp -R $rootDirectory/hedrotReceiver/hedrot_receiver.mxo $packageFolder/hedrotReceiver/
+mkdir $packageFolder/Max
+cp $rootDirectory/hedrotReceiver/hedrotReceiver.json $packageFolder/Max/
+cp $rootDirectory/hedrotReceiver/patches/*.maxpat $packageFolder/Max/
+cp -R $rootDirectory/hedrotReceiver/hedrot_receiver.mxo $packageFolder/Max/
 
 ######### copy the examples folder #############################
 mkdir $packageFolder/examples

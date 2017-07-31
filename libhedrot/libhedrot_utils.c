@@ -6,9 +6,13 @@
 //
 //
 
-#include "libhedrot_utils.h"
 #include <string.h>
 #include <stdlib.h>
+#if defined(_WIN32) || defined(_WIN64)
+#include <stdint.h>
+#endif
+#include "libhedrot_utils.h"
+
 
 
 //=====================================================================================================
@@ -17,6 +21,14 @@
 
 // double floating point modulo
 double mod(double a, double N) {return a - N*floor(a/N);} //return in range [0, N]
+
+// round (not defined in VS2012)
+#if defined(_WIN32) || defined(_WIN64)
+double round(double value) { 
+	return value < 0 ? -floor(0.5 - value) : floor(0.5 + value);
+}
+#endif /* #if defined(_WIN32) || defined(_WIN64) */
+
 
 
 //---------------------------------------------------------------------------------------------------
@@ -200,6 +212,6 @@ float getStdDev1f(float *samples, long numberOfSamples, float mean) {
     }
 
     // normalization and square root
-    return sqrt(var/numberOfSamples);
+    return (float) sqrt(var/numberOfSamples);
 }
 

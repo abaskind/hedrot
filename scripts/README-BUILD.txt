@@ -16,6 +16,8 @@
 	. edit "Max\visual studio\hedrot_receiver.props" and change the path to the « c74support » folder in the Max SDK (variable C74SUPPORT)
 	. run « scripts/Win/build.bat » 
 	. open hedrotReceiver.maxproj in Max and build the standalone in the same directory
+	. edit « scripts/Win/makeDistribution.bat »and change the following paths if necessary:
+			- path to rcedit (small tool to change the app icon, available at https://github.com/electron/rcedit)
 	. run « scripts/Win/makeDistribution.bat »
 
 In order to build hedrot binaries on Windows, a distribution of BLAS+LAPACK+LAPACKE is required. To build this distribution:

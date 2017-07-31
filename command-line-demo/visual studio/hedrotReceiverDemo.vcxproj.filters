@@ -24,6 +24,15 @@
     <ClCompile Include="..\..\libhedrot\libhedrot_serialcomm.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\libhedrot\libhedrot_calibration.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libhedrot\libhedrot_RTmagCalibration.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libhedrot\libhedrot_utils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libhedrot\libhedrot.h">
@@ -33,6 +42,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\firmware\hedrot-firmware\hedrot_comm_protocol.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libhedrot\libhedrot_calibration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libhedrot\libhedrot_RTmagCalibration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libhedrot\libhedrot_utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

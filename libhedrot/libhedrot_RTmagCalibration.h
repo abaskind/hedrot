@@ -13,6 +13,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#define _USE_MATH_DEFINES // for C+Windows
+#include <math.h>
 #include "libhedrot_utils.h"
 #include "libhedrot_calibration.h"
 

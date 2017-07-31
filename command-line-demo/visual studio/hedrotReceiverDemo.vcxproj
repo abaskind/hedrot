@@ -161,13 +161,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\libhedrot\libhedrot.c" />
+    <ClCompile Include="..\..\libhedrot\libhedrot_calibration.c" />
+    <ClCompile Include="..\..\libhedrot\libhedrot_RTmagCalibration.c" />
     <ClCompile Include="..\..\libhedrot\libhedrot_serialcomm.c" />
+    <ClCompile Include="..\..\libhedrot\libhedrot_utils.c" />
     <ClCompile Include="..\source\hedrotReceiverDemo.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\firmware\hedrot-firmware\hedrot_comm_protocol.h" />
     <ClInclude Include="..\..\libhedrot\libhedrot.h" />
+    <ClInclude Include="..\..\libhedrot\libhedrot_calibration.h" />
+    <ClInclude Include="..\..\libhedrot\libhedrot_RTmagCalibration.h" />
     <ClInclude Include="..\..\libhedrot\libhedrot_serialcomm.h" />
+    <ClInclude Include="..\..\libhedrot\libhedrot_utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

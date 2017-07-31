@@ -9,7 +9,7 @@
 
 
 #include "libhedrot_calibration.h"
-
+#include <stdio.h>
 #include "libhedrot_utils.h"
 
 // include cblas and lapack for matrix operations
@@ -448,7 +448,7 @@ int rotatedEllipsoidFit(calibrationData* calData, double *quadricCoefficients, d
 #else
 #if defined(_WIN32) || defined(_WIN64)
     // constants
-    double rcond = 1/MAX_CONDITION_NUMBER; // reverse maximum condition number
+    double rcond = 1/maxConditionNumber; // reverse maximum condition number
     
     double *matrixA = (double*) malloc(calData->numberOfSamples*9*sizeof(double)); // internal input matrix A
     double *matrixB = (double*) malloc(calData->numberOfSamples*sizeof(double)); // internal input matrix B (column mit ones), output = solution

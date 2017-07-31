@@ -38,9 +38,8 @@ REM ######### prepare and copy Max Standalone #############################
 
 REM #copy the standalone and the default preset file
 md "%packageFolder%\hedrotReceiver"
-xcopy "%rootDirectory%\Max\standalone-Win\x64\hedrotReceiver" "%packageFolder%\hedrotReceiver" /Y /Q /i /s
-copy "%rootDirectory%\Max\hedrotReceiver.json" "%packageFolder%\hedrotReceiver" > nul
-
+xcopy "%rootDirectory%\hedrotReceiver\standalone-Win\x64\hedrotReceiver" "%packageFolder%\hedrotReceiver" /Y /Q /i /s
+copy "%rootDirectory%\hedrotReceiver\hedrotReceiver.json" "%packageFolder%\hedrotReceiver" > nul
 
 REM ######### copy the command-line-demo #############################
 md "%packageFolder%\command-line-demo"
@@ -53,10 +52,10 @@ copy "%rootDirectory%\firmware\CHANGELOG.txt" "%packageFolder%\firmware\" > nul
 
 REM ######### copy the max source code and external #############################
 md "%packageFolder%\Max"
-copy "%rootDirectory%\Max\hedrotReceiver.json" "%packageFolder%\Max\" > nul
-copy "%rootDirectory%\Max\patches\*.maxpat" "%packageFolder%\Max\" > nul
-copy "%rootDirectory%\Max\hedrot_receiver.mxe" "%packageFolder%\Max\" > nul
-copy "%rootDirectory%\Max\hedrot_receiver.mxe64" "%packageFolder%\Max\" > nul
+copy "%rootDirectory%\hedrotReceiver\hedrotReceiver.json" "%packageFolder%\Max\" > nul
+copy "%rootDirectory%\hedrotReceiver\patches\*.maxpat" "%packageFolder%\Max\" > nul
+copy "%rootDirectory%\hedrotReceiver\hedrot_receiver.mxe" "%packageFolder%\Max\" > nul
+copy "%rootDirectory%\hedrotReceiver\hedrot_receiver.mxe64" "%packageFolder%\Max\" > nul
 
 REM ######### copy the examples folder #############################
 md "%packageFolder%\examples"
@@ -80,6 +79,17 @@ copy "%rootDirectory%\scripts\README-DISTRIBUTION.txt" "%packageFolder%\README.t
 sed -i "s/Hedrot Version: XXXX/Hedrot Version: %hedrotVersion%/g;" %packageFolder%\README.txt
 sed -i "s/Firmware Version: YYYY/Firmware Version: %hedrotFirmwareVersion%/g;" %packageFolder%\README.txt
 
+REM ######### change the icon of the standalone folder and of the standalone #############################
+C:\Users\Baskind\Desktop\Developpement\utils\rcedit "%packageFolder%\hedrotReceiver\hedrotReceiver.exe" --set-icon %thisDirectory%\..\logo\hedrot.ico
+cd %packageFolder%
+echo [.ShellClassInfo] >> hedrotReceiver\desktop.ini
+echo IconResource=%thisDirectory%\..\logo\hedrot.ico >> hedrotReceiver\desktop.ini
+echo [ViewState] >> hedrotReceiver\desktop.ini
+echo Mode= >> hedrotReceiver\desktop.ini
+echo Vid= >> hedrotReceiver\desktop.ini
+echo FolderType=Documents >> hedrotReceiver\desktop.ini
+attrib -A +S +H hedrotReceiver\desktop.ini
+attrib +R hedrotReceiver
 
 REM ######### ZIP #############################
 

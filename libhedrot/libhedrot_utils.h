@@ -21,6 +21,18 @@ double round(double value);
 #endif /* #if defined(_WIN32) || defined(_WIN64) */
 
 // math utils
+
+// min and max not standard in Mac
+#ifdef __MACH__  // if mach (mac os X)
+#ifndef min
+#define min(a,b) (((a)<(b))?(a):(b))
+#endif
+
+#ifndef max
+#define max(a,b) (((a)>(b))?(a):(b))
+#endif
+#endif
+
 #define M_PI_float (float)      3.14159265358979323846264338327950288
 #define	DEGREE_TO_RAD           M_PI_float / 180.0f
 #define	RAD_TO_DEGREE           180.0f / M_PI_float

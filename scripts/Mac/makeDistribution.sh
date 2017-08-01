@@ -51,9 +51,10 @@ cp ../logo/hedrot.icns $appcontentsdirectory/Resources/
 mkdir $packageFolder/command-line-demo
 cp "$rootDirectory/command-line-demo/xcode/hedrotReceiverDemo" "$packageFolder/command-line-demo/"
 
-######### copy the firmware #############################
+######### copy the firmware (both versions) #############################
 mkdir $packageFolder/firmware
-cp "$rootDirectory/firmware/build/hedrot-firmware.ino.hex" "$packageFolder/firmware/hedrot-firmware_version_$hedrotFirmwareVersion.hex"
+cp "$rootDirectory/firmware/hex/hedrot-firmware-teensy31-32.ino.hex" "$packageFolder/firmware/hedrot-firmware-teensy31-32_version_$hedrotFirmwareVersion.hex"
+cp "$rootDirectory/firmware/hex/hedrot-firmware-teensyLC.ino.hex" "$packageFolder/firmware/hedrot-firmware-teensyLC_version_$hedrotFirmwareVersion.hex"
 cp "$rootDirectory/firmware/CHANGELOG.txt" "$packageFolder/firmware/"
 
 ######### copy the max source code and external #############################

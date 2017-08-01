@@ -45,9 +45,10 @@ REM ######### copy the command-line-demo #############################
 md "%packageFolder%\command-line-demo"
 copy "%rootDirectory%\command-line-demo\visual studio\exe\Release_x64\hedrotReceiverDemo.exe" "%packageFolder%\command-line-demo\" > nul 
 
-REM ######### copy the firmware #############################
+REM ######### copy the firmware (both versions) #############################
 md "%packageFolder%\firmware"
-copy "%rootDirectory%\firmware\build\hedrot-firmware.ino.hex" "%packageFolder%\firmware\hedrot-firmware_version_%hedrotFirmwareVersion%.hex" > nul
+copy "%rootDirectory%\firmware\hex\hedrot-firmware-teensy31-32.ino.hex" "%packageFolder%\firmware\hedrot-firmware-teensy31-32_version_%hedrotFirmwareVersion%.hex" > nul
+copy "%rootDirectory%\firmware\hex\hedrot-firmware-teensyLC.ino.hex" "%packageFolder%\firmware\hedrot-firmware-teensyLC_version_%hedrotFirmwareVersion%.hex" > nul
 copy "%rootDirectory%\firmware\CHANGELOG.txt" "%packageFolder%\firmware\" > nul
 
 REM ######### copy the max source code and external #############################

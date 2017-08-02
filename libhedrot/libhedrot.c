@@ -896,6 +896,11 @@ void headtracker_compute_data(headtrackerData *trackingData) {
     convert_7bytes_to_3int16(trackingData->rawDataBuffer,7,trackingData->accRawData);
     convert_7bytes_to_3int16(trackingData->rawDataBuffer,14,trackingData->gyroRawData);
     
+    //scale the gyro data
+    trackingData->gyroCalData[0] = (trackingData->gyroRawData[0]-trackingData->gyroOffset[0]) * trackingData->gyroscopeCalibrationFactor;
+    trackingData->gyroCalData[1] = (trackingData->gyroRawData[1]-trackingData->gyroOffset[1]) * trackingData->gyroscopeCalibrationFactor;
+    trackingData->gyroCalData[2] = (trackingData->gyroRawData[2]-trackingData->gyroOffset[2]) * trackingData->gyroscopeCalibrationFactor;
+    
     // angle estimation
     if(trackingData->calibrationValid) {
         // if the real-time calibration of the magnetometer is on and if the counter reaches 0, update it
@@ -924,7 +929,7 @@ void headtracker_compute_data(headtrackerData *trackingData) {
     }
     
     // check if the gyro calibration is done
-    if(trackingData->gyroOffsetAutocalOn & trackingData->calibrationValid) {
+    if(trackingData->gyroOffsetAutocalOn) {
         switch(trackingData->gyroOffsetCalibratedState) {
             case 0:
                 // gyro calibration not started yet, start it now
@@ -1066,11 +1071,6 @@ char MadgwickAHRSupdateModified(headtrackerData *trackingData) {
     float a_norm2,m_norm2, gyro_norm2;
     
     float accDataNorm[3], magDataNorm[3];
-    
-    //scale the gyro data
-    trackingData->gyroCalData[0] = (trackingData->gyroRawData[0]-trackingData->gyroOffset[0]) * trackingData->gyroscopeCalibrationFactor;
-    trackingData->gyroCalData[1] = (trackingData->gyroRawData[1]-trackingData->gyroOffset[1]) * trackingData->gyroscopeCalibrationFactor;
-    trackingData->gyroCalData[2] = (trackingData->gyroRawData[2]-trackingData->gyroOffset[2]) * trackingData->gyroscopeCalibrationFactor;
     
     //scale mag data
     if(trackingData->RTmagCalOn) {

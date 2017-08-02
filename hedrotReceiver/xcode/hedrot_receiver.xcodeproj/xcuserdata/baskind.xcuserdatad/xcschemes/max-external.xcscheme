@@ -54,7 +54,7 @@
       </MacroExpansion>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "/Volumes/Data/Developpement/hedrot-headtracker/hedrot/Max/hedrotReceiver.maxproj"
+            argument = "/Volumes/Data/Developpement/hedrot-headtracker/hedrot/hedrotReceiver/hedrotReceiver.maxproj"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

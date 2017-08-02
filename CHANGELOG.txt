@@ -1,7 +1,7 @@
 hedrot distribution, changelog:
 
 Version 1.2.0 (02/08/17)
-	. calibration routines ported in the library
+	. calibration routines ported in the library, completely rewritten and enhanced
 	. experimental real-time magnetometer calibration routines
 	. default headtracker parameters (MaxGain, acc LP filter, magnetometer rate) slightly modified for better results
 	. added icon

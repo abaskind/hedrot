@@ -34,7 +34,7 @@
         <h2>
 <a id="what-is-hedrot" class="anchor" href="#what-is-hedrot" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What is hedrot?</h2>
 
-        <p><i>Hedrot</i> (for "head rotation tracker") is a low-cost (less than 40 euros) and efficient open-source hardware/software solution for head tracking. <i>Hedrot</i> is especially suitable for binaural rendering (3D-Audio on headphones), and has been initially designed for use with the binaural renderer <i>Bipan</i> as part of the <a href="http://www.bili-project.org/">Bili Project</a>.</p>
+        <p><i>Hedrot</i> (for "head rotation tracker") is a low-cost (around 25 euros with a teensy LC) and efficient open-source hardware/software solution for head tracking. <i>Hedrot</i> is especially suitable for binaural rendering (3D-Audio on headphones), and has been initially designed for use with the binaural renderer <i>Bipan</i> as part of the <a href="http://www.bili-project.org/">Bili Project</a>.</p>
 
         <p><i>Hedrot</i> provides an estimation of the rotation of the sensor (thus of the head if the sensor is attached to headphones) for the most usual x-y-z coordinate systems, either as a quaternion, or as a set of 3 orientation angles yaw, pitch and roll with two different orders (yaw-pitch-roll or roll-pitch-yaw). The main application provided with the distribution, <i>hedrotReceiver</i>, sends this information as OSC streams, with the extra possibility to scale each stream independently.</p>
         
@@ -64,11 +64,11 @@
 <a id="download-hedrot" class="anchor" href="#download-hedrot" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Download hedrot distribution</h2>
 
         
-Current version: 1.1.1
+Current version: 1.2.0
 <ul>
-<li><a href="https://github.com/abaskind/hedrot/releases/download/v1.1.1/hedrot-1.1.1-17-04-07-Mac.dmg">Version 1.1.1 (Mac)</a></li>
-<li><a href="https://github.com/abaskind/hedrot/releases/download/v1.1.1/hedrot-1.1.1-17-04-07-Win64.zip">Version 1.1.1 (Windows 64 bits)</a></li>
-<li><a href="hhttps://github.com/abaskind/hedrot/archive/v1.1.0.zip">Sources (zip)</a></li>
+<li><a href="https://github.com/abaskind/hedrot/releases/download/v1.2.0/hedrot-1.2.0-17-08-02-Mac.dmg">Version 1.2.0 (Mac)</a></li>
+<li><a href="https://github.com/abaskind/hedrot/releases/download/v1.2.0/hedrot-1.2.0-17-08-02-Win64.zip">Version 1.2.0 (Windows 64 bits)</a></li>
+<li><a href="https://github.com/abaskind/hedrot/archive/v1.2.0.zip">Sources (zip)</a></li>
 </ul>
         
         <h3>Previous versions</h3>
@@ -113,7 +113,7 @@ Contributions to help developing this collaborative project further are warmly w
 Head tracker parts:
 
 <ul>
-<li>1 Teensy 3 board (tested with versions 3.1 and 3.2), can be found for example by the following vendors:
+<li>1 Teensy 3 board (tested with versions 3.1, 3.2 and LC), can be found for example by the following vendors:
   <ul>
   <li><a href="https://www.pjrc.com/store/teensy32.html">PJRC</a></li>
   <li><a href="https://www.sparkfun.com/products/13736">Sparkfun</a></li>
@@ -155,9 +155,10 @@ Head tracker parts:
 <li>Xcode version 6.2 or later(for Mac), or Visual Studio 2012 (for Windows)</li>
 <li>Windows: a windows version of awk (like gawk) and the program 7-zip to make the package</li>
 <li>Max version 6 at least</li>
-<li>Arduino IDE 1.8.1</li>
-<li>Teensyduino 1.35 (teensy support for the Arduino IDE and the teensy USB serial driver on Windows), with at least the i2c_t3 library. <span>Note</span>: Teensyduino already includes the Teensy serial driver on Windows</li>
-</ul>
+<li>Arduino IDE 1.8.3</li>
+<li>Teensyduino 1.37 (teensy support for the Arduino IDE and the teensy USB serial driver on Windows), with at least the i2c_t3 library. <span>Note</span>: Teensyduino already includes the Teensy serial driver on Windows</li>
+<li>Windows: a distribution of BLAS, Lapack and LAPACKE. See README-BUILD.txt for more information about how to build it</li>
+        </ul>
       </section>
     </div>
 

@@ -3,7 +3,7 @@
 //
 //
 //
-// Copyright	© Alexis Baskind, 2015-2016
+// Copyright	© Alexis Baskind, 2015-2017
 // General Public License v3
 
 
@@ -109,7 +109,12 @@ void setup() {
     // (38400 chosen because it works as well at 8MHz as it does at 16MHz, but
     // it's really up to you depending on your project)
     Serial.begin(BAUDRATE);
+
     
+#if LED_ON
+    pinMode(LED_BUILTIN, OUTPUT);
+#endif
+
     // initialize device
     //Serial.println("Initializing I2C devices...");
     accel.initialize();
@@ -121,14 +126,27 @@ void setup() {
     gyro.initialize();
     gyro.setIntDataReadyEnabled(1);
     
-    
-    //Serial.println("Testing device connections...");
-    //Serial.println(mag.testConnection() ? "HMC5883L connection successful" : "HMC5883L connection failed");
-    
-#if LED_ON
-    pinMode(LED_BUILTIN, OUTPUT);
-#endif
-    
+    if( !mag.testConnection() || !accel.testConnection() || !gyro.testConnection()) {
+      // error connecting to the sensors
+      // infinite loop with quick blinking
+      while(1) {
+          digitalWrite(LED_BUILTIN, HIGH);
+          delay(100);
+          digitalWrite(LED_BUILTIN, LOW);
+          delay(100);
+      }
+    } else {
+      // no error while connecting
+      // blink twice slowly and go further
+        digitalWrite(LED_BUILTIN, HIGH);
+        delay(1000);
+        digitalWrite(LED_BUILTIN, LOW);
+        delay(1000);
+        digitalWrite(LED_BUILTIN, HIGH);
+        delay(1000);
+        digitalWrite(LED_BUILTIN, LOW);
+    }
+
     stopTransmission();
     
     samplerate = 1000;

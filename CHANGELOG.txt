@@ -1,5 +1,12 @@
 hedrot distribution, changelog:
 
+Version 1.2.1 (04/08/17)
+	. version 8 of the firmware. Version 8 offers exactly the same functionalities as version 7, but adds a self test when the board is connected or reset:
+		- if everything goes well, the onboard led should blink twice slowly (then it’s ready for use)
+		- if the teensy board can connect to the daughter sensor board but cannot read its data, the onboard led blinks fast endlessly	
+		- if the teensy board cannot connect to the daughter board, nothing happens
+		=> in both latter cases, there is probably a hardware problem: either the daugther board is damaged, or there is bad contact in the connections between both boards, or the main teensy board is damaged.
+
 Version 1.2.0 (02/08/17)
 	. calibration routines ported in the library, completely rewritten and enhanced
 	. experimental real-time magnetometer calibration routines

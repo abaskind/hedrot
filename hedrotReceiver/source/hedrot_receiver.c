@@ -988,7 +988,7 @@ void hedrot_receiver_mirrorHeadtrackerInfo(t_hedrot_receiver *x) {
     x->accRange = x->trackingData->accRange;
     object_attr_touch( (t_object *)x, gensym("accRange"));
     
-    for(i=0;i<3;i++) x->accHardOffset[i] = x->trackingData->accHardOffset[i];
+    for(i=0;i<3;i++) x->accHardOffset[i] = (long) x->trackingData->accHardOffset[i];
     object_attr_touch( (t_object *)x, gensym("accHardOffset"));
     
     x->accFullResolutionBit = x->trackingData->accFullResolutionBit;
@@ -1361,14 +1361,17 @@ t_max_err hedrot_receiver_accRange_set(t_hedrot_receiver *x, t_object *attr, lon
 t_max_err hedrot_receiver_accHardOffset_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     int i;
     
+    char accHardOffsetTMP[3];
+    
     if (!argc)
         return MAX_ERR_GENERIC;
     
     for(i=0;i<3;i++,argv++) {
-        x->accHardOffset[i] = (unsigned char) max(min(atom_getlong(argv),127),-128);
+        x->accHardOffset[i] = max(min(atom_getlong(argv),127),-128);
+        accHardOffsetTMP[i] = (char) x->accHardOffset[i];
     }
     
-    setAccHardOffset(x->trackingData, x->accHardOffset, 1);
+    setAccHardOffset(x->trackingData, accHardOffsetTMP, 1);
     
     return MAX_ERR_NONE;
 }
@@ -1746,7 +1749,7 @@ int C74_EXPORT main()
     CLASS_ATTR_ENUMINDEX(c, "accRange", 0, "2G 4G 8G 16G");
     CLASS_ATTR_ACCESSORS(c, "accRange", NULL, hedrot_receiver_accRange_set);
     
-    CLASS_ATTR_CHAR_ARRAY(c, "accHardOffset",    0,  t_hedrot_receiver,  accHardOffset,  3);
+    CLASS_ATTR_LONG_ARRAY(c, "accHardOffset",    0,  t_hedrot_receiver,  accHardOffset,  3);
     CLASS_ATTR_ACCESSORS(c, "accHardOffset", NULL, hedrot_receiver_accHardOffset_set);
     
     CLASS_ATTR_CHAR(c,    "accFullResolutionBit",    0,  t_hedrot_receiver,  accFullResolutionBit);

@@ -60,7 +60,7 @@ typedef struct hedrot_receiver
     unsigned char   gyroDLPFBandwidth;
     unsigned char   gyroOffsetAutocalOn;
     unsigned char   accRange;
-    char			accHardOffset[3];
+    long			accHardOffset[3]; // the Max API does not seem to handle signed char arrays => need to handle it as long
     unsigned char   accFullResolutionBit;
     unsigned char   accDataRate;
     unsigned char   magMeasurementBias;

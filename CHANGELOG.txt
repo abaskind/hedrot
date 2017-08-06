@@ -1,5 +1,8 @@
 hedrot distribution, changelog:
 
+Version 1.2.2 (??/??/??)
+	. bug solved: accelerometer hard offset could not be negative in the Max app
+
 Version 1.2.1 (04/08/17)
 	. version 8 of the firmware. Version 8 offers exactly the same functionalities as version 7, but adds a self test when the board is connected or reset:
 		- if everything goes well, the onboard led should blink twice slowly (then it’s ready for use)

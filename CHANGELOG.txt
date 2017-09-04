@@ -1,6 +1,6 @@
 hedrot distribution, changelog:
 
-Version 1.2.2 (??/??/??)
+Version 1.2.2 (04/09/17)
 	. bug solved: accelerometer hard offset could not be negative in the Max app
 
 Version 1.2.1 (04/08/17)

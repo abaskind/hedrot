@@ -2097,7 +2097,7 @@ void changeRTMagCalTimeSettings(headtrackerData *trackingData) {
     // update all timing constants in samples based on their values in seconds
     
     // change the subsampling factor for acquisition of the magnetometer data, depending on its settings
-    short magRate = 160;
+    double magRate = 160;
     
     // 1/ get the actual rate of the magnetometer
     switch(trackingData->magMeasurementMode) {

@@ -17,8 +17,8 @@
 #define MAX_CONDITION_NUMBER_OFFLINE 100000
 #define NORM_ERROR_TOLERANCE .05 // during calibration, all samples which norm is outside (1 +/- NORM_ERROR_TOLERANCE) after first pass of calibration are filtered out for the second pass
 
-#define MAX_ALLOWED_OFFSET 1000
-#define MAX_ALLOWED_SCALING 1000
+#define MAX_ALLOWED_OFFSET 10000
+#define MAX_ALLOWED_SCALING 10000
 
 //=====================================================================================================
 // structure definition: temporary calibration data for magnetometer and accelerometer

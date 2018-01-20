@@ -1,7 +1,7 @@
 maxError = .05; # maximum radius deviation
 
 
-rawMagCalData = readTextOfflineCalrawData("headtrackerRawMagCalibrationData-AKG-BAD.txt");
+rawMagCalData = readTextOfflineCalrawData("/Users/baskind/Desktop/headtrackerRawMagCalibrationData.txt");
 
 # estimation 1 (free ellipsoid)
 [ center1, radii1, evecs1, v1 ] = ellipsoid_fit( rawMagCalData, 0 )

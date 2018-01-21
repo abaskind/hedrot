@@ -16,7 +16,7 @@
 
 
 #include "ADXL345.h"
-#include "HMC5883L.h"
+#include "Mag5883.h"
 #include "ITG3200.h"
 #include "hedrot_comm_protocol.h"
 #include <EEPROM.h>
@@ -62,7 +62,7 @@
 // specific I2C addresses may be passed as a parameter here
 // ALT low = 0x53 (default for SparkFun 6DOF board)
 // ALT high = 0x1D
-HMC5883L mag;
+Mag5883 mag;
 ITG3200 gyro;
 ADXL345 accel;
 
@@ -101,34 +101,56 @@ void stopTransmission() {
 }
 
 void setup() {
+    //Serial.println("Step1");
     // join I2C bus (I2Cdev library doesn't do this automatically)
     //on the specs of the ITG3200, the maximum I2C speed is 400kHz, but it seems to work up to 1500kHz
     Wire.begin(I2C_MASTER, 0, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_1500);
-    
+    //Serial.println("Step2");
     // initialize serial communication
     // (38400 chosen because it works as well at 8MHz as it does at 16MHz, but
     // it's really up to you depending on your project)
     Serial.begin(BAUDRATE);
-
+    //Serial.println("Step3");
     
 #if LED_ON
     pinMode(LED_BUILTIN, OUTPUT);
 #endif
-
+    //Serial.println("Step4");
     // initialize device
     //Serial.println("Initializing I2C devices...");
     accel.initialize();
+    //Serial.println("Step5");
     accel.setIntDataReadyEnabled(1);
+    //Serial.println("Step6");
     
     mag.initialize();
-    
+    //Serial.println("Step7");
     // configure gyroscope
     gyro.initialize();
+    //Serial.println("Step8");
     gyro.setIntDataReadyEnabled(1);
-    
+    //Serial.println("Step9");
     if( !mag.testConnection() || !accel.testConnection() || !gyro.testConnection()) {
       // error connecting to the sensors
       // infinite loop with quick blinking
+      /*if( !mag.testConnection()) {
+        Serial.println("error connecting to Mag");
+      } else {
+        Serial.println("Connection to Mag OK");
+      }
+      
+      if( !accel.testConnection()) {
+        Serial.println("error connecting to Accel");
+      } else {
+        Serial.println("Connection to Accel OK");
+      }
+
+      if( !gyro.testConnection()) {
+        Serial.println("error connecting to Gyro");
+      } else {
+        Serial.println("Connection to Gyro OK");
+      }*/
+      
       while(1) {
           digitalWrite(LED_BUILTIN, HIGH);
           delay(100);

@@ -210,6 +210,7 @@ void hedrot_receiver_outputAccCalibrationSucceededNotice(t_hedrot_receiver *x);
 void hedrot_receiver_outputAccCalibrationFailedNotice(t_hedrot_receiver *x);
 void hedrot_receiver_outputAccCalibrationPausedNotice(t_hedrot_receiver *x);
 void hedrot_receiver_outputAccCalibrationResumedNotice(t_hedrot_receiver *x);
+void hedrot_receiver_boardOverloadNotice(t_hedrot_receiver *x);
 
 
 //getters and setters

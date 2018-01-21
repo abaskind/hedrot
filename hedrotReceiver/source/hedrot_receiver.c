@@ -130,7 +130,7 @@ void hedrot_receiver_tick(t_hedrot_receiver *x) {
                 if(x->verbose) post("[hedrot_receiver] : could not save raw real-time mag calibration data");
                 break;
             case NOTIFICATION_MESSAGE_BOARD_OVERLOAD:
-                if(x->verbose) post("[hedrot_receiver] : board too slow, reduce samplerate");
+                hedrot_receiver_boardOverloadNotice(x);
                 break;
             default:
                 post("[hedrot_receiver] : unknown message %ld from libhedrot", messageNumber);
@@ -906,7 +906,15 @@ void hedrot_receiver_outputAccCalibrationResumedNotice(t_hedrot_receiver *x) {
     if(x->verbose) post("[hedrot_receiver]: accelerometer calibration resumed");
 }
 
+void hedrot_receiver_boardOverloadNotice(t_hedrot_receiver *x) {
+    t_atom output;
 
+    atom_setsym(&output, gensym("board too slow, please reduce samplerate"));
+    
+    outlet_anything( x->x_error_outlet, gensym("board_overlad"), 1, &output);
+    
+    if(x->verbose) post("[hedrot_receiver] : board too slow, reduce samplerate");
+}
 
 
 void hedrot_receiver_outputReceptionStatus(t_hedrot_receiver *x) {

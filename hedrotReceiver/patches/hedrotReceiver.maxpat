@@ -155,7 +155,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u509001184"
+									"varname" : "u343001179"
 								}
 
 							}
@@ -9121,7 +9121,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u273001183"
+									"varname" : "u448001178"
 								}
 
 							}
@@ -14500,7 +14500,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u028001182"
+									"varname" : "u276001177"
 								}
 
 							}
@@ -15925,7 +15925,7 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 26.0, 84.0, 512.67334, 29.0 ],
 					"style" : "",
-					"text" : "headtracker transmitting...",
+					"text" : "no headtracker connected",
 					"textcolor" : [ 0.0, 0.501961, 1.0, 1.0 ],
 					"textjustification" : 1
 				}
@@ -16448,7 +16448,6 @@
 						"tags" : "",
 						"style" : "",
 						"subpatcher_template" : "",
-						"visible" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
 									"id" : "obj-44",
@@ -30041,7 +30040,7 @@
 					"patching_rect" : [ 1393.0, 48.0, 174.0, 20.0 ],
 					"presentation" : 1,
 					"presentation_linecount" : 2,
-					"presentation_rect" : [ 124.5, 476.0, 124.0, 34.0 ],
+					"presentation_rect" : [ 124.5, 476.0, 124.0, 33.0 ],
 					"style" : "",
 					"text" : "save window size and position"
 				}
@@ -30225,7 +30224,7 @@
 					"fontsize" : 18.0,
 					"id" : "obj-86",
 					"ignoreclick" : 1,
-					"items" : [ 0, "/dev/cu.Bluetooth-Incoming-Port", ",", 1, "/dev/cu.usbmodem2390101" ],
+					"items" : [ 0, "/dev/cu.Bluetooth-Incoming-Port", ",", 1, "/dev/cu.usbmodem3854521" ],
 					"labelclick" : 1,
 					"maxclass" : "umenu",
 					"numinlets" : 1,
@@ -31087,7 +31086,6 @@
 										"tags" : "",
 										"style" : "",
 										"subpatcher_template" : "",
-										"visible" : 1,
 										"boxes" : [ 											{
 												"box" : 												{
 													"fontname" : "Arial",
@@ -32841,7 +32839,7 @@
 													"numinlets" : 1,
 													"numoutlets" : 1,
 													"outlettype" : [ "bang" ],
-													"patching_rect" : [ 338.0, 249.0, 65.0, 20.0 ],
+													"patching_rect" : [ 338.0, 249.0, 65.0, 22.0 ],
 													"style" : "",
 													"text" : "closebang"
 												}
@@ -32856,7 +32854,7 @@
 													"numinlets" : 1,
 													"numoutlets" : 1,
 													"outlettype" : [ "bang" ],
-													"patching_rect" : [ 475.0, 290.0, 60.0, 20.0 ],
+													"patching_rect" : [ 475.0, 290.0, 60.0, 22.0 ],
 													"style" : "",
 													"text" : "loadbang"
 												}
@@ -32889,7 +32887,7 @@
 													"numinlets" : 2,
 													"numoutlets" : 1,
 													"outlettype" : [ "" ],
-													"patching_rect" : [ 475.0, 318.0, 181.0, 18.0 ],
+													"patching_rect" : [ 475.0, 318.0, 181.0, 22.0 ],
 													"style" : "",
 													"text" : "window flags float, window exec"
 												}
@@ -32917,7 +32915,7 @@
 													"numinlets" : 1,
 													"numoutlets" : 2,
 													"outlettype" : [ "wclose", "bang" ],
-													"patching_rect" : [ 174.0, 288.0, 64.0, 20.0 ],
+													"patching_rect" : [ 174.0, 288.0, 64.0, 22.0 ],
 													"style" : "",
 													"text" : "t wclose b"
 												}
@@ -32932,7 +32930,7 @@
 													"numinlets" : 2,
 													"numoutlets" : 1,
 													"outlettype" : [ "" ],
-													"patching_rect" : [ 338.0, 279.0, 47.0, 18.0 ],
+													"patching_rect" : [ 338.0, 279.0, 47.0, 22.0 ],
 													"style" : "",
 													"text" : "wclose"
 												}
@@ -32947,7 +32945,7 @@
 													"numinlets" : 2,
 													"numoutlets" : 1,
 													"outlettype" : [ "" ],
-													"patching_rect" : [ 196.0, 120.0, 89.0, 18.0 ],
+													"patching_rect" : [ 196.0, 120.0, 89.0, 22.0 ],
 													"style" : "",
 													"text" : "Are you sure ?"
 												}
@@ -32962,7 +32960,7 @@
 													"numinlets" : 2,
 													"numoutlets" : 2,
 													"outlettype" : [ "", "" ],
-													"patching_rect" : [ 196.0, 97.0, 68.0, 20.0 ],
+													"patching_rect" : [ 196.0, 97.0, 68.0, 22.0 ],
 													"style" : "",
 													"text" : "route bang"
 												}
@@ -32994,7 +32992,7 @@
 													"numinlets" : 2,
 													"numoutlets" : 1,
 													"outlettype" : [ "" ],
-													"patching_rect" : [ 60.0, 364.0, 35.0, 18.0 ],
+													"patching_rect" : [ 60.0, 364.0, 35.0, 22.0 ],
 													"style" : "",
 													"text" : "front"
 												}
@@ -33009,7 +33007,7 @@
 													"numinlets" : 1,
 													"numoutlets" : 2,
 													"outlettype" : [ "", "" ],
-													"patching_rect" : [ 59.0, 390.0, 69.0, 20.0 ],
+													"patching_rect" : [ 59.0, 390.0, 69.0, 22.0 ],
 													"save" : [ "#N", "thispatcher", ";", "#Q", "end", ";" ],
 													"style" : "",
 													"text" : "thispatcher"
@@ -33025,7 +33023,7 @@
 													"numinlets" : 1,
 													"numoutlets" : 1,
 													"outlettype" : [ "" ],
-													"patching_rect" : [ 246.0, 150.0, 74.0, 20.0 ],
+													"patching_rect" : [ 246.0, 150.0, 74.0, 22.0 ],
 													"style" : "",
 													"text" : "prepend set"
 												}
@@ -33040,7 +33038,7 @@
 													"numinlets" : 1,
 													"numoutlets" : 2,
 													"outlettype" : [ "bang", "" ],
-													"patching_rect" : [ 182.0, 66.0, 32.5, 20.0 ],
+													"patching_rect" : [ 182.0, 66.0, 32.5, 22.0 ],
 													"style" : "",
 													"text" : "t b l"
 												}
@@ -33065,16 +33063,14 @@
 													"fontname" : "Arial",
 													"fontsize" : 18.0,
 													"id" : "obj-2",
-													"linecount" : 2,
 													"maxclass" : "comment",
 													"numinlets" : 1,
 													"numoutlets" : 0,
-													"patching_rect" : [ 177.0, 178.0, 358.0, 47.0 ],
+													"patching_rect" : [ 177.0, 178.0, 358.0, 27.0 ],
 													"presentation" : 1,
-													"presentation_linecount" : 2,
-													"presentation_rect" : [ 8.0, 6.0, 358.0, 47.0 ],
+													"presentation_rect" : [ 8.0, 6.0, 358.0, 27.0 ],
 													"style" : "",
-													"text" : "Headtracker's accelerometer not calibrated or bad calibrated, please calibrate it first"
+													"text" : "board too slow, please reduce samplerate"
 												}
 
 											}
@@ -33214,12 +33210,12 @@
 									"fontsize" : 12.0,
 									"id" : "obj-18",
 									"maxclass" : "newobj",
-									"numinlets" : 3,
-									"numoutlets" : 3,
-									"outlettype" : [ "", "", "" ],
-									"patching_rect" : [ 1136.197876, 548.5, 285.0, 22.0 ],
+									"numinlets" : 4,
+									"numoutlets" : 4,
+									"outlettype" : [ "", "", "", "" ],
+									"patching_rect" : [ 1136.197876, 548.5, 365.0, 22.0 ],
 									"style" : "",
-									"text" : "route wrong_firmware_version calibration_not_valid"
+									"text" : "route wrong_firmware_version calibration_not_valid board_overlad"
 								}
 
 							}
@@ -33928,6 +33924,13 @@
 									"destination" : [ "obj-57", 0 ],
 									"hidden" : 1,
 									"source" : [ "obj-16", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-108", 0 ],
+									"source" : [ "obj-18", 2 ]
 								}
 
 							}
@@ -38930,13 +38933,13 @@
 					"restore" : 					{
 						"autodiscover" : [ 1 ],
 						"invertRotation" : [ 0 ],
-						"serialport" : [ "1 /dev/cu.usbmodem2390101" ],
+						"serialport" : [ "1 /dev/cu.usbmodem3854521" ],
 						"values_to_transmit" : [ 1 ]
 					}
 ,
 					"style" : "",
 					"text" : "autopattr @autorestore 0",
-					"varname" : "u423001185"
+					"varname" : "u476001180"
 				}
 
 			}

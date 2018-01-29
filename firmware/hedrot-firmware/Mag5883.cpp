@@ -1,3 +1,7 @@
+// Mag5883.cpp: Mag5883 I2C device methods for both Magnetometers used in gy-85 boards:
+// . Honeywell HMC5883L
+// . QMC5883L
+
 /*!
  * @file Mag5883.cpp
  * @brief Compatible with QMC5883 and QMC5883
@@ -111,7 +115,8 @@ bool Mag5883::testConnection() {
 }
 
 /** Get measurement bias value.
-dirty patch for QMC5883, ok for HMC5883L
+ *  This function should not be called if QMC5883
+@return if HMC5883L: Current bias value (0-2 for normal/positive/negative respectively). If QMC5883 (0)
  */
 uint8_t Mag5883::getMeasurementBias() {
     if(isHMC_){
@@ -120,14 +125,37 @@ uint8_t Mag5883::getMeasurementBias() {
       return 0; //dirty
     }
 }
+
 /** Set measurement bias value.
-dirty patch for QMC5883, ok for HMC5883L
+ *  This function should not be called if QMC5883
+@@param bias if HMC5883L: New bias value (0-2 for normal/positive/negative respectively)
  */
 void Mag5883::setMeasurementBias(uint8_t bias) {
     if(isHMC_){
       writeBits(HMC5883L_ADDRESS, HMC5883L_REG_CONFIG_A, HMC5883L_CRA_BIAS_BIT, HMC5883L_CRA_BIAS_LENGTH, bias);
     } else {
-      //dirty
+      //do nothing
+    }
+}
+
+/** Get number of samples averaged per measurement.
+ * @return Current samples averaged per measurement (0-3 for 1/2/4/8 respectively)
+ */
+uint8_t Mag5883::getSampleAveraging() {
+    if(isHMC_){
+      return readBits(HMC5883L_ADDRESS, HMC5883L_REG_CONFIG_A, HMC5883L_CRA_AVERAGE_BIT, HMC5883L_CRA_AVERAGE_LENGTH);
+    } else {
+      return readBits(QMC5883_ADDRESS, QMC5883_REG_CONFIG_1, QMC5883_CRA_AVERAGE_BIT, QMC5883_CRA_AVERAGE_LENGTH);
+    }
+}
+/** Set number of samples averaged per measurement.
+ * @param averaging New samples averaged per measurement setting(0-3 for 1/2/4/8 respectively)
+ */
+void Mag5883::setSampleAveraging(uint8_t averaging) {
+    if(isHMC_){
+      writeBits(HMC5883L_ADDRESS, HMC5883L_REG_CONFIG_A, HMC5883L_CRA_AVERAGE_BIT, HMC5883L_CRA_AVERAGE_LENGTH, averaging);
+    } else {
+      writeBits(QMC5883_ADDRESS, QMC5883_REG_CONFIG_1, QMC5883_CRA_AVERAGE_BIT, QMC5883_CRA_AVERAGE_LENGTH, averaging);
     }
 }
 
@@ -154,33 +182,6 @@ void Mag5883::setGain(uint8_t gain) {
     } else {
       gain = 1;//set to 8GA (dirty)
       writeByte(QMC5883_ADDRESS, QMC5883_REG_CONFIG_2, gain << 4);
-    }
-}
-
-/** Get number of samples averaged per measurement.
-dirty patch for QMC5883, ok for HMC5883L
- */
-uint8_t Mag5883::getSampleAveraging() {
-    if(isHMC_){
-      return readBits(HMC5883L_ADDRESS, HMC5883L_REG_CONFIG_A, HMC5883L_CRA_AVERAGE_BIT, HMC5883L_CRA_AVERAGE_LENGTH);
-    } else {
-      return 0;
-    }
-}
-/** Set number of samples averaged per measurement.
-dirty patch for QMC5883, ok for HMC5883L
- */
-void Mag5883::setSampleAveraging(uint8_t averaging) {
-    if(isHMC_){
-      writeBits(HMC5883L_ADDRESS, HMC5883L_REG_CONFIG_A, HMC5883L_CRA_AVERAGE_BIT, HMC5883L_CRA_AVERAGE_LENGTH, averaging);
-    } else {
-      averaging = 0;// set to 1 sample (dirty)
-
-      uint8_t value;
-      value = readRegister8(QMC5883_REG_CONFIG_1);
-      value &= 0x3f;
-      value |= (averaging << 6);
-      writeRegister8(QMC5883_REG_CONFIG_1, value);
     }
 }
 

@@ -122,6 +122,7 @@ typedef struct _headtrackerData {
     char            invertRotation;
     
     // sensor infos and settings
+    char            sensorBoardType; //headtracker sensor board type
     char            firmwareVersion; //headtracker firmware version
     long            samplerate;
     float           samplePeriod; // internal

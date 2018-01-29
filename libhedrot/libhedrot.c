@@ -1212,7 +1212,10 @@ char MadgwickAHRSupdateModified(headtrackerData *trackingData) {
 int  processKeyValueSettingPair(headtrackerData *trackingData, char *keyBuffer, char *valueBuffer, char UpdateHeadtrackerFlag) {
     int i;
     
-    if(strcmp(keyBuffer,"firmware_version") == 0) {
+    if(strcmp(keyBuffer,"sensor_board_type") == 0) {
+        trackingData->sensorBoardType=(char) strtol(valueBuffer,NULL,10);
+        if(trackingData->verbose) printf("sensor board type: %d\r\n",trackingData->sensorBoardType);
+    } else if(strcmp(keyBuffer,"firmware_version") == 0) {
         trackingData->firmwareVersion=(char) strtol(valueBuffer,NULL,10);
         if(trackingData->verbose) printf("firmware version: %d\r\n",trackingData->firmwareVersion);
         if(trackingData->firmwareVersion!=HEDROT_FIRMWARE_VERSION) {
@@ -1221,7 +1224,6 @@ int  processKeyValueSettingPair(headtrackerData *trackingData, char *keyBuffer, 
         } else {
             printf("firmware version OK\r\n");
         }
-        
     } else if(strcmp(keyBuffer,"samplerate") == 0) {
         trackingData->samplerate=strtol(valueBuffer,NULL,10);
         trackingData->samplePeriod = 1.0f / trackingData->samplerate;

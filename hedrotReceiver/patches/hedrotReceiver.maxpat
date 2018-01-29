@@ -155,7 +155,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u343001179"
+									"varname" : "u928001190"
 								}
 
 							}
@@ -8083,7 +8083,7 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 18.036011, 623.0, 134.0, 20.0 ],
 					"style" : "",
-					"text" : "Version 1.2.2"
+					"text" : "Version 1.3.0alpha"
 				}
 
 			}
@@ -9121,7 +9121,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u448001178"
+									"varname" : "u492001189"
 								}
 
 							}
@@ -14500,7 +14500,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr @autorestore 0",
-									"varname" : "u276001177"
+									"varname" : "u392001188"
 								}
 
 							}
@@ -16450,6 +16450,241 @@
 						"subpatcher_template" : "",
 						"boxes" : [ 							{
 								"box" : 								{
+									"id" : "obj-20",
+									"maxclass" : "newobj",
+									"numinlets" : 1,
+									"numoutlets" : 2,
+									"outlettype" : [ "", "" ],
+									"patching_rect" : [ 1484.0, 123.0, 69.0, 22.0 ],
+									"save" : [ "#N", "thispatcher", ";", "#Q", "end", ";" ],
+									"style" : "",
+									"text" : "thispatcher"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-19",
+									"maxclass" : "newobj",
+									"numinlets" : 1,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patcher" : 									{
+										"fileversion" : 1,
+										"appversion" : 										{
+											"major" : 7,
+											"minor" : 3,
+											"revision" : 4,
+											"architecture" : "x64",
+											"modernui" : 1
+										}
+,
+										"rect" : [ 59.0, 103.0, 640.0, 480.0 ],
+										"bglocked" : 0,
+										"openinpresentation" : 0,
+										"default_fontsize" : 12.0,
+										"default_fontface" : 0,
+										"default_fontname" : "Arial",
+										"gridonopen" : 1,
+										"gridsize" : [ 15.0, 15.0 ],
+										"gridsnaponopen" : 1,
+										"objectsnaponopen" : 1,
+										"statusbarvisible" : 2,
+										"toolbarvisible" : 1,
+										"lefttoolbarpinned" : 0,
+										"toptoolbarpinned" : 0,
+										"righttoolbarpinned" : 0,
+										"bottomtoolbarpinned" : 0,
+										"toolbars_unpinned_last_save" : 0,
+										"tallnewobj" : 0,
+										"boxanimatetime" : 200,
+										"enablehscroll" : 1,
+										"enablevscroll" : 1,
+										"devicewidth" : 0.0,
+										"description" : "",
+										"digest" : "",
+										"tags" : "",
+										"style" : "",
+										"subpatcher_template" : "",
+										"boxes" : [ 											{
+												"box" : 												{
+													"id" : "obj-11",
+													"maxclass" : "newobj",
+													"numinlets" : 1,
+													"numoutlets" : 1,
+													"outlettype" : [ "" ],
+													"patching_rect" : [ 29.0, 394.0, 87.0, 22.0 ],
+													"style" : "",
+													"text" : "prepend script"
+												}
+
+											}
+, 											{
+												"box" : 												{
+													"id" : "obj-10",
+													"linecount" : 2,
+													"maxclass" : "message",
+													"numinlets" : 2,
+													"numoutlets" : 1,
+													"outlettype" : [ "" ],
+													"patching_rect" : [ 293.0, 163.0, 189.0, 35.0 ],
+													"style" : "",
+													"text" : "hide magMeasurementBias, hide magMeasurementBias_comment"
+												}
+
+											}
+, 											{
+												"box" : 												{
+													"id" : "obj-9",
+													"maxclass" : "comment",
+													"numinlets" : 1,
+													"numoutlets" : 0,
+													"patching_rect" : [ 328.0, 109.0, 65.0, 20.0 ],
+													"style" : "",
+													"text" : "QMC5883"
+												}
+
+											}
+, 											{
+												"box" : 												{
+													"id" : "obj-7",
+													"maxclass" : "comment",
+													"numinlets" : 1,
+													"numoutlets" : 0,
+													"patching_rect" : [ 45.0, 109.0, 71.0, 20.0 ],
+													"style" : "",
+													"text" : "HMC5883L"
+												}
+
+											}
+, 											{
+												"box" : 												{
+													"id" : "obj-5",
+													"maxclass" : "message",
+													"numinlets" : 2,
+													"numoutlets" : 1,
+													"outlettype" : [ "" ],
+													"patching_rect" : [ 27.0, 131.0, 376.0, 22.0 ],
+													"style" : "",
+													"text" : "show magMeasurementBias, show magMeasurementBias_comment"
+												}
+
+											}
+, 											{
+												"box" : 												{
+													"id" : "obj-3",
+													"maxclass" : "newobj",
+													"numinlets" : 3,
+													"numoutlets" : 3,
+													"outlettype" : [ "bang", "bang", "" ],
+													"patching_rect" : [ 27.0, 65.0, 551.0, 22.0 ],
+													"style" : "",
+													"text" : "sel 0 1"
+												}
+
+											}
+, 											{
+												"box" : 												{
+													"comment" : "",
+													"id" : "obj-2",
+													"index" : 1,
+													"maxclass" : "outlet",
+													"numinlets" : 1,
+													"numoutlets" : 0,
+													"patching_rect" : [ 27.0, 426.0, 30.0, 30.0 ],
+													"style" : ""
+												}
+
+											}
+, 											{
+												"box" : 												{
+													"comment" : "",
+													"id" : "obj-1",
+													"index" : 1,
+													"maxclass" : "inlet",
+													"numinlets" : 0,
+													"numoutlets" : 1,
+													"outlettype" : [ "" ],
+													"patching_rect" : [ 27.0, 21.0, 30.0, 30.0 ],
+													"style" : ""
+												}
+
+											}
+ ],
+										"lines" : [ 											{
+												"patchline" : 												{
+													"destination" : [ "obj-3", 0 ],
+													"source" : [ "obj-1", 0 ]
+												}
+
+											}
+, 											{
+												"patchline" : 												{
+													"destination" : [ "obj-11", 0 ],
+													"source" : [ "obj-10", 0 ]
+												}
+
+											}
+, 											{
+												"patchline" : 												{
+													"destination" : [ "obj-2", 0 ],
+													"source" : [ "obj-11", 0 ]
+												}
+
+											}
+, 											{
+												"patchline" : 												{
+													"destination" : [ "obj-10", 0 ],
+													"source" : [ "obj-3", 1 ]
+												}
+
+											}
+, 											{
+												"patchline" : 												{
+													"destination" : [ "obj-5", 0 ],
+													"source" : [ "obj-3", 0 ]
+												}
+
+											}
+, 											{
+												"patchline" : 												{
+													"destination" : [ "obj-11", 0 ],
+													"source" : [ "obj-5", 0 ]
+												}
+
+											}
+ ]
+									}
+,
+									"patching_rect" : [ 1484.0, 80.0, 123.0, 22.0 ],
+									"saved_object_attributes" : 									{
+										"description" : "",
+										"digest" : "",
+										"globalpatchername" : "",
+										"style" : "",
+										"tags" : ""
+									}
+,
+									"style" : "",
+									"text" : "p sensor_board_type"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-2",
+									"maxclass" : "newobj",
+									"numinlets" : 0,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 1484.0, 43.0, 121.0, 22.0 ],
+									"style" : "",
+									"text" : "r sensor_board_type"
+								}
+
+							}
+, 							{
+								"box" : 								{
 									"id" : "obj-44",
 									"maxclass" : "newobj",
 									"numinlets" : 1,
@@ -16750,7 +16985,8 @@
 									"presentation" : 1,
 									"presentation_rect" : [ 24.75, 536.0, 134.0, 22.0 ],
 									"style" : "",
-									"text" : "Measurement Bias"
+									"text" : "Measurement Bias",
+									"varname" : "magMeasurementBias_comment"
 								}
 
 							}
@@ -16763,7 +16999,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 1811.5, 116.0, 178.0, 22.0 ],
+									"patching_rect" : [ 1811.5, 117.0, 178.0, 22.0 ],
 									"style" : "",
 									"text" : "prepend magMeasurementBias"
 								}
@@ -16801,6 +17037,7 @@
 , 							{
 								"box" : 								{
 									"allowdrag" : 0,
+									"hidden" : 1,
 									"id" : "obj-145",
 									"items" : [ "normal", ",", "positive", ",", "negative" ],
 									"maxclass" : "umenu",
@@ -16811,7 +17048,8 @@
 									"patching_rect" : [ 1811.5, 93.0, 100.0, 22.0 ],
 									"presentation" : 1,
 									"presentation_rect" : [ 177.25, 536.0, 100.0, 22.0 ],
-									"style" : ""
+									"style" : "",
+									"varname" : "magMeasurementBias"
 								}
 
 							}
@@ -17034,7 +17272,6 @@
 								"box" : 								{
 									"fontname" : "Arial Bold",
 									"fontsize" : 14.0,
-									"hidden" : 1,
 									"id" : "obj-128",
 									"maxclass" : "comment",
 									"numinlets" : 1,
@@ -17095,7 +17332,6 @@
 , 							{
 								"box" : 								{
 									"allowdrag" : 0,
-									"hidden" : 1,
 									"id" : "obj-133",
 									"items" : [ 0.75, "Hz", ",", 1.5, "Hz", ",", 3, "Hz", ",", 7.5, "Hz", ",", 15, "Hz", ",", 30, "Hz", ",", 75, "Hz" ],
 									"maxclass" : "umenu",
@@ -17427,12 +17663,12 @@
 									"fontname" : "Arial",
 									"fontsize" : 12.0,
 									"id" : "obj-71",
-									"linecount" : 5,
+									"linecount" : 7,
 									"maxclass" : "message",
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 17.963989, 455.0, 668.0, 76.0 ],
+									"patching_rect" : [ 17.963989, 455.0, 470.0, 102.0 ],
 									"style" : "",
 									"text" : ";\r>hedrot_receiver samplerate 1000;\r>hedrot_receiver gyroDataRate 0, gyroClockSource 1, gyroDLPFBandwidth 0;\r>hedrot_receiver accHardOffset 0 0 0, accRange 3, accFullResolutionBit 1, accDataRate 13;\r>hedrot_receiver magMeasurementBias 0, magSampleAveraging 0, magDataRate 6, magGain 2, magMeasurementMode 0"
 								}
@@ -19981,6 +20217,20 @@
 								"patchline" : 								{
 									"destination" : [ "obj-22", 0 ],
 									"source" : [ "obj-17", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-20", 0 ],
+									"source" : [ "obj-19", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-19", 0 ],
+									"source" : [ "obj-2", 0 ]
 								}
 
 							}
@@ -30224,7 +30474,7 @@
 					"fontsize" : 18.0,
 					"id" : "obj-86",
 					"ignoreclick" : 1,
-					"items" : [ 0, "/dev/cu.Bluetooth-Incoming-Port", ",", 1, "/dev/cu.usbmodem3854521" ],
+					"items" : "<empty>",
 					"labelclick" : 1,
 					"maxclass" : "umenu",
 					"numinlets" : 1,
@@ -30501,6 +30751,18 @@
 						"style" : "",
 						"subpatcher_template" : "",
 						"boxes" : [ 							{
+								"box" : 								{
+									"id" : "obj-106",
+									"maxclass" : "newobj",
+									"numinlets" : 1,
+									"numoutlets" : 0,
+									"patching_rect" : [ 1508.5, 738.25, 141.0, 22.0 ],
+									"style" : "",
+									"text" : "s sensor_board_type"
+								}
+
+							}
+, 							{
 								"box" : 								{
 									"fontname" : "Arial",
 									"fontsize" : 12.0,
@@ -31349,7 +31611,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 3,
 									"outlettype" : [ "float", "float", "float" ],
-									"patching_rect" : [ 1083.452148, 819.75, 89.0, 22.0 ],
+									"patching_rect" : [ 1046.704224, 820.75, 89.0, 22.0 ],
 									"style" : "",
 									"text" : "unpack 0. 0. 0."
 								}
@@ -31366,7 +31628,7 @@
 									"numoutlets" : 2,
 									"outlettype" : [ "", "bang" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 1183.681152, 858.75, 50.0, 22.0 ],
+									"patching_rect" : [ 1146.933228, 859.75, 50.0, 22.0 ],
 									"style" : ""
 								}
 
@@ -31382,7 +31644,7 @@
 									"numoutlets" : 2,
 									"outlettype" : [ "", "bang" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 1132.681152, 858.75, 50.0, 22.0 ],
+									"patching_rect" : [ 1095.933228, 859.75, 50.0, 22.0 ],
 									"style" : ""
 								}
 
@@ -31398,7 +31660,7 @@
 									"numoutlets" : 2,
 									"outlettype" : [ "", "bang" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 1081.681396, 858.75, 50.0, 22.0 ],
+									"patching_rect" : [ 1044.933472, 859.75, 50.0, 22.0 ],
 									"style" : ""
 								}
 
@@ -31411,7 +31673,7 @@
 									"numoutlets" : 2,
 									"outlettype" : [ "", "" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 1081.681396, 738.25, 138.637329, 107.5 ],
+									"patching_rect" : [ 1044.933472, 739.25, 138.637329, 107.5 ],
 									"setminmax" : [ -250.0, 250.0 ],
 									"size" : 3,
 									"style" : ""
@@ -31429,7 +31691,7 @@
 									"numoutlets" : 2,
 									"outlettype" : [ "", "bang" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 1020.947754, 858.75, 50.0, 22.0 ],
+									"patching_rect" : [ 984.199829, 859.75, 50.0, 22.0 ],
 									"style" : ""
 								}
 
@@ -31442,7 +31704,7 @@
 									"numoutlets" : 2,
 									"outlettype" : [ "", "" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 1020.947754, 738.25, 49.637329, 107.5 ],
+									"patching_rect" : [ 984.199829, 739.25, 49.637329, 107.5 ],
 									"setminmax" : [ 0.0, 10.0 ],
 									"style" : ""
 								}
@@ -31457,7 +31719,7 @@
 									"numinlets" : 3,
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "" ],
-									"patching_rect" : [ 1023.081238, 703.75, 123.0, 22.0 ],
+									"patching_rect" : [ 986.333313, 704.75, 123.0, 22.0 ],
 									"style" : "",
 									"text" : "route beta gyroOffset"
 								}
@@ -32027,12 +32289,12 @@
 									"id" : "obj-9",
 									"linecount" : 2,
 									"maxclass" : "newobj",
-									"numinlets" : 8,
-									"numoutlets" : 8,
-									"outlettype" : [ "", "", "", "", "", "", "", "" ],
-									"patching_rect" : [ 1092.5, 606.5, 435.0, 35.0 ],
+									"numinlets" : 9,
+									"numoutlets" : 9,
+									"outlettype" : [ "", "", "", "", "", "", "", "", "" ],
+									"patching_rect" : [ 1092.5, 606.5, 494.428528, 35.0 ],
 									"style" : "",
-									"text" : "route serial headtracker calibrating_gyro_offset calibrating_mag calibrating_acc RTmag_calibration version"
+									"text" : "route serial headtracker calibrating_gyro_offset calibrating_mag calibrating_acc RTmag_calibration version sensor_board_type"
 								}
 
 							}
@@ -34431,6 +34693,13 @@
 									"destination" : [ "obj-57", 0 ],
 									"hidden" : 1,
 									"source" : [ "obj-89", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-106", 0 ],
+									"source" : [ "obj-9", 7 ]
 								}
 
 							}
@@ -38933,13 +39202,13 @@
 					"restore" : 					{
 						"autodiscover" : [ 1 ],
 						"invertRotation" : [ 0 ],
-						"serialport" : [ "1 /dev/cu.usbmodem3854521" ],
+						"serialport" : [ "" ],
 						"values_to_transmit" : [ 1 ]
 					}
 ,
 					"style" : "",
 					"text" : "autopattr @autorestore 0",
-					"varname" : "u476001180"
+					"varname" : "u352001191"
 				}
 
 			}

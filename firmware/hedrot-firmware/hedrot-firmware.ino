@@ -304,6 +304,13 @@ void send3calibrationValues(float* calData) {
 void transmitInfo() {
     // ------------------------------- 1: GLOBAL INFOS ---------------------------------------------
     Serial.write(H2R_START_TRANSMIT_INFO_CHAR);//means "start transmitting info"
+    
+    // Sensor Board Type
+    // 0 = gy-85 with Honeywell HMC5883L Magnetometer
+    // 1 = gy-85 with QMC5883L Magnetometer
+    Serial.print("sensor_board_type ");Serial.print( mag.isHMC() ? 0 : 1 );
+    Serial.print(",");
+    
     Serial.print("firmware_version ");Serial.print(HEDROT_FIRMWARE_VERSION);
     Serial.print(",");
     
@@ -387,10 +394,10 @@ void transmitInfo() {
     Serial.print("accRange ");Serial.print(accel.getRange());
     Serial.print(",");
     
-    Serial.print("accelerometer_lowPowerStatus ");Serial.print(accel.getLowPowerEnabled());
+    /*Serial.print("accelerometer_lowPowerStatus ");Serial.print(accel.getLowPowerEnabled());
     Serial.print(",");
     Serial.print("accelerometer_selfTestEnabledBit ");Serial.print(accel.getSelfTestEnabled());
-    Serial.print(",");
+    Serial.print(",");*/
     
     // read accelerometer cal data from EEPROM
     float accCalOffsetData[3];

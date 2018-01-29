@@ -434,7 +434,6 @@ void hedrot_receiver_defered_import_settings(t_hedrot_receiver *x, t_symbol *s) 
     
     if(!import_headtracker_settings(x->trackingData, fullfilename))
         error("[hedrot_receiver] Error while importing settings");
-    
 }
 
 void hedrot_receiver_printVersion(t_hedrot_receiver *x, t_symbol *s) {
@@ -446,8 +445,6 @@ void hedrot_receiver_printVersion(t_hedrot_receiver *x, t_symbol *s) {
     // output version number on status outlet
     atom_setsym(&message_version, gensym(HEDROT_VERSION));
     outlet_anything(x->x_status_outlet, gensym("version"), 1, &message_version);
-    
-    
 }
 
 /* ------------------- methods for mag calibration --------------------------- */
@@ -958,11 +955,15 @@ void hedrot_receiver_outputReceptionStatus(t_hedrot_receiver *x) {
 
 // update the headtracker settings for the GUI
 void hedrot_receiver_mirrorHeadtrackerInfo(t_hedrot_receiver *x) {
-    t_atom sym[2];
+    t_atom sym[2], message_sensor_board_type;
     
     int i;
     
     if(x->verbose) post("Headtracker settings retrieved\n");
+    
+    // output sensor board type
+    atom_setlong(&message_sensor_board_type, x->trackingData->sensorBoardType);
+    outlet_anything(x->x_status_outlet, gensym("sensor_board_type"), 1, &message_sensor_board_type);
     
     atom_setsym(sym, gensym("headtracker_settings_retrieved"));
     atom_setsym(sym+1, gensym("bang"));

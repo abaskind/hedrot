@@ -1544,6 +1544,14 @@ t_max_err hedrot_receiver_magScaling_set(t_hedrot_receiver *x, t_object *attr, l
 }
 
 
+t_max_err hedrot_receiver_estimationMethod_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
+    if (argc && argv) {
+        x->estimationMethod = (float) atom_getlong(argv);
+        setEstimationMethod(x->trackingData, x->estimationMethod);
+    }
+    return MAX_ERR_NONE;
+}
+
 
 t_max_err hedrot_receiver_MadgwickBetaGain_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
@@ -1846,6 +1854,11 @@ int C74_EXPORT main()
     
     
     // angle estimation
+    CLASS_ATTR_CHAR(c,    "estimationMethod",    0,  t_hedrot_receiver,  estimationMethod);
+    CLASS_ATTR_ENUMINDEX(c, "estimationMethod", 0, "\"Madgwick\" \"gyroscope-only\"");
+    CLASS_ATTR_ACCESSORS(c, "estimationMethod", NULL, hedrot_receiver_estimationMethod_set);
+    CLASS_ATTR_SAVE(c,    "estimationMethod",   0);
+    
     CLASS_ATTR_FLOAT(c,    "MadgwickBetaGain",    0,  t_hedrot_receiver,  MadgwickBetaGain);
     CLASS_ATTR_ACCESSORS(c, "MadgwickBetaGain", NULL, hedrot_receiver_MadgwickBetaGain_set);
     CLASS_ATTR_SAVE(c,    "MadgwickBetaGain",   0);

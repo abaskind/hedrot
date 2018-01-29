@@ -134,6 +134,7 @@ headtrackerData* headtracker_new() {
     
     
     // default filter coefficients and internal variables
+    trackingData->estimationMethod = 0;
     trackingData->MadgwickBetaMax = 2.5;
     trackingData->MadgwickBetaGain = 1;
     setAccLPtimeConstant(trackingData, .01f); // default time constant 10 ms
@@ -925,7 +926,15 @@ void headtracker_compute_data(headtrackerData *trackingData) {
         }
         
         //compute cooked data and angles only if calibration is valid
-        MadgwickAHRSupdateModified(trackingData);
+        switch( trackingData->estimationMethod) {
+            case 0: // 0 = Madgwick 9 Axes
+                MadgwickAHRSupdateModified(trackingData);
+                break;
+            case 1: // 1 = gyroscope integration only (no magnetometer)
+                GyroscopeIntegrationUpdate(trackingData);
+                break;
+        }
+        
     }
     
     // check if the gyro calibration is done
@@ -1060,8 +1069,6 @@ void convert_7bytes_to_3int16(unsigned char *rawDataBuffer,int baseIndex,short *
 //  . beta coefficient (balance between gyroscope and accel/compass incremental estimation) made variable, depending on the movement (gyroscope activity)
 //
 //=====================================================================================================
-
-
 char MadgwickAHRSupdateModified(headtrackerData *trackingData) {
     float recipNorm;
     float s1, s2, s3, s4;
@@ -1179,6 +1186,44 @@ char MadgwickAHRSupdateModified(headtrackerData *trackingData) {
     qDot3 -= trackingData->beta * s3;
     qDot4 -= trackingData->beta * s4;
     
+    
+    // Integrate rate of change of quaternion to yield quaternion
+    trackingData->q1 += qDot1 * trackingData->samplePeriod;
+    trackingData->q2 += qDot2 * trackingData->samplePeriod;
+    trackingData->q3 += qDot3 * trackingData->samplePeriod;
+    trackingData->q4 += qDot4 * trackingData->samplePeriod;
+    
+    // Normalise quaternion
+    recipNorm = invSqrt(trackingData->q1 * trackingData->q1 + trackingData->q2 * trackingData->q2 + trackingData->q3 * trackingData->q3 + trackingData->q4 * trackingData->q4);
+    trackingData->q1 *= recipNorm;
+    trackingData->q2 *= recipNorm;
+    trackingData->q3 *= recipNorm;
+    trackingData->q4 *= recipNorm;
+    
+    return 0;
+}
+
+
+
+
+//=====================================================================================================
+// function GyroscopeIntegrationUpdate
+//=====================================================================================================
+//
+// AHRS algorithm update
+//
+// Gyroscope-only algorithm: integration of the quaternion derivative based on the gyroscope data
+//
+//=====================================================================================================
+char GyroscopeIntegrationUpdate(headtrackerData *trackingData) {
+    float recipNorm;
+    float qDot1, qDot2, qDot3, qDot4;
+
+    // Rate of change of quaternion from gyroscope
+    qDot1 = 0.5f * (-trackingData->q2 * trackingData->gyroCalData[0] - trackingData->q3 * trackingData->gyroCalData[1] - trackingData->q4 * trackingData->gyroCalData[2]);
+    qDot2 = 0.5f * (trackingData->q1 * trackingData->gyroCalData[0] + trackingData->q3 * trackingData->gyroCalData[2] - trackingData->q4 * trackingData->gyroCalData[1]);
+    qDot3 = 0.5f * (trackingData->q1 * trackingData->gyroCalData[1] - trackingData->q2 * trackingData->gyroCalData[2] + trackingData->q4 * trackingData->gyroCalData[0]);
+    qDot4 = 0.5f * (trackingData->q1 * trackingData->gyroCalData[2] + trackingData->q2 * trackingData->gyroCalData[1] - trackingData->q3 * trackingData->gyroCalData[0]);
     
     // Integrate rate of change of quaternion to yield quaternion
     trackingData->q1 += qDot1 * trackingData->samplePeriod;
@@ -1629,6 +1674,11 @@ void setGyroOffsetAutocalTime(headtrackerData *trackingData, float gyroOffsetAut
 
 void setGyroOffsetAutocalThreshold(headtrackerData *trackingData, long gyroOffsetAutocalThreshold) {
     trackingData->gyroOffsetAutocalThreshold = gyroOffsetAutocalThreshold;
+}
+
+
+void setEstimationMethod(headtrackerData *trackingData, char estimationMethod) {
+     trackingData->estimationMethod = estimationMethod;
 }
 
 

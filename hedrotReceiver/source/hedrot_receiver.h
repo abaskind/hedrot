@@ -74,6 +74,8 @@ typedef struct hedrot_receiver
     float           accScaling[3];
     float           magOffset[3];
     float           magScaling[3];
+    
+    char            estimationMethod;
     float           MadgwickBetaMax;
     float           MadgwickBetaGain;
     float           accLPtimeConstant;
@@ -240,6 +242,9 @@ t_max_err hedrot_receiver_accScaling_set(t_hedrot_receiver *x, t_object *attr, l
 t_max_err hedrot_receiver_magOffset_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_magScaling_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_outputDataPeriod_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
+
+
+t_max_err hedrot_receiver_estimationMethod_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_MadgwickBetaGain_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_MadgwickBetaMax_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_accLPtimeConstant_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);

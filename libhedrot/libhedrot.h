@@ -22,7 +22,7 @@
 
 
 // hedrot version
-#define HEDROT_VERSION "1.3.0alpha"
+#define HEDROT_VERSION "1.3.0beta1"
 
 //=====================================================================================================
 // static definitions
@@ -98,6 +98,11 @@ typedef struct _headtrackerData {
     
     
     //------------------------- HEAD TRACKER SETTINGS ------------------------
+    
+    // estimation method
+    // 0 = Madgwick 9 Axes
+    // 1 = gyroscope integration only (no magnetometer)
+    char            estimationMethod;
     
     // angle estimation coefficients
     float           MadgwickBetaMax;
@@ -267,6 +272,7 @@ void setAutoDiscover(headtrackerData *trackingData, char autoDiscover);
 void setGyroOffsetAutocalOn(headtrackerData *trackingData, char gyroOffsetAutocalOn);
 void setGyroOffsetAutocalTime(headtrackerData *trackingData, float gyroOffsetAutocalTime);
 void setGyroOffsetAutocalThreshold(headtrackerData *trackingData, long gyroOffsetAutocalThreshold);
+void setEstimationMethod(headtrackerData *trackingData, char estimationMethod);
 void setMadgwickBetaGain(headtrackerData *trackingData, float MadgwickBetaGain);
 void setMadgwickBetaMax(headtrackerData *trackingData, float MadgwickBetaMax);
 void setAccLPtimeConstant(headtrackerData *trackingData, float accLPtimeConstant);
@@ -331,7 +337,10 @@ void headtracker_autodiscover(headtrackerData *trackingData);
 void headtracker_autodiscover_tryNextPort(headtrackerData *trackingData);
 void headtracker_compute_data(headtrackerData *trackingData);
 void convert_7bytes_to_3int16(unsigned char *rawDataBuffer,int baseIndex,short *rawDataToSend);
+
 char MadgwickAHRSupdateModified(headtrackerData *trackingData);
+char GyroscopeIntegrationUpdate(headtrackerData *trackingData);
+
 void pushNotificationMessage(headtrackerData *trackingData, char messageNumber);
 void headtracker_sendFloatArray2Headtracker(headtrackerData *trackingData, float* data, int numValues, unsigned char StartTransmitChar, unsigned char StopTransmitChar);
 void headtracker_sendSignedCharArray2Headtracker(headtrackerData *trackingData, char* data, int numValues, unsigned char StartTransmitChar, unsigned char StopTransmitChar);

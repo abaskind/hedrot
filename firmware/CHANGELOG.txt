@@ -9,3 +9,9 @@ Version 8 (04/08/17)
 		- if the teensy board can connect to the daughter sensor board but cannot read its data, the onboard led blinks fast endlessly	
 		- if the teensy board cannot connect to the daughter board, nothing happens
 		=> in both latter cases, there is probably a hardware problem: either the daugther board is damaged, or there is bad contact in the connections between both boards, or the main teensy board is damaged.
+
+Version 9 (21/01/18)
+	. First hotfix version of the firmware that works with the QMC5883 Magnetometer
+
+Version 10 (29/01/18)
+	. clean version of the firmware that works with the QMC5883 Magnetometer

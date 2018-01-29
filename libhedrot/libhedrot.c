@@ -2102,38 +2102,57 @@ void changeRTMagCalTimeSettings(headtrackerData *trackingData) {
     double magRate = 160;
     
     // 1/ get the actual rate of the magnetometer
-    switch(trackingData->magMeasurementMode) {
-        case 0:
-            // continuous mode, constant rate of 160 Hz
-            magRate = 160;
-            break;
-        case 1:
-            // single mode, rate is defined by user
-            switch(trackingData->magDataRate) {
-                case 0:
-                    magRate = .75;
-                    break;
-                case 1:
-                    magRate = 1.5;
-                    break;
-                case 2:
-                    magRate = 3;
-                    break;
-                case 3:
-                    magRate = 7.5;
-                    break;
-                case 4:
-                    magRate = 15;
-                    break;
-                case 5:
-                    magRate = 30;
-                    break;
-                case 6:
-                    magRate = 75;
-                    break;
+    if(trackingData->sensorBoardType==0) { // if magnetometer = HMC5883L
+        switch(trackingData->magMeasurementMode) {
+            case 0:
+                // continuous mode, rate is defined by user
+                switch(trackingData->magDataRate) {
+                    case 0:
+                        magRate = .75;
+                        break;
+                    case 1:
+                        magRate = 1.5;
+                        break;
+                    case 2:
+                        magRate = 3;
+                        break;
+                    case 3:
+                        magRate = 7.5;
+                        break;
+                    case 4:
+                        magRate = 15;
+                        break;
+                    case 5:
+                        magRate = 30;
+                        break;
+                    case 6:
+                        magRate = 75;
+                        break;
+                }
+                break;
+            case 1:
+                // single mode, maximum rate of 160 Hz (for HMC5883L)
+                magRate = min(160,trackingData->samplerate);
+                break;
+        }
+    } else if(trackingData->sensorBoardType==1) { // if magnetometer = QMC5883
+        // continuous mode, rate is defined by user
+        switch(trackingData->magDataRate) {
+            case 0:
+                magRate = 10;
+                break;
+            case 1:
+                magRate = 50;
+                break;
+            case 2:
+                magRate = 100;
+                break;
+            case 3:
+                magRate = 200;
+                break;
             }
-            break;
     }
+    
     
     // 2/ compute the acquisition rate
     trackingData->RTMagCalAcquisitionRateFactor = round(trackingData->samplerate / magRate);

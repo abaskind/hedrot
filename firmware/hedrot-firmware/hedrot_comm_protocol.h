@@ -11,7 +11,7 @@
 #ifndef _HEADTRACKER_COMM_PROTOCOL_H_
 #define _HEADTRACKER_COMM_PROTOCOL_H_
 
-#define HEDROT_FIRMWARE_VERSION 9
+#define HEDROT_FIRMWARE_VERSION                        10
 
 //serial communication settings
 #define BAUDRATE                                       230400

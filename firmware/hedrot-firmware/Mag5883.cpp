@@ -1,38 +1,10 @@
 // Mag5883.cpp: Mag5883 I2C device methods for both Magnetometers used in gy-85 boards:
 // . Honeywell HMC5883L
 // . QMC5883L
-
-/*!
- * @file Mag5883.cpp
- * @brief Compatible with QMC5883 and QMC5883
- * @n 3-Axis Digital Compass IC
- *
- * @copyright	[DFRobot](http://www.dfrobot.com), 2017
- * @copyright	GNU Lesser General Public License
- *
- * @author [dexian.huang](952838602@qq.com)
- * @version  V1.0
- * @date  2017-7-3
- */
-
- /* A FAIRE
-  . unifier méthodes lecture/écriture
-  . documenter toutes les options avec valeurs binaires
-  . compléter pour QMC
-  . adapter changeRTMagCalTimeSettings surtout mais tout l'objet Max en général
-  */
-
-#if ARDUINO >= 100
-#include "Arduino.h"
-#else
-#include "WProgram.h"
-#endif
+// part of code derived from [DFRobot](http://www.dfrobot.com), 2017
+// part of code derived from I2Cdev library
 
 #include "Mag5883.h"
-
-#include "I2Ccom.h" // mélange sale de I2Ccom et des méthodes de DFRobot
-
-
 
 bool Mag5883::initialize()
 {
@@ -40,7 +12,6 @@ bool Mag5883::initialize()
   retry = 5;
   
   while(retry--){
-    Wire.begin();
     Wire.beginTransmission(HMC5883L_ADDRESS);
     isHMC_ = (0 == Wire.endTransmission());
     if(isHMC_){
@@ -52,15 +23,16 @@ bool Mag5883::initialize()
   //Serial.println(isHMC_);
 
   if(isHMC_){
-    if ((fastRegister8(HMC5883L_REG_IDENT_A) != 0x48)
-    || (fastRegister8(HMC5883L_REG_IDENT_B) != 0x34)
-    || (fastRegister8(HMC5883L_REG_IDENT_C) != 0x33)){
+    if ((readByte(HMC5883L_ADDRESS, HMC5883L_REG_IDENT_A) != 0x48)
+    || (readByte(HMC5883L_ADDRESS, HMC5883L_REG_IDENT_B) != 0x34)
+    || (readByte(HMC5883L_ADDRESS, HMC5883L_REG_IDENT_C) != 0x33)){
       return false;
     }
 
-    setGain(HMC5883L_RANGE_0_88GA);
-    setMode(HMC5883L_CONTINOUS);
-    setDataRate(HMC5883L_DATARATE_15HZ);
+	setMeasurementBias(HMC5883L_BIAS_NORMAL);
+    setRange(HMC5883L_RANGE_0_88G);
+    setMode(HMC5883L_MODE_SINGLE);
+    setDataRate(HMC5883L_DATARATE_75HZ);
     setSampleAveraging(HMC5883L_SAMPLES_1);
 
     return true;
@@ -78,19 +50,20 @@ bool Mag5883::initialize()
     //Serial.print("isQMC_= ");
     //Serial.println(isQMC_);
     if(isQMC_){
-      writeRegister8(QMC5883_REG_IDENT_B,0X01);
-      writeRegister8(QMC5883_REG_IDENT_C,0X40);
-      writeRegister8(QMC5883_REG_IDENT_D,0X01);
-      writeRegister8(QMC5883_REG_CONFIG_1,0X1D);
-      if ((fastRegister8(QMC5883_REG_IDENT_B) != 0x01)
-      || (fastRegister8(QMC5883_REG_IDENT_C) != 0x40)
-      || (fastRegister8(QMC5883_REG_IDENT_D) != 0x01)){
+      writeByte(QMC5883_ADDRESS, QMC5883_REG_IDENT_B, 0X01);
+      writeByte(QMC5883_ADDRESS, QMC5883_REG_IDENT_C, 0X40);
+      writeByte(QMC5883_ADDRESS, QMC5883_REG_IDENT_D, 0X01);
+      writeByte(QMC5883_ADDRESS, QMC5883_REG_CONFIG_1, 0X1D);
+      
+      if ((readByte(QMC5883_ADDRESS, QMC5883_REG_IDENT_B) != 0x01)
+      || (readByte(QMC5883_ADDRESS, QMC5883_REG_IDENT_C) != 0x40)
+      || (readByte(QMC5883_ADDRESS, QMC5883_REG_IDENT_D) != 0x01)){
         return false;
       }
-      setGain(QMC5883_RANGE_8GA);
-      setMode(QMC5883_CONTINOUS);
+      setRange(QMC5883_RANGE_8G);
+      setMode(QMC5883_MODE_CONTINUOUS);
       setDataRate(QMC5883_DATARATE_200HZ);
-      setSampleAveraging(QMC5883_SAMPLES_8);
+      setSampleAveraging(QMC5883_SAMPLES_1);
 
       return true;
     }
@@ -104,30 +77,30 @@ bool Mag5883::initialize()
  */
 bool Mag5883::testConnection() {
   if(isHMC_){
-    return ((fastRegister8(HMC5883L_REG_IDENT_A) == 0x48)
-            && (fastRegister8(HMC5883L_REG_IDENT_B) == 0x34)
-            && (fastRegister8(HMC5883L_REG_IDENT_C) == 0x33));
+    return ((readByte(HMC5883L_ADDRESS, HMC5883L_REG_IDENT_A) == 0x48)
+            && (readByte(HMC5883L_ADDRESS, HMC5883L_REG_IDENT_B) == 0x34)
+            && (readByte(HMC5883L_ADDRESS, HMC5883L_REG_IDENT_C) == 0x33));
   } else {
-    return ((fastRegister8(QMC5883_REG_IDENT_B) == 0x01)
-            && (fastRegister8(QMC5883_REG_IDENT_C) == 0x40)
-            && (fastRegister8(QMC5883_REG_IDENT_D) == 0x01));
+    return ((readByte(QMC5883_ADDRESS, QMC5883_REG_IDENT_B) == 0x01)
+            && (readByte(QMC5883_ADDRESS, QMC5883_REG_IDENT_C) == 0x40)
+            && (readByte(QMC5883_ADDRESS, QMC5883_REG_IDENT_D) == 0x01));
   }
 }
 
 /** Get measurement bias value.
- *  This function should not be called if QMC5883
+ *  This function has no effect sif QMC5883
 @return if HMC5883L: Current bias value (0-2 for normal/positive/negative respectively). If QMC5883 (0)
  */
 uint8_t Mag5883::getMeasurementBias() {
     if(isHMC_){
       return readBits(HMC5883L_ADDRESS, HMC5883L_REG_CONFIG_A, HMC5883L_CRA_BIAS_BIT, HMC5883L_CRA_BIAS_LENGTH);
     } else {
-      return 0; //dirty
+      return 0; // no effect
     }
 }
 
 /** Set measurement bias value.
- *  This function should not be called if QMC5883
+ *  This function has no effect if QMC5883
 @@param bias if HMC5883L: New bias value (0-2 for normal/positive/negative respectively)
  */
 void Mag5883::setMeasurementBias(uint8_t bias) {
@@ -159,73 +132,82 @@ void Mag5883::setSampleAveraging(uint8_t averaging) {
     }
 }
 
-/** get magnetic field gain value ("range" in DFRobot).
-dirty patch for QMC5883, ok for HMC5883L
+/** get magnetic field gain value
+***** FOR HMC5883L *******
+ * The table below shows nominal gain settings. Use the "Gain" column to convert
+ * counts to Gauss. Choose a lower gain value (higher GN#) when total field
+ * strength causes overflow in one of the data output registers (saturation).
+ * The data output range for all settings is 0xF800-0x07FF (-2048 - 2047).
+ *
+ * Value | Field Range | Gain (LSB/Gauss)
+ * ------+-------------+-----------------
+ * 0     | +/- 0.88 Ga | 1370
+ * 1     | +/- 1.3 Ga  | 1090 (Default)
+ * 2     | +/- 1.9 Ga  | 820
+ * 3     | +/- 2.5 Ga  | 660
+ * 4     | +/- 4.0 Ga  | 440
+ * 5     | +/- 4.7 Ga  | 390
+ * 6     | +/- 5.6 Ga  | 330
+ * 7     | +/- 8.1 Ga  | 230
+ *
+***** FOR QMC5883 *******
+ *
+ * Value | Recommended Range
+ * ------+------------
+ * 0     | +/- 2 G
+ * 1     | +/- 8 G
+ * 
+ * @return Current magnetic field gain value
  */
-uint8_t Mag5883::getGain() {
+uint8_t Mag5883::getRange() {
     if(isHMC_){
-      return readBits(HMC5883L_ADDRESS, HMC5883L_REG_CONFIG_B, HMC5883L_CRB_GAIN_BIT, HMC5883L_CRB_GAIN_LENGTH);
+      return readBits(HMC5883L_ADDRESS, HMC5883L_REG_CONFIG_B, HMC5883L_CRB_RANGE_BIT, HMC5883L_CRB_RANGE_LENGTH);
     } else {
-      return 0; //8GA, fixe
+      return readBits(QMC5883_ADDRESS, QMC5883_REG_CONFIG_1, QMC5883_CRB_RANGE_BIT, QMC5883_CRB_RANGE_LENGTH);
     }
 }
 
-/** Set magnetic field gain value ("range" in DFRobot).
-dirty patch for QMC5883, ok for HMC5883L
+/** Set magnetic field gain value
  */
-void Mag5883::setGain(uint8_t gain) {
+void Mag5883::setRange(uint8_t gain) {
     if(isHMC_){
       // use this method to guarantee that bits 4-0 are set to zero, which is a
       // requirement specified in the datasheet; it's actually more efficient than
       // using the I2Cdev.writeBits method
       writeByte(HMC5883L_ADDRESS, HMC5883L_REG_CONFIG_B, gain << 5);
     } else {
-      gain = 1;//set to 8GA (dirty)
-      writeByte(QMC5883_ADDRESS, QMC5883_REG_CONFIG_2, gain << 4);
-    }
-}
-
-/** Get data output rate value.
-Mag5883
- */
-uint8_t Mag5883::getDataRate() {
-  return 1;
-    if(isHMC_){
-      return readBits(HMC5883L_ADDRESS, HMC5883L_REG_CONFIG_A, HMC5883L_CRA_RATE_BIT, HMC5883L_CRA_RATE_LENGTH);
-    } else {
-      return 0b11; // dirty
-    }
-}
-
-/** Set data output rate value.
-dirty patch for QMC5883, ok for HMC5883L
- */
-void Mag5883::setDataRate(uint8_t rate) {
-    if(isHMC_){
-      writeBits(HMC5883L_ADDRESS, HMC5883L_REG_CONFIG_A, HMC5883L_CRA_RATE_BIT, HMC5883L_CRA_RATE_LENGTH, rate);
-    } else {
-      uint8_t value;
-      rate = 0b11;//set to 200Hz (dirty)
-      value = readRegister8(QMC5883_REG_CONFIG_1);
-      value &= 0xf3;
-      value |= (rate << 2);
+      writeBits(QMC5883_ADDRESS, QMC5883_REG_CONFIG_1, QMC5883_CRB_RANGE_BIT, QMC5883_CRB_RANGE_LENGTH, gain);
     }
 }
 
 /** Get measurement mode.
-dirty patch for QMC5883, ok for HMC5883L
+***** FOR HMC5883L *******
+ * In continuous-measurement mode, the device continuously performs measurements
+ * and places the result in the data register. RDY goes high when new data is
+ * placed in all three registers. After a power-on or a write to the mode or
+ * configuration register, the first measurement set is available from all three
+ * data output registers after a period of 2/fDO and subsequent measurements are
+ * available at a frequency of fDO, where fDO is the frequency of data output.
+ *
+ * When single-measurement mode (default) is selected, device performs a single
+ * measurement, sets RDY high and returned to idle mode. Mode register returns
+ * to idle mode bit values. The measurement remains in the data output register
+ * and RDY remains high until the data output register is read or another
+ * measurement is performed.
+ *
+***** FOR QMC5883 *******
+ * Measurement mode is forced to continous, rate is defined by user 
  */
  
 uint8_t Mag5883::getMode() {
     if(isHMC_){
       return readBits(HMC5883L_ADDRESS, HMC5883L_REG_MODE, HMC5883L_MODEREG_BIT, HMC5883L_MODEREG_LENGTH);
     } else {
-      return 0; //dirty
+      return 1; //measurement mode forced to continuous
     }
 }
 
-/** Set measurement mode.
-dirty patch for QMC5883, ok for HMC5883L
+/** Set measurement mode (forced to continous for QMC5883)
  */
 void Mag5883::setMode(uint8_t newMode) {
     if(isHMC_){
@@ -235,15 +217,62 @@ void Mag5883::setMode(uint8_t newMode) {
       writeByte(HMC5883L_ADDRESS, HMC5883L_REG_MODE, newMode << (HMC5883L_MODEREG_BIT - HMC5883L_MODEREG_LENGTH + 1));
       mode = newMode; // track to tell if we have to clear bit 7 after a read
     } else {
-        newMode = 1;// set to 1 (continuous) (dirty)
-        uint8_t value;
-        value = readRegister8(QMC5883_REG_CONFIG_1);
-        value &= 0xfc;
-        value |= newMode;
-    
-        writeRegister8(QMC5883_REG_CONFIG_1, value);
+        newMode = 1;// force to 1 (continuous)
+        mode = newMode;
+
+        writeBits(QMC5883_ADDRESS, QMC5883_REG_CONFIG_1, QMC5883_MODEREG_BIT, QMC5883_MODEREG_LENGTH, newMode);
     }
 }
+
+/** Get data output rate value.
+***** FOR HMC5883L *******
+ * The Table below shows all selectable output rates in continuous measurement
+ * mode. All three channels shall be measured within a given output rate. Other
+ * output rates with maximum rate of 160 Hz can be achieved by monitoring DRDY
+ * interrupt pin in single measurement mode.
+ *
+ * Value | Typical Data Output Rate (Hz)
+ * ------+------------------------------
+ * 0     | 0.75
+ * 1     | 1.5
+ * 2     | 3
+ * 3     | 7.5
+ * 4     | 15 (Default)
+ * 5     | 30
+ * 6     | 75
+ * 7     | Not used
+ *
+ *
+***** FOR QMC5883 *******
+ * 
+ *  * Value | Typical Data Output Rate (Hz)
+ * ------+------------------------------
+ * 0     | 10
+ * 1     | 50
+ * 2     | 100
+ * 3     | 200
+ * 
+ * @return Current rate of data output to registers
+ */
+uint8_t Mag5883::getDataRate() {
+  return 1;
+    if(isHMC_){
+      return readBits(HMC5883L_ADDRESS, HMC5883L_REG_CONFIG_A, HMC5883L_CRA_RATE_BIT, HMC5883L_CRA_RATE_LENGTH);
+    } else {
+      return readBits(QMC5883_ADDRESS, QMC5883_REG_CONFIG_1, QMC5883_CRA_RATE_BIT, QMC5883_CRA_RATE_LENGTH);
+    }
+}
+
+/** Set data output rate value.
+ */
+void Mag5883::setDataRate(uint8_t rate) {
+    if(isHMC_){
+      writeBits(HMC5883L_ADDRESS, HMC5883L_REG_CONFIG_A, HMC5883L_CRA_RATE_BIT, HMC5883L_CRA_RATE_LENGTH, rate);
+    } else {
+      writeBits(QMC5883_ADDRESS, QMC5883_REG_CONFIG_1, QMC5883_CRA_RATE_BIT, QMC5883_CRA_RATE_LENGTH, rate);
+    }
+}
+
 
 /** Get 3-axis heading measurements.
  * In the event the ADC reading overflows or underflows for the given channel,
@@ -263,7 +292,7 @@ void Mag5883::getHeading(int16_t *x, int16_t *y, int16_t *z) {
       *x = (((int16_t)buffer[0]) << 8) | buffer[1];
       *y = (((int16_t)buffer[4]) << 8) | buffer[5];
       *z = (((int16_t)buffer[2]) << 8) | buffer[3];
-    } else { // dirty
+    } else {
       readBytes(QMC5883_ADDRESS, QMC5883_REG_OUT_X_L, 6, buffer);
       //if (mode == HMC5883L_MODE_SINGLE) writeByte(devAddr, HMC5883L_RA_MODE, HMC5883L_MODE_SINGLE << (HMC5883L_MODEREG_BIT - HMC5883L_MODEREG_LENGTH + 1));
       *x = (((int16_t)buffer[1]) << 8) | buffer[0]; // careful LSB before MSB
@@ -272,393 +301,4 @@ void Mag5883::getHeading(int16_t *x, int16_t *y, int16_t *z) {
     }
 }
 
-/*Vector Mag5883::readRaw(void)
-{
-  int range = 10;
-  float Xsum = 0.0;
-  float Ysum = 0.0;
-  float Zsum = 0.0;
-  if(isHMC_){
-    while(range--){
-      v.XAxis = readRegister16(HMC5883L_REG_OUT_X_M);
-      v.YAxis = readRegister16(HMC5883L_REG_OUT_Y_M);
-      v.ZAxis = readRegister16(HMC5883L_REG_OUT_Z_M);
-      calibrate();
-      Xsum += v.XAxis;
-      Ysum += v.YAxis;
-      Zsum += v.ZAxis;
-    }
-    v.XAxis = Xsum/range;
-    v.YAxis = Ysum/range;
-    v.ZAxis = Zsum/range;
-    if(firstRun){
-      initMinMax();
-      firstRun = false;
-    }
-  }else if(isQMC_){
-    while (range--){
-      v.XAxis = readRegister16(QMC5883_REG_OUT_X_M);
-      v.YAxis = readRegister16(QMC5883_REG_OUT_Y_M);
-      v.ZAxis = readRegister16(QMC5883_REG_OUT_Z_M);
-      calibrate();
-      Xsum += v.XAxis;
-      Ysum += v.YAxis;
-      Zsum += v.ZAxis;
-    }
-    v.XAxis = Xsum/range;
-    v.YAxis = Ysum/range;
-    v.ZAxis = Zsum/range;
-    if(firstRun){
-      initMinMax();
-      firstRun = false;
-    }
-  }
-  return v;
-}
-void Mag5883::calibrate()
-{
-  if(v.XAxis < minX ) minX = v.XAxis;
-  if(v.XAxis > maxX ) maxX = v.XAxis;
-  if(v.YAxis < minY ) minY = v.YAxis;
-  if(v.YAxis > maxY ) maxY = v.YAxis;
-  if(v.ZAxis < minZ ) minZ = v.ZAxis;
-  if(v.ZAxis > maxZ ) maxZ = v.ZAxis;
-}
-void Mag5883::initMinMax()
-{
-  minX = v.XAxis;
-  maxX = v.XAxis;
-  minY = v.YAxis;
-  maxY = v.YAxis;
-  minZ = v.ZAxis;
-  maxZ = v.ZAxis;
-}*/
 
-
-/*void Mag5883::setRange(QMC5883_range_t range)
-{
-  if(isHMC_){
-    switch(range){
-    case HMC5883L_RANGE_0_88GA:
-      mgPerDigit = 0.073f;
-      break;
-
-    case HMC5883L_RANGE_1_3GA:
-      mgPerDigit = 0.92f;
-      break;
-
-    case HMC5883L_RANGE_1_9GA:
-      mgPerDigit = 1.22f;
-      break;
-
-    case HMC5883L_RANGE_2_5GA:
-      mgPerDigit = 1.52f;
-      break;
-
-    case HMC5883L_RANGE_4GA:
-      mgPerDigit = 2.27f;
-      break;
-
-    case HMC5883L_RANGE_4_7GA:
-      mgPerDigit = 2.56f;
-      break;
-
-    case HMC5883L_RANGE_5_6GA:
-      mgPerDigit = 3.03f;
-      break;
-
-    case HMC5883L_RANGE_8_1GA:
-      mgPerDigit = 4.35f;
-      break;
-
-    default:
-      break;
-    }
-
-    writeRegister8(HMC5883L_REG_CONFIG_B, range << 5);
-  }else if(isQMC_){
-    switch(range)
-    {
-    case QMC5883_RANGE_2GA:
-      mgPerDigit = 1.22f;
-      break;
-    case QMC5883_RANGE_8GA:
-      mgPerDigit = 4.35f;
-      break;
-    default:
-      break;
-    }
-
-    writeRegister8(QMC5883_REG_CONFIG_2, range << 4);
-  }
-}
-
-QMC5883_range_t Mag5883::getRange(void)
-{
-  if(isHMC_){
-    return (QMC5883_range_t)((readRegister8(HMC5883L_REG_CONFIG_B) >> 5));
-  }else if(isQMC_){
-    return (QMC5883_range_t)((readRegister8(QMC5883_REG_CONFIG_2) >> 4));
-  }
-  return QMC5883_RANGE_8GA;
-}*/
-
-/*
-void Mag5883::setMeasurementMode(QMC5883_mode_t mode)
-{
-  uint8_t value;
-  if(isHMC_){
-    value = readRegister8(HMC5883L_REG_MODE);
-    value &= 0b11111100;
-    value |= mode;
-
-    writeRegister8(HMC5883L_REG_MODE, value);
-  }else if(isQMC_){
-    value = readRegister8(QMC5883_REG_CONFIG_1);
-    value &= 0xfc;
-    value |= mode;
-
-    writeRegister8(QMC5883_REG_CONFIG_1, value);
-  }
-}
-
-QMC5883_mode_t Mag5883::getMeasurementMode(void)
-{
-  uint8_t value=0;
-  if(isHMC_){
-    value = readRegister8(HMC5883L_REG_MODE);
-  }else if(isQMC_){
-    value = readRegister8(QMC5883_REG_CONFIG_1); 
-  }
-  value &= 0b00000011;  
-  return (QMC5883_mode_t)value;
-}*/
-
-/*void Mag5883::setDataRate(QMC5883_dataRate_t dataRate)
-{
-  uint8_t value;
-  if(isHMC_){
-    value = readRegister8(HMC5883L_REG_CONFIG_A);
-    value &= 0b11100011;
-    value |= (dataRate << 2);
-
-    writeRegister8(HMC5883L_REG_CONFIG_A, value);
-  }else if(isQMC_){
-    value = readRegister8(QMC5883_REG_CONFIG_1);
-    value &= 0xf3;
-    value |= (dataRate << 2);
-
-    writeRegister8(QMC5883_REG_CONFIG_1, value);
-  }
-}
-
-QMC5883_dataRate_t Mag5883::getDataRate(void)
-{
-  uint8_t value=0;
-  if(isHMC_){
-    value = readRegister8(HMC5883L_REG_CONFIG_A);
-    value &= 0b00011100;
-    value >>= 2;
-  }else if(isQMC_){
-    value = readRegister8(QMC5883_REG_CONFIG_1);
-    value &= 0b00001100;
-    value >>= 2;
-  }
-  return (QMC5883_dataRate_t)value;
-}*/
-
-/*void Mag5883::setSamples(QMC5883_samples_t samples)
-{
-  uint8_t value;
-  if(isHMC_){
-    value = readRegister8(HMC5883L_REG_CONFIG_A);
-    value &= 0b10011111;
-    value |= (samples << 5);
-    writeRegister8(HMC5883L_REG_CONFIG_A, value);
-  }else if(isQMC_){
-    value = readRegister8(QMC5883_REG_CONFIG_1);
-    value &= 0x3f;
-    value |= (samples << 6);
-    writeRegister8(QMC5883_REG_CONFIG_1, value);
-  }
-}
-
-QMC5883_samples_t Mag5883::getSamples(void)
-{
-  uint8_t value=0;
-  if(isHMC_){
-    value = readRegister8(HMC5883L_REG_CONFIG_A);
-    value &= 0b01100000;
-    value >>= 5;
-  }else if(isQMC_){
-    value = readRegister8(QMC5883_REG_CONFIG_1);
-    value &= 0x3f;
-    value >>= 6;
-  }
-  return (QMC5883_samples_t)value;
-}*/
-
-// Write byte to register
-void Mag5883::writeRegister8(uint8_t reg, uint8_t value)
-{
-  if(isHMC_){
-    Wire.beginTransmission(HMC5883L_ADDRESS);
-    #if ARDUINO >= 100
-        Wire.write(reg);
-        Wire.write(value);
-    #else
-        Wire.send(reg);
-        Wire.send(value);
-    #endif
-    Wire.endTransmission();
-  }else if(isQMC_){
-    Wire.beginTransmission(QMC5883_ADDRESS);
-    #if ARDUINO >= 100
-        Wire.write(reg);
-        Wire.write(value);
-    #else
-        Wire.send(reg);
-        Wire.send(value);
-    #endif
-    Wire.endTransmission();
-  }
-}
-// Read byte to register
-uint8_t Mag5883::fastRegister8(uint8_t reg)
-{
-  uint8_t value=0;
-  if(isHMC_){
-    Wire.beginTransmission(HMC5883L_ADDRESS);
-    #if ARDUINO >= 100
-        Wire.write(reg);
-    #else
-        Wire.send(reg);
-    #endif
-    Wire.endTransmission();
-
-    Wire.requestFrom(HMC5883L_ADDRESS, 1);
-    #if ARDUINO >= 100
-        value = Wire.read();
-    #else
-        value = Wire.receive();
-    #endif
-    Wire.endTransmission();
-  }else if(isQMC_){
-    Wire.beginTransmission(QMC5883_ADDRESS);
-    #if ARDUINO >= 100
-        Wire.write(reg);
-    #else
-        Wire.send(reg);
-    #endif
-    Wire.endTransmission();
-    Wire.requestFrom(QMC5883_ADDRESS, 1);
-    #if ARDUINO >= 100
-        value = Wire.read();
-    #else
-        value = Wire.receive();
-    #endif
-    Wire.endTransmission();
-  }
-  return value;
-}
-
-// Read byte from register
-uint8_t Mag5883::readRegister8(uint8_t reg)
-{
-  uint8_t value=0;
-  if(isHMC_){
-    Wire.beginTransmission(HMC5883L_ADDRESS);
-    #if ARDUINO >= 100
-        Wire.write(reg);
-    #else
-        Wire.send(reg);
-    #endif
-    Wire.endTransmission();
-
-    Wire.beginTransmission(HMC5883L_ADDRESS);
-    Wire.requestFrom(HMC5883L_ADDRESS, 1);
-    while(!Wire.available()) {};
-    #if ARDUINO >= 100
-        value = Wire.read();
-    #else
-        value = Wire.receive();
-    #endif
-    Wire.endTransmission();
-  }else if(isQMC_){
-    Wire.beginTransmission(QMC5883_ADDRESS);
-    #if ARDUINO >= 100
-        Wire.write(reg);
-    #else
-        Wire.send(reg);
-    #endif
-    Wire.endTransmission();
-    Wire.beginTransmission(QMC5883_ADDRESS);
-    Wire.requestFrom(QMC5883_ADDRESS, 1);
-    while(!Wire.available()) {};
-    #if ARDUINO >= 100
-        value = Wire.read();
-    #else
-        value = Wire.receive();
-    #endif
-    Wire.endTransmission();
-  }
-  return value;
-}
-// Read word from register
-int16_t Mag5883::readRegister16(uint8_t reg)
-{
-  int16_t value=0;
-  if(isHMC_){
-    Wire.beginTransmission(HMC5883L_ADDRESS);
-    #if ARDUINO >= 100
-        Wire.write(reg);
-    #else
-        Wire.send(reg);
-    #endif
-    Wire.endTransmission();
-    Wire.beginTransmission(HMC5883L_ADDRESS);
-    Wire.requestFrom(HMC5883L_ADDRESS, 2);
-    while(!Wire.available()) {};
-    #if ARDUINO >= 100
-        uint8_t vha = Wire.read();
-        uint8_t vla = Wire.read();
-    #else
-        uint8_t vha = Wire.receive();
-        uint8_t vla = Wire.receive();
-    #endif
-    Wire.endTransmission();
-    value = vha << 8 | vla;
-  }else if(isQMC_){
-    Wire.beginTransmission(QMC5883_ADDRESS);
-    #if ARDUINO >= 100
-        Wire.write(reg);
-    #else
-        Wire.send(reg);
-    #endif
-    Wire.endTransmission();
-    Wire.beginTransmission(QMC5883_ADDRESS);
-    Wire.requestFrom(QMC5883_ADDRESS, 2);
-    while(!Wire.available()) {};
-    #if ARDUINO >= 100
-        uint8_t vha = Wire.read();
-        uint8_t vla = Wire.read();
-    #else
-        uint8_t vha = Wire.receive();
-        uint8_t vla = Wire.receive();
-    #endif
-    Wire.endTransmission();
-    value = vha << 8 | vla;
-  }
-  return value;
-}
-
-int Mag5883::getICType(void)
-{
-  if(isHMC_){
-    return IC_HMC5883L;
-  }else if(isQMC_){
-    return IC_QMC5883;
-  }else{
-    return IC_NONE;
-  }
-}

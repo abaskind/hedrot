@@ -437,8 +437,8 @@ void transmitInfo() {
     //read magnetometer gain from EEPROM
     char magGain = EEPROM.read(MAG_GAIN_EEPROM_ADDRESS);
     //set magnetometer gain and read it for double-checking
-    mag.setGain(magGain);
-    Serial.print("magGain ");Serial.print(mag.getGain());
+    mag.setRange(magGain);
+    Serial.print("magGain ");Serial.print(mag.getRange());
     Serial.print(",");
     
     //read magnetometer measurement mode from EEPROM
@@ -597,7 +597,7 @@ void loop() {
             {
                 char magGain = Serial.read();
                 //set magnetometer gain
-                mag.setGain(magGain);
+                mag.setRange(magGain);
                 // write in EEPROM
                 EEPROM.write(MAG_GAIN_EEPROM_ADDRESS, magGain);
             }

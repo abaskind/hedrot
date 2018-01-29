@@ -66,7 +66,7 @@ typedef struct hedrot_receiver
     unsigned char   magMeasurementBias;
     unsigned char   magSampleAveraging;
     unsigned char   magDataRate;
-    unsigned char   magGain;
+    unsigned char   magRange;
     unsigned char   magMeasurementMode;
     float           gyroOffsetAutocalTime; // in ms
     long            gyroOffsetAutocalThreshold; //in LSB units
@@ -229,7 +229,7 @@ t_max_err hedrot_receiver_accDataRate_set(t_hedrot_receiver *x, t_object *attr, 
 t_max_err hedrot_receiver_magMeasurementBias_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_magSampleAveraging_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_magDataRate_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
-t_max_err hedrot_receiver_magGain_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) ;
+t_max_err hedrot_receiver_magRange_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) ;
 t_max_err hedrot_receiver_magMeasurementMode_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_gyroOffsetAutocalOn_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);
 t_max_err hedrot_receiver_gyroOffsetAutocalTime_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv);

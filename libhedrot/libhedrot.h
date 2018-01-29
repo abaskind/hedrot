@@ -153,7 +153,7 @@ typedef struct _headtrackerData {
     unsigned char   magMeasurementBias;
     unsigned char   magSampleAveraging;
     unsigned char   magDataRate;
-    unsigned char   magGain;
+    unsigned char   magRange;
     unsigned char   magMeasurementMode;
     
     //---------------  calibration internal values und settings -------------------
@@ -296,7 +296,7 @@ void setAccDataRate(headtrackerData *trackingData, unsigned char accDataRate, ch
 void setMagMeasurementBias(headtrackerData *trackingData, unsigned char magMeasurementBias, char requestSettingsFlag);
 void setMagSampleAveraging(headtrackerData *trackingData, unsigned char magSampleAveraging, char requestSettingsFlag);
 void setMagDataRate(headtrackerData *trackingData, unsigned char magDataRate, char requestSettingsFlag);
-void setMagGain(headtrackerData *trackingData, unsigned char magGain, char requestSettingsFlag);
+void setMagRange(headtrackerData *trackingData, unsigned char magRange, char requestSettingsFlag);
 void setMagMeasurementMode(headtrackerData *trackingData, unsigned char magMeasurementMode, char requestSettingsFlag);
 
 //=====================================================================================================

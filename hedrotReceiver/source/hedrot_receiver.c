@@ -1015,8 +1015,8 @@ void hedrot_receiver_mirrorHeadtrackerInfo(t_hedrot_receiver *x) {
     x->magDataRate = x->trackingData->magDataRate;
     object_attr_touch( (t_object *)x, gensym("magDataRate"));
     
-    x->magGain = x->trackingData->magGain;
-    object_attr_touch( (t_object *)x, gensym("magGain"));
+    x->magRange = x->trackingData->magRange;
+    object_attr_touch( (t_object *)x, gensym("magRange"));
     
     x->magMeasurementMode = x->trackingData->magMeasurementMode;
     object_attr_touch( (t_object *)x, gensym("magMeasurementMode"));
@@ -1172,7 +1172,7 @@ void hedrot_receiver_doopenforwrite(t_hedrot_receiver *x, t_symbol *s) {
     len = strlen(str);
     sysfile_write(x->fh_write, &len, str);
     
-    sprintf(str, "magGain, %hhi;\n", x->trackingData->magGain);
+    sprintf(str, "magRange, %hhi;\n", x->trackingData->magRange);
     len = strlen(str);
     sysfile_write(x->fh_write, &len, str);
     
@@ -1432,10 +1432,10 @@ t_max_err hedrot_receiver_magDataRate_set(t_hedrot_receiver *x, t_object *attr, 
 }
 
 
-t_max_err hedrot_receiver_magGain_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
+t_max_err hedrot_receiver_magRange_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->magGain = (unsigned char) max(min(atom_getlong(argv),7),0);
-        setMagGain(x->trackingData, x->magGain, 1);
+        x->magRange = (unsigned char) max(min(atom_getlong(argv),7),0);
+        setMagRange(x->trackingData, x->magRange, 1);
     }
     return MAX_ERR_NONE;
 }
@@ -1778,12 +1778,10 @@ int C74_EXPORT main()
     CLASS_ATTR_ACCESSORS(c, "magSampleAveraging", NULL, hedrot_receiver_magSampleAveraging_set);
     
     CLASS_ATTR_CHAR(c,    "magDataRate",    0,  t_hedrot_receiver,  magDataRate);
-    CLASS_ATTR_ENUMINDEX(c, "magDataRate", 0, "\"0.75 Hz\" \"1.5 Hz\" \"3 Hz\" \"7.5 Hz\" \"15 Hz\" \"30 Hz\" \"75 Hz\"");
-    CLASS_ATTR_STYLE(c, "magDataRate", 0, "enumindex");
     CLASS_ATTR_ACCESSORS(c, "magDataRate", NULL, hedrot_receiver_magDataRate_set);
     
-    CLASS_ATTR_CHAR(c,    "magGain",    0,  t_hedrot_receiver,  magGain);
-    CLASS_ATTR_ACCESSORS(c, "magGain", NULL, hedrot_receiver_magGain_set);
+    CLASS_ATTR_CHAR(c,    "magRange",    0,  t_hedrot_receiver,  magRange);
+    CLASS_ATTR_ACCESSORS(c, "magRange", NULL, hedrot_receiver_magRange_set);
     
     CLASS_ATTR_CHAR(c,    "magMeasurementMode",    0,  t_hedrot_receiver,  magMeasurementMode);
     CLASS_ATTR_ACCESSORS(c, "magMeasurementMode", NULL, hedrot_receiver_magMeasurementMode_set);

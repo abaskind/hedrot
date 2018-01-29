@@ -103,7 +103,7 @@ headtrackerData* headtracker_new() {
     trackingData->magMeasurementBias = 0;
     trackingData->magSampleAveraging = 0;
     trackingData->magDataRate = 6;
-    trackingData->magGain = 4;
+    trackingData->magRange = 4;
     trackingData->magMeasurementMode = 1;
     
     // default calibration attributes (receiver but saved in the headtracker)
@@ -264,7 +264,7 @@ int export_headtracker_settings(headtrackerData *trackingData, char* filename) {
     fprintf(fd, "magMeasurementBias, %d;\n",        trackingData->magMeasurementBias);
     fprintf(fd, "magSampleAveraging, %d;\n",        trackingData->magSampleAveraging);
     fprintf(fd, "magDataRate, %d;\n",               trackingData->magDataRate);
-    fprintf(fd, "magGain, %d;\n",                   trackingData->magGain);
+    fprintf(fd, "magRange, %d;\n",                   trackingData->magRange);
     fprintf(fd, "magMeasurementMode, %d;\n",        trackingData->magMeasurementMode);
     fprintf(fd, "gyroOffset, %f %f %f;\n",          trackingData->gyroOffset[0],trackingData->gyroOffset[1],trackingData->gyroOffset[2]);
     fprintf(fd, "gyroOffsetAutocalTime, %f;\n",     trackingData->gyroOffsetAutocalTime);
@@ -1292,10 +1292,10 @@ int  processKeyValueSettingPair(headtrackerData *trackingData, char *keyBuffer, 
         if(trackingData->verbose) printf("magDataRate: %d\r\n",trackingData->magDataRate);
         if(UpdateHeadtrackerFlag) setMagDataRate(trackingData, trackingData->magDataRate, 0);
         
-    } else if(strcmp(keyBuffer,"magGain") == 0) {
-        trackingData->magGain=(char) strtol(valueBuffer,NULL,10);
-        if(trackingData->verbose) printf("magGain: %d\r\n",trackingData->magGain);
-        if(UpdateHeadtrackerFlag) setMagGain(trackingData, trackingData->magGain, 0);
+    } else if(strcmp(keyBuffer,"magRange") == 0) {
+        trackingData->magRange=(char) strtol(valueBuffer,NULL,10);
+        if(trackingData->verbose) printf("magRange: %d\r\n",trackingData->magRange);
+        if(UpdateHeadtrackerFlag) setMagRange(trackingData, trackingData->magRange, 0);
         
     } else if(strcmp(keyBuffer,"magMeasurementMode") == 0) {
         trackingData->magMeasurementMode=(char) strtol(valueBuffer,NULL,10);
@@ -1879,12 +1879,12 @@ void setMagDataRate(headtrackerData *trackingData, unsigned char magDataRate, ch
     if(requestSettingsFlag) headtracker_requestHeadtrackerSettings(trackingData);
 }
 
-void setMagGain(headtrackerData *trackingData, unsigned char magGain, char requestSettingsFlag) {
+void setMagRange(headtrackerData *trackingData, unsigned char magRange, char requestSettingsFlag) {
     unsigned char message[2];
     
-    trackingData->magGain = magGain;
+    trackingData->magRange = magRange;
     message[0] = R2H_TRANSMIT_MAG_GAIN;
-    message[1] = trackingData->magGain;
+    message[1] = trackingData->magRange;
     write_serial(trackingData->serialcomm, message, 2);
     
     // request settings

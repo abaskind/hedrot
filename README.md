@@ -43,7 +43,7 @@ Part of code is derived from Sebastian Madgwick's open-source gradient descent a
 - Windows: Teensy serial driver (called "Windows Serial Installer" on https://www.pjrc.com)
 
 ## Extra Requirements for building from sources:
-- Xcode version 6.2 or later (for Mac), or Visual Studio 2012 (for Windows)
+- Xcode version 8.2 or later (for Mac), or Visual Studio 2012 (for Windows)
 - Windows: a windows version of awk (like gawk) and the program 7-zip to make the package
 - Max version 6 at least (to rebuild the "hedrotReceiver" application. Not needed otherwise)
 - Arduino IDE 1.8.3

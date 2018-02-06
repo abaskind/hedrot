@@ -584,7 +584,7 @@ void hedrot_receiver_defered_exportAccRawCalData(t_hedrot_receiver *x, t_symbol 
 char hedrot_receiver_createCalDataDictionary( float offset[], float scaling[], calibrationData *calData,
                                              t_dictionary *calDict, t_jit_object *sampleMatrix,
                                              t_buffer_obj *normBufferObj, t_symbol *normBufferObjName) {
-    int i;
+    long i;
     t_atom offsetData[3];
     t_atom ScalingData[3];
     t_float *tab; // buffer values

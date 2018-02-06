@@ -367,12 +367,12 @@ int nonRotatedEllipsoidFit(calibrationData* calData, float* estimatedOffset, flo
     TMPestimatedScaling[2] = (float) sqrt(gamma/matrixB[2]);
     
     // last check: are the estimated values absurd (i.e. outside of pre-defined bounds that depend on the magnetometer)?
-    if((abs(TMPestimatedOffset[0])>MAX_ALLOWED_OFFSET)
-        || (abs(TMPestimatedOffset[1])>MAX_ALLOWED_OFFSET)
-        || (abs(TMPestimatedOffset[2])>MAX_ALLOWED_OFFSET)
-        || (abs(TMPestimatedScaling[0])>MAX_ALLOWED_SCALING)
-        || (abs(TMPestimatedScaling[1])>MAX_ALLOWED_SCALING)
-        || (abs(TMPestimatedScaling[2])>MAX_ALLOWED_SCALING)) {
+    if((fabsf(TMPestimatedOffset[0])>MAX_ALLOWED_OFFSET)
+        || (fabsf(TMPestimatedOffset[1])>MAX_ALLOWED_OFFSET)
+        || (fabsf(TMPestimatedOffset[2])>MAX_ALLOWED_OFFSET)
+        || (fabsf(TMPestimatedScaling[0])>MAX_ALLOWED_SCALING)
+        || (fabsf(TMPestimatedScaling[1])>MAX_ALLOWED_SCALING)
+        || (fabsf(TMPestimatedScaling[2])>MAX_ALLOWED_SCALING)) {
             printf( "The estimated values are absurd\r\n");
             err = 1;
             goto end;
@@ -574,7 +574,7 @@ int filterCalData(calibrationData *inCalData, calibrationData *outCalData, float
     // the standard deviation of the distance (if it were gaussian, keeps 99.7% of the data)
     outCalData->numberOfSamples = 0;
     for (i=0;i<inCalData->numberOfSamples; i++) {
-        if(abs(distance[i]-dist_mean) < 3*dist_STD) {
+        if(fabsf(distance[i]-dist_mean) < 3*dist_STD) {
             outCalData->rawSamples[outCalData->numberOfSamples][0] = inCalData->rawSamples[i][0];
             outCalData->rawSamples[outCalData->numberOfSamples][1] = inCalData->rawSamples[i][1];
             outCalData->rawSamples[outCalData->numberOfSamples][2] = inCalData->rawSamples[i][2];

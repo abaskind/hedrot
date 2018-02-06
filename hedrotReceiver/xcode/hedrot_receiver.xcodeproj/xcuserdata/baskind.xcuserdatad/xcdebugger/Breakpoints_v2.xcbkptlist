@@ -16,7 +16,7 @@
             startingLineNumber = "916"
             endingLineNumber = "916"
             landmarkName = "headtracker_compute_data()"
-            landmarkType = "7">
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -32,7 +32,7 @@
             startingLineNumber = "127"
             endingLineNumber = "127"
             landmarkName = "hedrot_receiver_tick()"
-            landmarkType = "7">
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -62,7 +62,7 @@
             startingLineNumber = "333"
             endingLineNumber = "333"
             landmarkName = "nonRotatedEllipsoidFit()"
-            landmarkType = "7">
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -126,7 +126,7 @@
             startingLineNumber = "395"
             endingLineNumber = "395"
             landmarkName = "nonRotatedEllipsoidFit()"
-            landmarkType = "7">
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -142,7 +142,7 @@
             startingLineNumber = "261"
             endingLineNumber = "261"
             landmarkName = "nonRotatedEllipsoidFit()"
-            landmarkType = "7">
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -158,7 +158,7 @@
             startingLineNumber = "331"
             endingLineNumber = "331"
             landmarkName = "nonRotatedEllipsoidFit()"
-            landmarkType = "7">
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -174,7 +174,7 @@
             startingLineNumber = "332"
             endingLineNumber = "332"
             landmarkName = "nonRotatedEllipsoidFit()"
-            landmarkType = "7">
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -190,7 +190,7 @@
             startingLineNumber = "487"
             endingLineNumber = "487"
             landmarkName = "rotatedEllipsoidFit()"
-            landmarkType = "7">
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -206,7 +206,7 @@
             startingLineNumber = "484"
             endingLineNumber = "484"
             landmarkName = "rotatedEllipsoidFit()"
-            landmarkType = "7">
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -252,7 +252,7 @@
             startingLineNumber = "652"
             endingLineNumber = "652"
             landmarkName = "computeCalNormStatistics()"
-            landmarkType = "7">
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -268,7 +268,7 @@
             startingLineNumber = "637"
             endingLineNumber = "637"
             landmarkName = "computeCalNormStatistics()"
-            landmarkType = "7">
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -428,7 +428,7 @@
             startingLineNumber = "583"
             endingLineNumber = "583"
             landmarkName = "filterCalData()"
-            landmarkType = "7">
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

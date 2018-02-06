@@ -259,7 +259,7 @@ void *hedrot_receiver_new(t_symbol *s, short ac, t_atom *av)
     if(x->magCalDataCalNorm_BufferObj) {
         // resize the buffer
         atom_setlong(temp_atom, MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION);
-        if(!object_method_typed (x->magCalDataCalNorm_BufferObj, gensym("sizeinsamps"), 1L, temp_atom, temp_atom + 1) == MAX_ERR_NONE) {
+        if((!object_method_typed (x->magCalDataCalNorm_BufferObj, gensym("sizeinsamps"), 1L, temp_atom, temp_atom + 1)) == MAX_ERR_NONE) {
             error("[hedrot_receiver] (method hedrot_receiver_new): problem while changing buffer size");
         }
     } else {
@@ -278,7 +278,7 @@ void *hedrot_receiver_new(t_symbol *s, short ac, t_atom *av)
     if(x->accCalDataCalNorm_BufferObj) {
         // resize the buffer
         atom_setlong(temp_atom, MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION);
-        if(!object_method_typed (x->accCalDataCalNorm_BufferObj, gensym("sizeinsamps"), 1L, temp_atom, temp_atom + 1) == MAX_ERR_NONE) {
+        if((!object_method_typed (x->accCalDataCalNorm_BufferObj, gensym("sizeinsamps"), 1L, temp_atom, temp_atom + 1)) == MAX_ERR_NONE) {
             error("[hedrot_receiver] (method hedrot_receiver_new): problem while changing buffer size");
         }
     } else {
@@ -295,7 +295,7 @@ void *hedrot_receiver_new(t_symbol *s, short ac, t_atom *av)
     if(x->RTmagCalDataCalNorm_BufferObj) {
         // resize the buffer
         atom_setlong(temp_atom, MAX_NUMBER_OF_SAMPLES_FOR_CALIBRATION);
-        if(!object_method_typed (x->RTmagCalDataCalNorm_BufferObj, gensym("sizeinsamps"), 1L, temp_atom, temp_atom + 1) == MAX_ERR_NONE) {
+        if((!object_method_typed (x->RTmagCalDataCalNorm_BufferObj, gensym("sizeinsamps"), 1L, temp_atom, temp_atom + 1)) == MAX_ERR_NONE) {
             error("[hedrot_receiver] (method hedrot_receiver_new): problem while changing buffer size");
         }
     } else {
@@ -1256,7 +1256,7 @@ void hedrot_receiver_doopenforwrite(t_hedrot_receiver *x, t_symbol *s) {
 void hedrot_receiver_startrec(t_hedrot_receiver *x) {
     //if the handle x->fh_write is NULL but if x->filename does not point to NULL, try to reopen the file
     if(x->fh_write == NULL) {
-        if(x->filename != NULL) {
+        if(!strcmp(x->filename,"")) {
             hedrot_receiver_opendestinationtextfile(x,gensym(x->filename));
         } else {
             error("t_hedrot_receiver: no file opened");

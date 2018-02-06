@@ -11,11 +11,17 @@
 #include "stdlib.h"
 #include "string.h"
 
-// global tables
+// global tables and serial constants
 #if defined(_WIN32) || defined(_WIN64)
 /* we don't use the  table for windos cos we can set the number directly. */
 /* This may result in more possible baud rates than the table contains. */
 #else /* #if defined(_WIN32) || defined(_WIN64) */
+#define OPENPARAMS (O_RDWR|O_NDELAY|O_NOCTTY)
+#define BAUDRATE_230400 B230400
+#define BAUDRATE_115200 B115200
+#define BAUDRATE_57600  B57600
+#define BAUDRATE_38400  B38400
+struct timeval tv;
 long baudspeedbittable[] =
 {
     BAUDRATE_230400,

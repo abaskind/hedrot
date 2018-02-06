@@ -32,18 +32,6 @@
 #define MAX_NUMBER_OF_PORTS 99
 #define READ_BUFFER_SIZE 10000
 
-// serial constants and tables (only for mac)
-#if defined(_WIN32) || defined(_WIN64)
-#else /* #if defined(_WIN32) || defined(_WIN64) */
-#define OPENPARAMS (O_RDWR|O_NDELAY|O_NOCTTY)
-#define BAUDRATE_230400 B230400
-#define BAUDRATE_115200 B115200
-#define BAUDRATE_57600  B57600
-#define BAUDRATE_38400  B38400
-struct timeval tv;
-#endif /* #if defined(_WIN32) || defined(_WIN64) */
-
-
 //=====================================================================================================
 // structure definition: headtrackerSerialcomm (all infos for serial communication with the headtracker)
 //=====================================================================================================

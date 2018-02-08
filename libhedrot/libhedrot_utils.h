@@ -23,14 +23,12 @@ double round(double value);
 // math utils
 
 // min and max not standard in Mac
-#ifdef __MACH__  // if mach (mac os X)
 #ifndef min
 #define min(a,b) (((a)<(b))?(a):(b))
 #endif
 
 #ifndef max
 #define max(a,b) (((a)>(b))?(a):(b))
-#endif
 #endif
 
 #define M_PI_float (float)      3.14159265358979323846264338327950288

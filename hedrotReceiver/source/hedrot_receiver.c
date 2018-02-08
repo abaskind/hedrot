@@ -582,7 +582,7 @@ void hedrot_receiver_defered_exportAccRawCalData(t_hedrot_receiver *x, t_symbol 
 
 
 char hedrot_receiver_createCalDataDictionary( float offset[], float scaling[], calibrationData *calData,
-                                             t_dictionary *calDict, t_jit_object *sampleMatrix,
+                                             t_dictionary *calDict, void *sampleMatrix,
                                              t_buffer_obj *normBufferObj, t_symbol *normBufferObjName) {
     long i;
     t_atom offsetData[3];
@@ -646,9 +646,9 @@ char hedrot_receiver_createCalDataDictionary( float offset[], float scaling[], c
             
             for(i = 0; i<calData->numberOfSamples; i++) {
                 // samples matrix: fill for each plane (corresponding to x,y and z coordinates)
-                *samples_matrixPointer++ = calData->calSamples[i][0]; // x
-                *samples_matrixPointer++ = calData->calSamples[i][1]; // y
-                *samples_matrixPointer++ = calData->calSamples[i][2]; // z
+                *samples_matrixPointer++ = (float) calData->calSamples[i][0]; // x
+                *samples_matrixPointer++ = (float) calData->calSamples[i][1]; // y
+                *samples_matrixPointer++ = (float) calData->calSamples[i][2]; // z
             }
             
             // at the end of the loop, add the reference to the matrix to the dictionary
@@ -1376,7 +1376,7 @@ t_max_err hedrot_receiver_accHardOffset_set(t_hedrot_receiver *x, t_object *attr
         return MAX_ERR_GENERIC;
     
     for(i=0;i<3;i++,argv++) {
-        x->accHardOffset[i] = max(min(atom_getlong(argv),127),-128);
+        x->accHardOffset[i] = max(min((long) atom_getlong(argv),127),-128);
         accHardOffsetTMP[i] = (char) x->accHardOffset[i];
     }
     
@@ -1546,7 +1546,7 @@ t_max_err hedrot_receiver_magScaling_set(t_hedrot_receiver *x, t_object *attr, l
 
 t_max_err hedrot_receiver_estimationMethod_set(t_hedrot_receiver *x, t_object *attr, long argc, t_atom *argv) {
     if (argc && argv) {
-        x->estimationMethod = (float) atom_getlong(argv);
+        x->estimationMethod = (char) atom_getlong(argv);
         setEstimationMethod(x->trackingData, x->estimationMethod);
     }
     return MAX_ERR_NONE;

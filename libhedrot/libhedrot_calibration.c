@@ -8,9 +8,7 @@
 //
 
 
-#include "libhedrot_calibration.h"
 #include <stdio.h>
-#include "libhedrot_utils.h"
 
 // include cblas and lapack for matrix operations
 #ifdef __MACH__  // if mach (mac os X)
@@ -21,6 +19,8 @@
 #endif
 #endif
 
+#include "libhedrot_calibration.h"
+#include "libhedrot_utils.h"
 
 //=====================================================================================================
 // function accMagCalibration
@@ -357,9 +357,9 @@ int nonRotatedEllipsoidFit(calibrationData* calData, float* estimatedOffset, flo
     }
     
     // compute the radii and offsets from the results
-    TMPestimatedOffset[0] = (float) -matrixB[3]/matrixB[0];
-    TMPestimatedOffset[1] = (float) -matrixB[4]/matrixB[1];
-    TMPestimatedOffset[2] = (float) -matrixB[5]/matrixB[2];
+    TMPestimatedOffset[0] = (float) (-matrixB[3]/matrixB[0]);
+    TMPestimatedOffset[1] = (float) (-matrixB[4]/matrixB[1]);
+    TMPestimatedOffset[2] = (float) (-matrixB[5]/matrixB[2]);
     
     gamma = 1 + ( matrixB[3]*matrixB[3] / matrixB[0] + matrixB[4]*matrixB[4] / matrixB[1] + matrixB[5]*matrixB[5] / matrixB[2] );
     TMPestimatedScaling[0] = (float) sqrt(gamma/matrixB[0]);
@@ -386,7 +386,7 @@ int nonRotatedEllipsoidFit(calibrationData* calData, float* estimatedOffset, flo
     estimatedScaling[2] = TMPestimatedScaling[2];
     
     // store the condition number
-    calData->conditionNumber = vectorS[0]/vectorS[5];
+    calData->conditionNumber = (float) (vectorS[0]/vectorS[5]);
     
     // cook extra data (for displaying/debugging purposes)
     cookCalibrationData(calData, estimatedOffset, estimatedScaling);
@@ -561,7 +561,7 @@ int filterCalData(calibrationData *inCalData, calibrationData *outCalData, float
     // compute distance to the average
     distance = (float*) malloc(inCalData->numberOfSamples*sizeof(float));
     for( i =0; i<inCalData->numberOfSamples; i++)
-        distance[i] = sqrt((inCalData->rawSamples[i][0]-center[0])*(inCalData->rawSamples[i][0]-center[0])
+        distance[i] = (float) sqrt((inCalData->rawSamples[i][0]-center[0])*(inCalData->rawSamples[i][0]-center[0])
                            +(inCalData->rawSamples[i][1]-center[1])*(inCalData->rawSamples[i][1]-center[1])
                            +(inCalData->rawSamples[i][2]-center[2])*(inCalData->rawSamples[i][2]-center[2]));
     
@@ -610,7 +610,7 @@ void cookCalibrationData(calibrationData* calData, float* estimatedOffset, float
         calData->calSamples[i][2] = (calData->rawSamples[i][2]-estimatedOffset[2]) * invEstimatedScaling[2];
         
         // norm, norm average, norm standard deviation and max norm error update
-        calData->dataNorm[i] = sqrt(calData->calSamples[i][0]*calData->calSamples[i][0]
+        calData->dataNorm[i] = (float) sqrt(calData->calSamples[i][0]*calData->calSamples[i][0]
                                     + calData->calSamples[i][1]*calData->calSamples[i][1]
                                     + calData->calSamples[i][2]*calData->calSamples[i][2]);
         
@@ -645,7 +645,7 @@ void computeCalNormStatistics(calibrationData* calData, float* estimatedOffset, 
         calSample[2] = (calData->rawSamples[i][2]-estimatedOffset[2]) * invEstimatedScaling[2];
         
         // norm, norm average, norm standard deviation and max norm error update
-        dataNorm[i] = sqrt(calSample[0]*calSample[0]
+        dataNorm[i] = (float) sqrt(calSample[0]*calSample[0]
                             + calSample[1]*calSample[1]
                             + calSample[2]*calSample[2]);
     }

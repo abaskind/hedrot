@@ -164,9 +164,9 @@ void getMean3(double *samples, long numberOfSamples, float* mean) {
     n = 3 * numberOfSamples;
     
     while(n--) {
-        mean[0] += *samples++;
-        mean[1] += *samples++;
-        mean[2] += *samples++;
+        mean[0] += (float) *samples++;
+        mean[1] += (float) *samples++;
+        mean[2] += (float) *samples++;
     }
     
     // normalization
@@ -203,7 +203,7 @@ float getMean1f(float *samples, long numberOfSamples) {
 float getStdDev1f(float *samples, long numberOfSamples, float mean) {
     long n;
     double TMPval;
-    float var = 0;
+    double var = 0;
 
     n = numberOfSamples;
     while(n--) {

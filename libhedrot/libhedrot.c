@@ -12,11 +12,11 @@
 //---------------------------------------------------------------------------------------------------
 // Header files
 
-#include "libhedrot.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
+#include "libhedrot.h"
 #include "libhedrot_utils.h"
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -891,7 +891,7 @@ void gyroOffsetCalibration(headtrackerData *trackingData) {
 
 
 void headtracker_compute_data(headtrackerData *trackingData) {
-    char RTmagCalres;
+    short RTmagCalres;
     
     convert_7bytes_to_3int16(trackingData->rawDataBuffer,0,trackingData->magRawData);
     convert_7bytes_to_3int16(trackingData->rawDataBuffer,7,trackingData->accRawData);
@@ -2205,15 +2205,15 @@ void changeRTMagCalTimeSettings(headtrackerData *trackingData) {
     
     
     // 2/ compute the acquisition rate
-    trackingData->RTMagCalAcquisitionRateFactor = round(trackingData->samplerate / magRate);
+    trackingData->RTMagCalAcquisitionRateFactor = (short) round(trackingData->samplerate / magRate);
     
     // 3/ compute the calibration rate
-    trackingData->RTMagCalibrationRateFactor = round(trackingData->RTMagCalibrationPeriod * magRate);
+    trackingData->RTMagCalibrationRateFactor = (short) round(trackingData->RTMagCalibrationPeriod * magRate);
     RTmagCalibration_setCalibrationRateFactor(trackingData->RTmagCalibrationData, trackingData->RTMagCalibrationRateFactor);
     
     // 4/ update the max number of samples for step1
     // update maxNumberOfSamplesStep1 according to RTmagMaxMemoryDuration and the sampling rate of the magnetometer
-    trackingData->RTmaxNumberOfSamplesStep1 = round(trackingData->RTmagMaxMemoryDuration * magRate);
+    trackingData->RTmaxNumberOfSamplesStep1 = (short) round(trackingData->RTmagMaxMemoryDuration * magRate);
     RTmagCalibration_setmaxNumberOfSamples(trackingData->RTmagCalibrationData, trackingData->RTmaxNumberOfSamplesStep1);
 }
 

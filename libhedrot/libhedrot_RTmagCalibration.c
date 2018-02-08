@@ -84,7 +84,7 @@ void initRTmagCalData(RTmagCalData* data, float* initalEstimatedOffset, float* i
     data->calibrationRateFactor = calibrationRateFactor;
     data->calibrationRateCounter = data->calibrationRateFactor;
     
-    data->proportionOfRejectedPoints_LPcoeff = 1.0 - exp(-1.0/TIME_CONSTANT_INDICATOR_OF_REJECTED_POINTS);
+    data->proportionOfRejectedPoints_LPcoeff = (float) (1.0 - exp(-1.0/TIME_CONSTANT_INDICATOR_OF_REJECTED_POINTS));
 }
 
 
@@ -122,9 +122,9 @@ void computeFibonnaciMapping( RTmagCalData* data) {
         theta   = 2.0*M_PI*mod(M_INV_GOLDEN_RATIO*i,1);
         sinPhi  = 1.0 - (2*i+1.0)/RT_CAL_NUMBER_OF_ZONES;
         
-        data->Fibonacci_Points[i][0] = cos(theta)*sinPhi;      // x
-        data->Fibonacci_Points[i][1] = sin(theta)*sinPhi;      // y
-        data->Fibonacci_Points[i][2] = sqrt(1-sinPhi*sinPhi);  // z
+        data->Fibonacci_Points[i][0] = (float) (cos(theta)*sinPhi);      // x
+        data->Fibonacci_Points[i][1] = (float) (sin(theta)*sinPhi);      // y
+        data->Fibonacci_Points[i][2] = (float) (sqrt(1-sinPhi*sinPhi));  // z
     }
 }
 
@@ -145,9 +145,9 @@ short getClosestFibonacciPoint( RTmagCalData* data, double calPoint[3]) {
     zoneNumber = -1;
     minDistance2 = 10e8; // very large number
     for( i=0; i<RT_CAL_NUMBER_OF_ZONES; i++) {
-        dist2 = (calPoint[0]-data->Fibonacci_Points[i][0])*(calPoint[0]-data->Fibonacci_Points[i][0])
+        dist2 = (float) ((calPoint[0]-data->Fibonacci_Points[i][0])*(calPoint[0]-data->Fibonacci_Points[i][0])
         + (calPoint[1]-data->Fibonacci_Points[i][1])*(calPoint[1]-data->Fibonacci_Points[i][1])
-        + (calPoint[2]-data->Fibonacci_Points[i][2])*(calPoint[2]-data->Fibonacci_Points[i][2]);
+        + (calPoint[2]-data->Fibonacci_Points[i][2])*(calPoint[2]-data->Fibonacci_Points[i][2]));
         
         if(dist2 < minDistance2) {
             minDistance2 = dist2;
@@ -269,7 +269,7 @@ short RTmagCalibrationUpdateDirect( RTmagCalData* data, short rawPoint[3]) {
             initRTmagCalData(data, data->estimatedOffset, data->estimatedScaling, data->RTmagMaxDistanceError, data->calibrationRateFactor, data->maxNumberOfSamples);
             return 0;
         } else {
-            data->proportionOfRejectedPoints_State = proportionOfRejectedPoints;
+            data->proportionOfRejectedPoints_State = (float) proportionOfRejectedPoints;
             // go further
         }
     }
@@ -431,9 +431,9 @@ short RTmagCalibrationUpdateIterative( RTmagCalData* data, short rawPoint[3]) {
                         zoneNumber = getClosestFibonacciPoint(data, data->calData->calSamples[i]);
                         
                         // adds the point to the corresponding zone number
-                        rawTMPpoint[0] = data->calData->rawSamples[i][0];
-                        rawTMPpoint[1] = data->calData->rawSamples[i][1];
-                        rawTMPpoint[2] = data->calData->rawSamples[i][2];
+                        rawTMPpoint[0] = (short) data->calData->rawSamples[i][0];
+                        rawTMPpoint[1] = (short) data->calData->rawSamples[i][1];
+                        rawTMPpoint[2] = (short) data->calData->rawSamples[i][2];
                         addPoint2FibonnaciZone( data, zoneNumber, rawTMPpoint);
                     }
                     

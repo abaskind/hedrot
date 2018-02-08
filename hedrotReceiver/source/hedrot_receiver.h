@@ -109,7 +109,7 @@ typedef struct hedrot_receiver
     
     t_dictionary	*RTmagCalInfoDict;
     t_symbol        *RTmagCalInfoDictName;
-    t_jit_object    *RTmagCalDataCalSamples_Matrix;
+    void			*RTmagCalDataCalSamples_Matrix;
     t_buffer_obj    *RTmagCalDataCalNorm_BufferObj;
     t_symbol        *RTmagCalDataCalNorm_BufferObjName;
     
@@ -163,7 +163,7 @@ void hedrot_receiver_stoprec(t_hedrot_receiver *x);
 
 // generic methods for calibration
 char hedrot_receiver_createCalDataDictionary( float offset[], float scaling[], calibrationData *calData,
-                                             t_dictionary *calDict, t_jit_object *sampleMatrix,
+                                             t_dictionary *calDict, void *sampleMatrix,
                                              t_buffer_obj *normBufferObj, t_symbol *normBufferObjName);
 
 // methods for mag calibration

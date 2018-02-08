@@ -1,6 +1,7 @@
-hedrot distribution, changelog:
+﻿hedrot distribution, changelog:
 
 Version 1.3.0 (XX/XX/18)
+	. 3D-printable enclosure ! (provided are the source Sketchup files as well as the STL files needed for printing)
 	. now compatible with alternative version of the gy-85 board using qst QMC5883L magnetometer instead of Honeywell HMC5883L 
 	. magnetometer calibration: less constraints on so-called « absurd » estimation: now able to deal with bigger magnetic field biases that may occur with some headphones
 	. added specific gyroscope-only estimation method (if the magnetometer does not provide reliable results)

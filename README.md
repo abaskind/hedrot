@@ -1,5 +1,7 @@
 # hedrot
 
+### Note: the development of hedrot has been stopped and the project is currently not maintained.
+
 ## What is hedrot?
 Hedrot (for "head rotation tracker") is a low-cost (around 25 euros with a teensy LC) and efficient open-source hardware/software solution for head tracking. Hedrot is especially suitable for binaural rendering (3D-Audio on headphones), and has been initially designed for use with the binaural renderer Bipan as part of the Bili Project http://www.bili-project.org/.
 
